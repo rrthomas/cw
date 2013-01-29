@@ -43,14 +43,14 @@ fi
 if test "$1" -ge "1";then
  if test -z "`grep $CWLIB \"$BASH_PROFILE\" 2>/dev/null`";then
   echo "export PATH=\"$CWLIB:\$PATH\"" >>"$BASH_PROFILE"
-  echo "* added PATH environmental variable to $BASH_PROFILE"
+  echo "* added PATH environment variable to $BASH_PROFILE"
  else
   echo "* entry already exists for runlevel 1($BASH_PROFILE). (PATH)"
   WARN=1
  fi
  if test -z "`grep $CWLIB \"$TCSH_PROFILE\" 2>/dev/null`";then
   echo "setenv PATH \"$CWLIB:\$PATH\"" >>"$TCSH_PROFILE"
-  echo "* added PATH environmental variable to $TCSH_PROFILE"
+  echo "* added PATH environment variable to $TCSH_PROFILE"
  else
   echo "* entry already exists for runlevel 1($TCSH_PROFILE). (PATH)"
   WARN=1
@@ -59,14 +59,14 @@ fi
 if test "$1" -ge "2";then
  if test -z "`grep NOCOLOR_PIPE \"$BASH_PROFILE\" 2>/dev/null`";then
   echo "export NOCOLOR_PIPE=1" >>"$BASH_PROFILE"
-  echo "* added NOCOLOR_PIPE environmental variable to $BASH_PROFILE"
+  echo "* added NOCOLOR_PIPE environment variable to $BASH_PROFILE"
  else
   echo "* entry already exists for runlevel 2($BASH_PROFILE). (NOCOLOR_PIPE)"
   WARN=1
  fi
  if test -z "`grep NOCOLOR_PIPE \"$TCSH_PROFILE\" 2>/dev/null`";then
   echo "setenv NOCOLOR_PIPE 1" >>"$TCSH_PROFILE"
-  echo "* added NOCOLOR_PIPE environmental variable to $TCSH_PROFILE"
+  echo "* added NOCOLOR_PIPE environment variable to $TCSH_PROFILE"
  else
   echo "* entry already exists for runlevel 2($TCSH_PROFILE). (NOCOLOR_PIPE)"
   WARN=1
@@ -76,7 +76,7 @@ if test "$1" -ge "3";then
  if test -z "`grep CW_SHLVL \"$BASH_PROFILE\" 2>/dev/null`";then
   TMP_SHLVL=`expr $SHLVL - 1`
   echo "export CW_SHLVL=$TMP_SHLVL" >>"$BASH_PROFILE"
-  echo "* added CW_SHLVL environmental variable to $BASH_PROFILE"
+  echo "* added CW_SHLVL environment variable to $BASH_PROFILE"
  else
   echo "* entry already exists for runlevel 3($BASH_PROFILE). (CW_SHLVL)"
   WARN=1
@@ -84,7 +84,7 @@ if test "$1" -ge "3";then
  if test -z "`grep CW_SHLVL \"$TCSH_PROFILE\" 2>/dev/null`";then
   TMP_SHLVL=`expr $SHLVL - 1`
   echo "setenv CW_SHLVL $TMP_SHLVL" >>"$TCSH_PROFILE"
-  echo "* added CW_SHLVL environmental variable to $TCSH_PROFILE"
+  echo "* added CW_SHLVL environment variable to $TCSH_PROFILE"
  else
   echo "* entry already exists for runlevel 3($TCSH_PROFILE). (CW_SHLVL)"
   WARN=1

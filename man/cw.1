@@ -16,7 +16,7 @@ The \fBpath\fR (or \fBother\fR) definition instruction is the only required defi
 
 .TP 
 \fBpath\fR [\fIpath:path:...\fR]
-path list separated by colons to the program being wrapped.  \fB<env>\fR can be inserted to use the \fBPATH\fR environmental variable (traditional $PATH\-style format)
+path list separated by colons to the program being wrapped.  \fB<env>\fR can be inserted to use the \fBPATH\fR environment variable (traditional $PATH\-style format)
 .TP 
 \fBother\fR [\fIprogram\fR]
 uses specific program(s), in shell execution format, instead of using \fBpath\fR to find and execute the program.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments  (\fBpath\fR and \fBother\fR can not be used with each other)
@@ -70,12 +70,6 @@ changes the color before and after any uppercase letter (A\-Z)
 \fBlcase\fR [\fIbefore color:after color\fR]
 changes the color before and after any lowercase letter (a\-z)
 .TP 
-\fBremap\fR [\fIcolor\fR] [\fI##;##\fR | \fIcolor\fR]
-remaps the internal \fBcolor\fR value to the ANSI value "^[[\fB##;##\fRm"(where \fB#\fR is a single digit and only the \fB##;##\fR should be supplied) or \fBcolor\fR (original/un\-remapped).  (ex. "remap grey 30;47" would change the \fBgrey\fR color to a grey highlighted effect)
-.TP 
-\fBsupermap\fR [\fImapname\fR]
-changes the internal color format to an entirely different color format (i.e. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if \fBsupermap\fR and \fBremap\fR are both defined, then \fBsupermap\fR will be forcefully disabled due to potential internal conflicts
-.TP 
 \fBproctitle\fR [\fItitle\fR]
 changes the process title to the provided \fBtitle\fR, this is will change how the program appears in programs like \fBps\fR and \fBw\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBs\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
@@ -95,7 +89,7 @@ prepends the \fBstring\fR to each (colored) line, this is intended for special p
 appends the \fBstring\fR to each (colored) line, this is intended for special processing outside of cw.  the \fBstring\fR is not colored
 .TP 
 \fBlimit\fR [\fInumber\fR]
-only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the environmental variable $COLUMNS instead of a static value)
+only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the environment variable $COLUMNS instead of a static value)
 .TP 
 \fBwait\fR [\fIsecs\fR] [\fIusecs\fR]
 number of extra \fBsecs\fR and \fBusecs\fR to wait for output after the real program has exited.  this definition is rarely necessary
@@ -146,7 +140,7 @@ executes the \fBprogram\fR string as it is placed in the definition file.  this 
 this is the same as \fB!\fR, except it does not display the output or allow input
 .TP 
 \fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
-sets the environmental variable \fBVAR\fR to \fBVALUE\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBe\fR" IS INCLUDED IN THE SUPPORT}
+sets the environment variable \fBVAR\fR to \fBVALUE\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBe\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fB#\fR[\fItext\fR]
 ignores the following \fBtext\fR for processing. (for comments)
@@ -205,12 +199,6 @@ re\-defines the internal colormap to the opposite colors.  this is intended to h
 .TP 
 \fBCW_COLORIZE\fR
 defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
-.TP 
-\fBCW_REMAP\fR
-remaps one or more internal color(s) to ANSI values or other internal color values.  this is useful for remapping colors to special ANSI (code) values or more advanced color scheming (than \fBCW_COLORIZE\fR).  the colors \fBdefault\fR and \fBnone\fR may not be remapped or used.  the format is \fBCW_REMAP=color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:...\fR ('#' stands for a single digit, which forms the ANSI code; '|' stands for "or", and the '|' is not included; '[' and ']' are not included)
-.TP 
-\fBCW_SUPERMAP\fR
-changes the internal color format to an entirely different color format (i.e. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if a supermap and a remap are both defined, then the supermap will be forcefully disabled due to potential internal conflicts
 .TP 
 \fBCW_HEADER\fR
 defines the path to a text file to display before the program is launched (the \fBheader\fR definition instruction overrides this)

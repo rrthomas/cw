@@ -50,7 +50,7 @@ install: cw cwu
 	@$(ECHO) "* Or to automate the two lines above use the"\
         "\"colorcfg\" command. (and add optional anti-coloring precautions)"
 	@$(ECHO) "* Once the desired shell(s) are set up, use the"\
-        "\"color\" command, or the environmental variable NOCOLOR=1 to turn"\
+        "\"color\" command, or the environment variable NOCOLOR=1 to turn"\
         "color wrapping on and off."
 	@$(ECHO) ""
 	@$(ECHO) "* PLEASE view the README file for more information if"\

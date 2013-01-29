@@ -103,8 +103,6 @@ and in some cases the "usepty" definition instruction will need to be used)
 if you find that there are too many color schemes for each program
 then you may want to set CW_COLORIZE in your environment.  see the
 "cw" manual page for the proper syntax of CW_COLORIZE.
-(for more advanced color scheming see the CW_REMAP environmental variable,
-also referenced in the manual page)
 
 
 10. What are headers and footers, and how do I use them? 
