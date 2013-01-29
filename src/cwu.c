@@ -1,4 +1,4 @@
-/* cwu -- color wrapper directive updater for cw(color wrapper).
+/* cwu -- color wrapper directive updater for cw (color wrapper).
 ** Copyright (C) 2004 v9/fakehalo [v9@fakehalo.us]
 **
 ** This program is free software; you can redistribute it and/or

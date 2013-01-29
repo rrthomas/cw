@@ -1,23 +1,19 @@
-(color wrapper was designed on GNU/linux.  but, cw is written 
-in ANSI C and has been ported to several other operating systems. (see
-./PLATFORM for supported operating systems)
+color wrapper was designed on GNU/linux, but cw is written
+in ANSI C and has been ported to several other operating systems.
+see PLATFORM for supported operating systems.
 
 what to do:
 
-for installing globally(as root):
+to install globally (as root):
 # ./configure && make install
 
-for installing in your local home directory(generally non-root):
-# ./configure && make installlocal
+to install in your home directory:
+# ./configure --prefix=$HOME/.local && make install
 
-for only compiling the binaries:
-# ./configure && make local
+to just compile the binaries:
+# ./configure && make
 
+Now please read README if you haven't already.
 
-after the make "installocal" or "install" has been completed, please
-view the README if you haven't already.
-
-NOTE: if you want to install to /usr/ instead of /usr/local/(default)
-run "./configure --prefix=/usr".  "--prefix" and "--mandir" are the
-only configure arguments used, despite what the defacto (autoconf) configure
-help says.
+NOTE: --prefix and --mandir are the only configure arguments
+available, despite what the auto-generated ./configure --help says.
