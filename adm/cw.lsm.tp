@@ -21,6 +21,6 @@ Alternate-site:	fakehalo.us /cw
 		%GZSIZE%
 		%BZ2SIZE%
 Platforms:	C Compiler ANSI/POSIX (GNU gcc). built for GNU/linux, but
-has been compiled on FreeBSD, NetBSD, OpenBSD, and OSX. most likely other
+has been compiled on FreeBSD, NetBSD, OpenBSD, and Mac OS X. most likely other
 operating systems will be compliant.
 End
