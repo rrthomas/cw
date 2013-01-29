@@ -15,44 +15,22 @@ INSTALL=@INSTALL@
 all: cw
 
 cw:
-	@$(ECHO) "* Compiling cw (color wrapper)..."
-	@$(CC) src/cw.c -o bin/cw @CFLAGS@ @LIBS@ @DEFS@
+	$(CC) src/cw.c -o bin/cw @CFLAGS@ @LIBS@ @DEFS@
 
 clean:
-	@$(ECHO) "* Cleaning generated content..."
-	@$(RM) -rf Makefile config.status config.cache config.log config.h\
-        bin/cw$(EXEEXT)
+	$(RM) -rf Makefile config.status config.cache config.log config.h bin/cw$(EXEEXT)
 
 install: cw
-	@$(ECHO) "* Installing color wrapper..."
-	@for FILE in bin/*;do $(INSTALL) $$FILE $(BINDIR);done
-	@$(LN) -sf $(BINDIR)/cw$(EXEEXT) $(BINDIR)/cwe$(EXEEXT)
-	@$(ECHO) "* Installing color wrapper generic definition files..."
-	@$(MKDIR_P) $(LIBDIR)/cw/
-	@for FILE in def/*.in;do printf "#!$(BINDIR)/cw\n" > $${FILE%.in};\
-	  echo $(INSTALL) $${FILE%.in} $(LIBDIR)/cw/;done
-	@$(ECHO) "* Installing color wrapper generic header/footer files..."
-	@$(MKDIR_P) $(LIBDIR)/cw/etc
-	@for FILE in etc/*;do $(INSTALL) -m 644 $$FILE $(LIBDIR)/cw/etc;done
-	@$(ECHO) "* Installing manual pages..."
-	@for FILE in man/*;do $(INSTALL) -m 644 $$FILE $(MANDIR)/man1/;done
-	@$(ECHO) "-----------------------------------------------------------"
-	@$(ECHO) "* Finished; definitions are stored in: $(LIBDIR)/cw"
-	@$(ECHO) "* For bash: place 'export PATH=\"$(LIBDIR)/cw:\$$PATH\"'"\
-        "at the end of ~/.bash_profile (or /etc/profile globally)"
-	@$(ECHO) "* For tcsh: place 'setenv PATH \"$(LIBDIR)/cw:\$$PATH\"'"\
-        "at the end of ~/.login (or /etc/csh.login globally)"
-	@$(ECHO) "* Or to automate the two lines above use the"\
-        "\"colorcfg\" command. (and add optional anti-coloring precautions)"
-	@$(ECHO) "* Once the desired shell(s) are set up, use the"\
-        "environment variable NOCOLOR=1 to turn coloring off."
-	@$(ECHO) ""
-	@$(ECHO) "* PLEASE view the README file for more information if"\
-        "you haven't already."
+	for FILE in bin/*; do $(INSTALL) $$FILE $(BINDIR); done
+	$(LN) -sf $(BINDIR)/cw$(EXEEXT) $(BINDIR)/cwe$(EXEEXT)
+	$(MKDIR_P) $(LIBDIR)/cw/
+	for FILE in def/*.in; do \
+	  printf "#!$(BINDIR)/cw\n" > $${FILE%.in};\
+	  echo $(INSTALL) $${FILE%.in} $(LIBDIR)/cw/;\
+	done
+	$(MKDIR_P) $(LIBDIR)/cw/etc
+	for FILE in etc/*; do $(INSTALL) -m 644 $$FILE $(LIBDIR)/cw/etc; done
+	for FILE in man/*; do $(INSTALL) -m 644 $$FILE $(MANDIR)/man1/; done
 
 uninstall:
-	@$(ECHO) "* Uninstalling..."
-	@$(RM) -rf $(BINDIR)/cw$(EXEEXT) $(BINDIR)/cwe$(EXEEXT)\
-        $(BINDIR)/colorcfg\
-        $(LIBDIR)/cw $(MANDIR)/man1/cw.1\
-        $(MANDIR)/man1/cwe.1
+	$(RM) -rf $(BINDIR)/cw$(EXEEXT) $(BINDIR)/cwe$(EXEEXT) $(BINDIR)/colorcfg $(LIBDIR)/cw $(MANDIR)/man1/cw.1 $(MANDIR)/man1/cwe.1
