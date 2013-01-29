@@ -643,7 +643,7 @@ void sighandler(signed int sig){
  else if(sig==SIGUSR1)ext=1;
  else if(sig==SIGALRM)ext=2;
  else if(sig==SIGPIPE||sig==SIGINT){
-  fprintf(stderr,pal2[16]);
+  fprintf(stderr,"%s",pal2[16]);
   fflush(stderr);
   cwexit(0,0);
  }
@@ -1236,7 +1236,8 @@ unsigned char cwprintf(char *str){
 #ifdef USE_XCONV
  unsigned int c=0;
 #endif
- unsigned int i=0,j=0,k=0,p=0;
+ unsigned int i=0,j=0,k=0;
+ size_t p=0;
  char *tmp,*ctmp;
  j=strlen(str);
  if(cfgtable.y.on)k=(sm[cfgtable.y.map].max*j);
@@ -1278,8 +1279,8 @@ unsigned char cwprintf(char *str){
 #endif
      }
      else if(j>=(i+4)&&str[i+1]=='C'&&str[i+2]=='['
-     &&(p=(unsigned int)strchr(str+i+4,']'))){
-      p-=((unsigned int)str+i+3);
+     &&(p=(size_t)strchr(str+i+4,']'))){
+      p-=((size_t)str+i+3);
       if(p>1){
        if(!(ctmp=(char *)malloc(p+1)))
         cwexit(1,"malloc() failed.");
