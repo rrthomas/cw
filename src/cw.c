@@ -371,7 +371,7 @@ static char *cfgmsg[]={
 /* program start. */
 signed int main(signed int argc,char **argv){
  unsigned int i=0,j=0,margc=0;
- char *tmp,*ptr,**margv;
+ char *ptr,**margv;
  cfgtable.z.l=cfgtable.z.h=-1;
  if(!(margv=(char **)malloc((sizeof(char *)*(argc+1)))))
   cwexit(1,"malloc() failed.");
@@ -505,13 +505,6 @@ signed int main(signed int argc,char **argv){
  c_read(scrname,margc,margv);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0);
- if((ptr=(char *)getenv("HOME"))){
-  if(!(tmp=(char *)malloc(strlen(ptr)+9+1)))
-   cwexit(1,"malloc() failed.");
-  sprintf(tmp,"%s/.nocolor",ptr);
-  cfgtable.nocolor+=(access(tmp,F_OK)?0:1);
-  free(tmp);
- }
  if(getenv("CW_SHLVL")&&getenv("SHLVL")&&
  strcmp(getenv("CW_SHLVL"),getenv("SHLVL")))
   cfgtable.nocolor=1;

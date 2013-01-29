@@ -4,7 +4,7 @@ FAQ-style readme:
 2. How does cw work?
 3. How do I install cw?
 4. How do I enable use of cw?
-5. How do I turn cw on and off?
+5. How do I turn cw off?
 6. Is there a more system-specific way to turn coloring on and off?
 7. How can I make/modify the coloring of a specific program?
 8. Can ncurses programs be color wrapped? 
@@ -60,13 +60,10 @@ if the "colorcfg" script is not available these can be set manually (see the
 "cw" manpage).
 
 
-5. How do I turn cw on and off?
+5. How do I turn cw off?
 
 (see question 4 if you haven't read it already, to get to this point.)
-if cw has been installed, a shell script named "color" was also installed,
-the syntax is [on|off] or toggled if no arguments are supplied.  if the
-"color" script is not available you may set NOCOLOR=1 in your environment,
-or create (touch) ~/.nocolor.
+set NOCOLOR=1 in your environment to turn cw off.
 
 
 6. Is there a more system-specific way to turn coloring on and off?
