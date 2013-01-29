@@ -1,0 +1,27 @@
+#!/cw
+# for -exec's, if another color wrapped program is called it will not
+# be colored. (lets this definition file take over)
+$NOCOLOR_NEXT=1
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+nopipe
+random-goto label1:label2
+:label1
+base grey+
+match white:default /
+match white:default [
+match white:default ]
+match white:default (
+match white:default )
+match grey:default :
+match grey:default ;
+match grey:default .
+:label2
+base cyan
+match cyan+:default /
+match cyan+:default [
+match cyan+:default ]
+match cyan+:default (
+match cyan+:default )
+match grey:default :
+match grey:default ;
+match grey:default .

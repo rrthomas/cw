@@ -1,0 +1,19 @@
+#!/cw
+path /sbin:/usr/sbin:/bin:/usr/bin:<env>
+random cyan:green:purple:brown
+base random
+regex white:default [a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}
+ifos sunos
+match random+:none Device
+match random&:none -----
+ifos-else
+match random+:none Address
+match random+:default -
+ifos <any>
+match random+:default .
+match random+:default [
+match random+:default ]
+match white:default <
+match white:default >
+match random+:default (
+match random+:default )

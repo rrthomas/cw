@@ -1,0 +1,25 @@
+#!/cw
+path /usr/bin:/bin:/usr/sbin:/sbin:<env>
+random-goto label1:label2
+:label1
+base purple
+digit red+:default
+match purple+:default /
+match red+:default :
+match red+:default .
+match red+:red (
+match red+:default )
+match red+:red [
+match red+:default ]
+match purple+:none Filesystem
+:label2
+base cyan
+digit green+:default
+match cyan+:default /
+match green+:default :
+match green+:default .
+match green+:green (
+match green+:default )
+match green+:green [
+match green+:default ]
+match cyan+:none Filesystem

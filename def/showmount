@@ -1,0 +1,13 @@
+#!/cw
+path /sbin:/usr/sbin:/bin:/usr/bin:<env>
+base cyan
+digit cyan+:default
+match cyan+:default /
+match cyan+:default .
+match green+:default :
+match grey:default [
+match grey:default ]
+match white:none Hosts
+match white:none All
+match white:none Directories
+match white:none Export

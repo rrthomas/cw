@@ -1,0 +1,5 @@
+#!/cw
+path /etc
+random cyan:green:purple
+base random
+regex random&:random+ ^[^#][^\/]+

@@ -1,0 +1,314 @@
+(! = major, * = minor)
+
+version 1.0.16:
+* Fixed compiling issue on newer Fedora(/other?) distributions.
+  (found/identified by edge@gecko.org)
+
+version 1.0.15:
+* Fixed "make install" failure that occured on some systems. (like ubuntu)
+* Fixed compiler warnings of execle() calls the occured on some systems.
+* Added the pre-made 'objdump' definition file.
+* Added the pre-made 'strace-color' definition file. (overwrites some
+  default behaviors of strace, so it will not be directly replaced)
+* Added the pre-made 'ltrace-color' definition file. (overwrites some
+  default behaviors of ltrace, so it will not be directly replaced)
+* Added the pre-made 'crontab@' definition file.
+* Added the pre-made 'inittab@' definition file.
+* Added the pre-made 'profile@' definition file.
+* Added the pre-made 'protocols@' definition file.
+* Added the pre-made 'hosts@' definition file.
+* Added the pre-made 'resolv.conf@' definition file.
+* Added the pre-made 'auth.log@' definition file.
+
+version 1.0.14:
+* Fixed bug that could crash cw, introduced in the previous version.
+  (found/patched by lapan_mv@inbox.ru)
+
+version 1.0.13:
+! Added command-line options --cw-colorize, --cw-invert, --cw-nocolor,
+  --cw-norandom, --cw-usepty, and --cw-supermap to be used for
+  on-the-fly changes in conjunction with wrapped programs.
+* Added the "noaddhelp" definition instruction, to disable the display
+  of cw options when "--help" is passed to the wrapped program.
+
+version 1.0.12:
+* Added support to compile on QNX. (6.3.0)
+* Added the "nowarnings" and "warnings" definition instructions, for
+  disabling/enabling definition file error messages. (on by default)
+  specific operating systems. (similar properties to "ifarg"/"ifnarg")
+* Changed "colorcfg" to support installation to different directories.
+  (for ./configure --prefix=..., which is now fully supported)
+* Changed the real program filename reference to strip the path and only
+  show the filename. (ie. "/usr/local/lib/cw/id" will now show as "id"
+  when referenced by the real program(argv[0])) 
+* Changed the proctitle to display the pid of the wrapped program.
+* Changed the "path" definition instruction to allow "<env>" to be 
+  included with other paths. (not the only path allowed anymore)
+* Changed some error message displays.
+* Changed some definition files.
+* Added the pre-made 'figlet' definition file.
+* Revised most pre-made definition instructions.
+
+version 1.0.11:
+! Added the "cwe" command. (actually linked to cw binary)
+! Added the "supermap" definition instruction and the "CW_SUPERMAP"
+  environmental variable check, to completely change the method of coloring
+  from ANSI to another (internal) coloring format.
+* Added the "lborder" and "rborder" definition instructions and "CW_LBORDER"
+  and "CW_RBORDER" environmental variable checks, to place data on the left
+  and right sides of each string. (not colored, used for interpreted data)
+* Added "CW_RANDOM" environmental variable check, to globally change the
+  default random list of color choices.
+* Added the "forcecolor" definition instruction, to color no matter
+  what anti-coloring measures are enabled.
+* Added the "print" definition instruction, to print a string as it
+  is read in the definition file.
+* Added the "noeol" definition instruction, to not append the reset/cap value
+  on the end of each line.
+* Added the "proctitle" definition instruction, to make cw appear different
+  in process listings.
+* Added proctitle support, to have a better process appearance. (where
+  applicable)
+* Changed handling of user interrupts(CTRL-C), now the first CTRL-C will
+  be passed to the wrapped program and the second will force exit.
+* Fixed bug that would crash cw if $HOME was not present in the environment.
+* Fixed bug for platforms that dont support regex, would crash if
+  "token" definition instructions were used.
+
+version 1.0.10:
+* Added "!" and "@" to run programs as they are placed in the cw definition
+  file.
+* Added the "ifexit", "ifnexit" and "ifexit-else" definition instructions, to
+  compare exit levels from the "!" and "@" definition instructions.
+* Added "CW_CHK_NOCOLOR" and "CW_CHK_SETCODE" environmental variable checks,
+  to run a program/shell expression and check the exit code to either
+  disable the color or set to be used against the "ifexit" definition
+  instructions.
+* Added the "useifregex" definition instruction, to enable use of regex
+  comparisons with the "ifarg" and "ifos" definition instructions. 
+* Fixed a bug in cwu which left files behind when changes failed.
+* Fixed potential security issue with cwu relating to unchecked
+  temporary files, this is not a major concern as the definition
+  directory would have to be world writable.
+
+version 1.0.9:
+* Added "CW_HEADER" and "CW_FOOTER" environmental variable checks, to set
+  a header/footer if there is not one specified in the definition file.
+* Added the "remap" definition instruction and the "CW_REMAP" environmental
+  variable check, to remap colors to special ANSI (code) colors or other
+  internal colors.
+* Added the "clear" definition instruction and the "CW_CLEAR"
+  environmental variable check, to clear the screen before the program starts.
+* Added the "nocolor" definition instruction, to disable all coloring via
+  a definition file. (this is mainly for if-related definition
+  instructions)
+* Added pre-made headers/footers. (in ./etc, installed to NONE/lib/cw/etc)
+* Fixed bug when using the random color family with CW_COLORIZE.
+* Fixed a textual configuration error bug, which displayed the wrong
+  error message.
+* Revised the pre-made 'wc' definition file.
+
+version 1.0.8:
+! Fixed a bug that could cut off the last lines of extremely long output
+  from programs that process faster than cw.
+! Added passing of the exit value (of the real program) through cw.
+* Added the "ifos" and "ifnos" definition instructions, for matching
+  specific operating systems. (similar properties to "ifarg"/"ifnarg")
+* Added "ifos-else" and "ifarg-else" for more simplified comparisons.
+* Added support to stop the program while running. (^Z)
+* Added the "nobackground" definition instruction, to disable stopping(^Z)
+  of the program (this may be forced anyways, depending upon compile)
+* Added the pre-made 'groups' definition file.
+* Added support for Solaris. (code changes/scripts/etc)
+* Added support for Cygwin. (code changes/scripts/etc)
+* Removed the "OS=" argument used in conjunction with the "ifarg"
+  and "ifnarg" definition instructions, this was not sufficient
+  for complex definition files and has been replaced with it's
+  own definition instruction. ("OS=" was introduced in v1.0.7)
+* Revised the pre-made 'arp' definition file. (SunOS addition)
+* Revised the pre-made 'mount' definition file. (SunOS addition)
+* Revised the pre-made 'ping' definition file. (SunOS addition)
+* Revised the pre-made 'lsof' definition file.
+* Revised the pre-made 'ps' definition file.
+* Revised the pre-made 'df' definition file.
+
+version 1.0.7:
+! Added the "regex" definition instruction, for matching text with regex
+  patterns. (this is intended for when the "match" definition instruction
+  is not enough) 
+! Added the "usepty" definition instruction and the "CW_USEPTY"
+  environmental variable check. (allocates a pty to emulate the
+  environment a program may expect)
+! Added the "OS=" argument to be used in conjunction with the "ifarg"
+  and "ifnarg" definition instructions, this will allow for operating
+  system specific coloring. (ie. "ifarg OS=linux")
+! Added "CW_INVERT" environmental variable check, this is to help make
+  terminals with white backgrounds more readable. (inverts internal 
+  colormap)
+* Added "<env>" to be used in conjunction with the "path" definition
+  instruction to import the PATH environmental variable. 
+* Added autoconf-style configuration/install scripts.
+* Added the pre-made 'cw-pipe' definition file. (generic pipe colorer)
+* Added the pre-made 'tcpdump' definition file.
+* Fixed "cwu" text wrapping large lines.
+* Fixed "colorcfg" for local install usage. (was non-operational)
+* Fixed infinite recursive running of cw when using improper "path"
+  definitions.
+* Fixed some textual error messages. (was displaying incorrect data)
+* Revised the pre-made 'id' definition file.
+* Revised the pre-made 'date' definition file.
+* Revised the pre-made 'configure' definition file.
+* Revised the pre-made 'arp' definition file.
+* Revised the pre-made 'ps' definition file.
+* Revised the pre-made 'ping' definition file.
+* Revised the pre-made 'date' definition file.
+
+version 1.0.6:
+! Added "CW_COLORIZE" environmental variable check, this is to help make
+  a uniform color scheme. (overrides all definition colors)
+* Added "MAKELEVEL" environmental variable check, this variable is set
+  by the 'make' program. (if set, it acts as "NOCOLOR" would.  this is 
+  another preventive measure taken to stop unwanted coloring)
+* Added "colorcfg", a small script to automate the installation of color
+  wrapper on a per-user basis.
+* Added "black" as a usable color for random related definitions.
+* Revised execution method.
+* Revised the pre-made 'make' definition file.
+* Revised the pre-made 'df' definition file.
+
+version 1.0.5:
+! Added the colors "random", "random+" and "random&" to be used for
+  random colors. (the random values are set at the start of cw and by
+  the "random" definition instruction)
+! Added the "random" definition instruction. (sets the values of the
+  "random", "random+" and "random&" colors)
+! Added the "random-goto" definition instruction. (more detail specific
+  coloring than the "random" definition instruction)
+! Added "CW_NORANDOM" environmental variable check, to disable
+  random colors by always selecting the first list choice with the
+  "random" and "random-goto" definition instructions.
+! Added the "nopipe" definition instruction and the "NOCOLOR_PIPE"
+  environmental variable check. (enables the disabling of color if no
+  tty is present.  idea/patch provided by komar@ukr.net, thanks)
+* Added the text versions of the manual pages. (in doc/)
+* Added the pre-made 'g++' definition file. ('gcc' copy)
+* Added the pre-made 'cal' definition file. (suggested by
+  px@zeroday.net, thanks)
+* Added the pre-made 'md5sum' definition file. (suggested by
+  px@zeroday.net, thanks)
+* Added the pre-made 'cksum' definition file. (suggested by
+  px@zeroday.net, thanks)
+* Revised the pre-made 'make' definition file. (won't color 
+  'menuconfig' anymore, thanks jce@gmode.zeroday.net)
+* Removed the pre-made 'objdump' definition file.
+* Revised the pre-made 'finger' definition file. (fixes)
+* Revised the pre-made 'smbstatus' definition file. (random)
+* Revised the pre-made 'quota' definition file. (random)
+* Revised the pre-made 'users' definition file. (random)
+* Revised the pre-made 'host' definition file. (random)
+* Revised the pre-made 'free' definition file. (random)
+* Revised the pre-made 'mpg123' definition file. (random)
+* Revised the pre-made 'blockdev' definition file. (random)
+* Revised the pre-made 'wc' definition file. (random)
+* Revised the pre-made 'du' definition file. (random)
+* Revised the pre-made 'ping' definition file. (random)
+* Revised the pre-made 'lsmod' definition file. (random)
+* Revised the pre-made 'tracepath' definition file. (random)
+* Revised the pre-made 'traceroute' definition file. (random)
+* Revised the pre-made 'w' definition file. (random)
+* Revised the pre-made 'uname' definition file. (random)
+* Revised the pre-made 'stat' definition file. (random)
+* Revised the pre-made 'who' definition file. (random)
+* Revised the pre-made 'praliases' definition file. (random)
+* Revised the pre-made 'find' definition file. (random)
+* Revised the pre-made 'uptime' definition file. (random)
+* Revised the pre-made 'tar' definition file. (random)
+* Revised the pre-made 'ps' definition file. (random)
+* Revised the pre-made 'mount' definition file. (random)
+* Revised the pre-made 'umount' definition file. (random)
+* Revised the pre-made 'hdparm' definition file. (random)
+* Revised the pre-made 'dmesg' definition file. (random)
+* Revised the pre-made 'arp' definition file. (random)
+* Revised the pre-made 'arping' definition file. (random)
+* Revised the pre-made 'env' definition file. (random)
+* Revised the pre-made 'ifconfig' definition file. (random)
+* Revised the pre-made 'cpuinfo@' definition file. (random)
+* Revised the pre-made 'meminfo@' definition file. (random)
+* Revised the pre-made 'passwd@' definition file. (random)
+* Revised the pre-made 'group@' definition file. (random)
+
+version 1.0.4:
+! Added "CW_SHLVL" environmental variable check, to compare with
+  $SHLVL(bash/tcsh set this according to the current shell level). (this
+  is to limit where coloring is applied.  so, if CW_SHLVL is set to 1,
+  it will only color if the shell level is in its first instance)
+! Added the "other" definition instruction. (defines alternate
+  program(s) to run, in shell script format)
+* Added the pre-made 'smbstatus' definition file.
+* Added the pre-made 'showmount' definition file.
+* Added the pre-made 'tracepath' definition file.
+* Added the pre-made 'quotastats' definition file.
+* Added the pre-made 'praliases' definition file.
+* Added the pre-made 'nfsstat' definition file.
+* Added the pre-made 'pmap_dump' definition file.
+* Added the pre-made 'services@' definition file. (text)
+* Added the pre-made 'syslog' definition file. (other, tail's syslog
+  file)
+* Revised the pre-made 'df' definition file. (again)
+* Revised the pre-made 'lastlog' definition file.
+
+version 1.0.3:
+* Added the "limit" definition instruction. (limits the amount of text 
+  to be displayed per line, does not apply to when colors are turned off)
+* Added the pre-made 'fstab@' definition file. (text)
+* Added the pre-made 'group@' definition file. (text)
+* Fixed color defaulting for text file color wrapping when piped.
+* Revised the pre-made 'dmesg' definition file.
+* Revised the pre-made 'uname' definition file.
+* Revised the pre-made 'df' definition file.
+
+version 1.0.2:
+* Added the "nostrip" definition instruction. (this will turn off
+  ANSI stripping)
+! Added ANSI stripping, which strips the real programs output of ANSI color
+  codes. (px@zeroday.net's idea)
+! Added text file color wrapping. (this will take effect when the cw
+  executable file has an '@' on the end of the filename)
+* Added ifarg/ifnarg constant "<none>", for mataching no arguments.
+* Added the pre-made 'messages@' definition file. (text)
+* Added the pre-made 'xferlog@' definition file. (text)
+* Added the pre-made 'passwd@' definition file. (text)
+* Added the pre-made 'cpuinfo@' definition file. (text)
+* Added the pre-made 'meminfo@' definition file. (text)
+* Added the pre-made 'nslookup' definition file.
+* Added the pre-made 'vmstat' definition file.
+* Added the pre-made 'pmap' definition file.
+* Added the pre-made 'configure' definition file. (same as make's; 
+  suggested to use this instead of ./configure if colors are on, it will 
+  eliminate potential issues)
+! Fixed bug in which overly long output strings would crash cw. (crash
+  first noticed by px@zeroday.net)
+! Fixed "invalid path" bug when the path is actually valid. (changed R_OK
+  to X_OK with access(), thanks px@zeroday.net)
+* Fixed some grammar error(s). (thanks px@zeroday.net)
+* Revised package to compile on other operating systems, specifically
+  bsd. (no other system besides GNU/linux will be supported in future
+  releases)
+* Revised ifarg/ifnarg constant handling. (can now use in list form, 
+  instead of the only comparison)
+* Revised ifarg/ifnarg constant "any" to "<any>", for matching any
+  value. (this was undocumented in the last version, so it shouldn't be
+  a problem)
+* Revised the pre-made 'find' definition file.
+* Revised the pre-made 'fuser' definition file.
+* Revised the pre-made 'ping' definition file.
+* Revised the pre-made 'who' definition file. (color problems with some
+  command-line arguments, thanks px@zeroday.net)
+* Revised the pre-made 'wc' definition file. (not to color -l, -c,
+  -w, etc, thanks costing@cs.pub.ro)
+
+version 1.0.1:
+* First public release.
+
+version 1.0.0:
+* Test version/unreleased.

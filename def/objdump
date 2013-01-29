@@ -1,0 +1,19 @@
+#!/cw
+# this is a bit heavy on the regex, may be slow on old-old systems.
+path /sbin:/usr/sbin:/bin:/usr/bin:<env>
+nopipe
+random cyan:green:grey+
+base random
+ifarg --help:<none>
+regex random+:default <.+>
+regex random+:default --[^ ]+
+ifarg -s
+regex random&:default [0-9A-Fa-f]{8} [0-9A-Fa-f]{8} [0-9A-Fa-f]{8} [0-9A-Fa-f]{8}
+ifarg -R
+regex random+:default ^[0-9A-Fa-f]{8,16}[ ]
+regex random&:default [ ](_{1,2})[A-Za-z0-9_]+$
+ifnarg -s:-R
+regex random&:default ^[ ]*[A-Za-z0-9\/]+:
+ifnarg --help:<none>:-s:-R
+regex random+:default 0x[0-9A-Fa-f]{1,16}
+regex random&:default [\<\>\(\)\*\+\$\%\,\.]

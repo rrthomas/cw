@@ -1,0 +1,14 @@
+successfully compiled cw on(using gcc):
+
+Linux
+FreeBSD
+NetBSD
+OpenBSD
+MacOSX
+Solaris
+Cygwin
+QNX
+
+(if you have a unix-based os not listed above and can lend me a temporary
+shell i will attempt to port it, and/or if you have success on any other
+platforms please e-mail v9@fakehalo.us)

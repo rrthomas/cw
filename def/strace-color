@@ -1,0 +1,9 @@
+#!/cw
+$NOCOLOR_NEXT=1
+other strace {} 2>&1
+random cyan:green:purple
+base random
+regex random+:random& \(.+\).*[ ]=[ ]
+match random&:none +++
+match random&:none ---
+

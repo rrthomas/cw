@@ -1,0 +1,20 @@
+#!/cw
+path /usr/bin:/bin:/usr/sbin:/sbin:<env>
+random purple:cyan:green:grey+
+base random
+digit random+:default
+match random+:default (
+match random+:default )
+match random&:default [
+match random&:default ]
+match random&:default {
+match random&:default }
+match random&:default :
+match random&:default .
+match random&:default ,
+match random&:default -
+match random&:default =
+match random&:default /
+match default:default USER
+ifnarg --help
+token random&:default 0 32

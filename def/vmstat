@@ -1,0 +1,18 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+ifarg -m
+base green+
+match green:default _
+match green:default -
+match white:none Cache
+match white:none Num
+token cyan:none 1 32
+ifarg-else
+base cyan+
+digit cyan:default
+match white:default -
+match white:default [
+match white:default ]
+ifarg <any>
+match white:cyan+ (
+match white:default )

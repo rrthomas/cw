@@ -1,0 +1,8 @@
+#!/cw
+$NOCOLOR_NEXT=1
+other ltrace {} 2>&1
+nopipe
+random cyan:green:purple
+base random
+match random+:random& +++
+match random&:random+ ---

@@ -1,0 +1,16 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+random cyan:green
+base random
+digit random+:default
+ucase random+:default
+match white:default :
+match white:default .
+match white:default (
+match white:default )
+match white:default -
+match white:default `
+match white:default '
+match random&:default /
+match random+:default %
+match random+:default  %{?} 

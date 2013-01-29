@@ -1,0 +1,22 @@
+adm/		- administration directory for the maintainer
+bin/		- directory for compiled binaries
+doc/		- text versions of the manual pages
+def/		- generic/pre-made definition files (cw executables)
+etc/		- generic/pre-made header/footer files (placed in def dir)
+man/		- manual pages
+src/		- source code for color wrapper
+CHANGES		- changes made to the source code
+CONTRIB		- how to contribute definitions
+COPYING		- the program license (GNU GPL)
+FILES		- this file
+INSTALL		- how to install color wrapper
+MD5SUM		- verification values for files (match on website)
+PLATFORM	- list of successful operating system compiles
+README		- small paragraph explaining what cw does
+VERSION		- the version value of this package
+config.h.in	- autoheader generated (edit config.h when created)
+configure	- configuration script to compile cw
+configure.in	- autoconf to generate configuration script
+cw.lsm		- color wrapper LSM information
+install-sh	- pseudo install script (autoconf related)
+Makefile.in	- manipulated to form the Makefile (./configure)

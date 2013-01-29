@@ -1,0 +1,11 @@
+#!/cw
+path /etc
+base cyan
+match grey:default #
+match cyan+:default /
+match grey:cyan+ (
+match grey:default )
+match green+:default tcp
+match yellow:default udp
+token white:default 0 9
+token white:default 0 32

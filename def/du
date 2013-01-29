@@ -1,0 +1,40 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+usepty
+random-goto label1:label2
+:label1
+base grey+
+ifnarg --help
+match grey:default /
+match default:default M
+match default:default K
+token white:default 0 9
+ifarg-else
+match white:default [
+match white:default ]
+match white:default <
+match white:default >
+match white:default :
+match grey:default ,
+match grey:default =
+match white:default -
+ifarg <any>
+match default:none Try
+:label2
+base cyan
+ifnarg --help
+match cyan+:default /
+match default:default M
+match default:default K
+token green+:default 0 9
+ifarg-else
+match green+:default [
+match green+:default ]
+match green+:default <
+match green+:default >
+match green+:default :
+match cyan+:default ,
+match cyan+:default =
+match cyan+:default -
+ifarg <any>
+match default:none Try

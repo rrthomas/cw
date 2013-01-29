@@ -1,0 +1,12 @@
+#!/cw
+path /sbin:/usr/sbin:/bin:/usr/bin:<env>
+random purple:cyan:green
+base random
+digit random+:default
+match random+:random& (
+match random+:default )
+match random+:default [
+match random+:default ]
+match random&:none Module
+ifarg -h:--help
+match random+:default -

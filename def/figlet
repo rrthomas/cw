@@ -1,0 +1,8 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:<env>
+#supermap ctrlk
+random cyan:green:purple
+base random
+match random+:default |
+match random&:default _
+

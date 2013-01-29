@@ -1,0 +1,11 @@
+#!/cw
+path /etc
+base grey+
+digit white:default
+match white:default :
+match cyan+:default #
+match grey:default /
+match grey:default ,
+match grey:default =
+match grey:default supermount
+match yellow:default none

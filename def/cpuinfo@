@@ -1,0 +1,6 @@
+#!/cw
+path /proc
+random purple:cyan:green:grey+
+base random
+match random&:default :
+token random+:default 0 58

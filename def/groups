@@ -1,0 +1,11 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+random cyan:green:purple:red
+# could be used in shell scripts, disable coloring if piped/redirected.
+nopipe
+base random
+match random+:default -
+match random&:default [
+match random&:default ]
+match random+:default root
+match random+:default wheel

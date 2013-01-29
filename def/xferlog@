@@ -1,0 +1,8 @@
+#!/cw
+path /var/log
+base purple
+digit purple+:default
+match purple+:default /
+match white:default :
+match white:default .
+token red+:none 0 32

@@ -1,0 +1,17 @@
+#!/cw
+path /sbin:/usr/sbin:/bin:/usr/bin:<env>
+usepty
+random purple:cyan:green:grey+
+base random
+digit random+:default
+match random+:default .
+match random+:default :
+match random+:default *
+match random&:default (
+match random&:default )
+match random+:random& [
+match random+:default ]
+match random&:default =
+match random&:default ,
+match random&:default  ms
+match random&:default traceroute

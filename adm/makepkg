@@ -1,0 +1,31 @@
+#!/bin/bash
+# this is just for me (project maintainer) to automatically make the
+# package.  don't forget to rename the root package directory to 'cw',
+# if it isnt already.
+
+# start script.
+NOCOLOR=1
+CMPTIME=`date "+%Y\/%m\/%d %T %Z"`
+LSMTIME=`date "+%Y-%m-%d"`
+VERSION=`cat version | grep -v "#"`
+cd ..
+make clean 1>/dev/null 2>&1
+rm -rf src/cw.h adm/cw-* MD5SUM VERSION cw.lsm config.status config.cache config.log config.h Makefile
+echo $VERSION>VERSION
+sed "s/%VERSION%/$VERSION/g;s/%CMPTIME%/$CMPTIME/g" adm/cw.h.tp>src/cw.h
+sed "s/%VERSION%/$VERSION/g;s/%GZSIZE%/0 cw-${VERSION}.tar.gz/g;s/%BZ2SIZE%/0 cw-${VERSION}.tar.bz2/g;s/%LSMTIME%/$LSMTIME/g;" adm/cw.lsm.tp>cw.lsm
+md5sum * */* 1>MD5SUM 2>/dev/null
+touch * */*
+cd ..
+mv cw cw-${VERSION}
+tar -c cw-${VERSION}/>/tmp/cw-${VERSION}.tar
+gzip /tmp/cw-${VERSION}.tar
+tar -c cw-${VERSION}/>/tmp/cw-${VERSION}.tar
+bzip2 /tmp/cw-${VERSION}.tar
+# doesn't effect the packaged version from here on.
+mv cw-${VERSION} cw
+mv /tmp/cw-${VERSION}.* cw/adm/ 
+cd cw/adm
+GZSIZE=`wc -c cw-${VERSION}.tar.gz|awk {'print $1'}`
+BZ2SIZE=`wc -c cw-${VERSION}.tar.bz2|awk {'print $1'}`
+sed "s/%VERSION%/$VERSION/g;s/%GZSIZE%/$GZSIZE cw-${VERSION}.tar.gz/g;s/%BZ2SIZE%/$BZ2SIZE cw-${VERSION}.tar.bz2/g;s/%LSMTIME%/$LSMTIME/g" cw.lsm.tp>../cw.lsm

@@ -1,0 +1,15 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+random cyan:green:purple
+base random
+match random+:default .
+match random&:default :
+match random+:default -
+match random+:default [
+match random+:default ]
+match random+:white (
+match random+:default )
+match random+:default SOA
+match random+:default mail is handled by
+match random+:default name server
+match random+:default domain name pointer

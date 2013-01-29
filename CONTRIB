@@ -1,0 +1,17 @@
+Did i not make a definition file for a program I should have?
+Something not operating correctly with cw?
+Feature ideas?
+
+Send to <v9@fakehalo.us> and I will include it a future version release.
+(if applicable)
+
+Contributors:
+ px@zeroday.net        - many ideas/suggestions, bug finding, and
+                         general helper.
+ komar@ukr.net         - came up with the idea/code that i made into the
+                         "nopipe" definition instruction.  also provided
+                         other misc. ideas.
+ jce@gmode.zeroday.net - found a bug when compiling the kernel, with the
+                         'make' definition file. (fixed in 1.0.5)
+ lapan_mv@inbox.ru     - found a bug in the calculation of memory to be
+                         allocated, which could cause a segfault.

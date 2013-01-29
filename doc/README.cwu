@@ -1,0 +1,32 @@
+NAME
+       cwu - (color wrapper) directive updater
+
+SYNOPSIS
+       cwu [definitions directory] [cw binary path]
+
+DESCRIPTION
+       cwu  is a free color wrapper directive updater designed to update defi-
+       nition files when the cw binary has changed locations.
+
+
+       definitions directory
+              directory that all the cw definitions  are  stored  in,  usually
+              NONE/lib/cw
+
+       cw binary path
+              path to the (new) cw binary location
+
+AUTHOR
+       Written by v9/fakehalo. [v9@fakehalo.us]
+
+BUGS
+       Report bugs to <v9@fakehalo.us>.
+
+COPYRIGHT
+       Copyright (C) 2004 v9/fakehalo.
+       This is free software; see the source for copying conditions.  There is
+       NO warranty; not even for MERCHANTABILITY or FITNESS FOR  A  PARTICULAR
+       PURPOSE.
+
+SEE ALSO
+       cw(1) cwe(1)

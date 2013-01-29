@@ -1,0 +1,18 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+nopipe
+random cyan:green
+# coloring the output stream of tar would create a broken archive.
+ifnarg -c:--create
+base random
+match white:random :
+match white:default =
+match random+:default /
+match random+:default -
+match random+:default .
+match random&:default `
+match random&:default '
+match white:default [
+match white:default ]
+match white:default <
+match white:default >

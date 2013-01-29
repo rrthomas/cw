@@ -1,0 +1,117 @@
+NAME
+       cwe - (color wrapper) echo
+
+SYNOPSIS
+       cwe [string]
+
+DESCRIPTION
+       cwe  is  a command to echo special formatted (colored) strings to stan-
+       dard output.  cwe is directly linked to the cw binary and cw recognizes
+       that it is only designed to color a single string and exit.  if you are
+       not familiar with cw you should  probably  consult  that  documentation
+       first.  (as  long as the first 3 letters are "cwe" in the link name, cw
+       will assume it is cwe)
+
+       The main purpose of  cwe's  existence  is  to  expand  color  to  shell
+       prompts,  shell  scripts,  and other (non-program/file wrapping) things
+       while still keeping (some of) the color scheme cw provides.
+
+       Several conversions are supported, and are the same as the print  defi-
+       nition instruction when using cw directly.
+
+
+       \\     ignore the current \
+
+       \e     escape conversion, usually used for ANSI (color) codes
+
+       \r     carriage return conversion
+
+       \n     new line conversion
+
+       \t     horizontal tab conversion
+
+       \v     virtical tab conversion
+
+       \xNN   hexadecimal   value   conversion,   must   be  followed  by  two
+              bytes(00-ff) (where available)
+
+       \C[color]
+              color conversion, brackets are included in the string
+
+       the color values used are in the text form of:
+              black, blue, green,  cyan,  red,  purple,  brown,  grey+,  grey,
+              blue+,  green+,  cyan+,  red+,  purple+, yellow, white, default,
+              none, random, random+, random&
+
+       colors with a + designate a brighter color.  random, random+  and  ran-
+       dom& are random colors set at the start of cw or by the CW_RANDOM envi-
+       ronmental variable (random& is a complementary color to random and ran-
+       dom+)
+
+EXAMPLES
+       bash# export CW_RANDOM='cyan:blue'
+       bash# export PS1='$(cwe "\C[random+]\u\C[default]# ")'
+       (note that \u is processed by bash and not cwe)
+
+ENVIRONMENT
+       CW_RANDOM
+              creates a new random colorset based on a list  of  colors  sepa-
+              rated by colons.  the random color selected will be used for the
+              colors random, random+ and random& (color values explicitly used
+              in  context to this variable are: black, blue, green, cyan, red,
+              purple, brown, grey, grey+)
+
+       CW_NORANDOM
+              disables random colors by always using  the  first  list  choice
+              (any value placed in the variable will enable)
+
+       CW_INVERT
+              re-defines  the  internal colormap to the opposite colors.  this
+              is intended to help terminals with white backgrounds become more
+              readable (any value placed in the variable will enable)
+
+       CW_COLORIZE
+              defines  a  static  colorset to override the definition file(and
+              CW_INVERT) colors.  this is intended  to  help  make  a  uniform
+              color  scheme.  the format is CW_COLORIZE=color[:color] ('[' and
+              ']' are not included).  if a second color is  provided  you  may
+              use  any  colors  desired  for both fields, however if you place
+              just one color in the variable it must be one of  the  following
+              colors:  black,  blue,  green,  cyan,  red, purple, brown, grey,
+              grey+, random (using the dual color entry style can cause irreg-
+              ular  coloring using offbeat combinations do to the method being
+              used to colorize, it is recommended  to  use  the  single  entry
+              style)
+
+       CW_REMAP
+              remaps  one  or  more  internal color(s) to ANSI values or other
+              internal color values.  this is useful for remapping  colors  to
+              special ANSI (code) values or more advanced color scheming (than
+              CW_COLORIZE).  the colors random, random+, random&, default  and
+              none   may   not   be   remapped   or   used.    the  format  is
+              CW_REMAP=color=[##;##|color]:color=[##;##|color]:... ('#' stands
+              for  a  single  digit, which forms the ANSI code; '|' stands for
+              "or", and the '|' is not included; '[' and ']' are not included)
+
+       CW_SUPERMAP
+              changes the internal color format to an entirely different color
+              format(ie. non-ANSI), this is intended for  special  non-console
+              coloring  situations.   supermaps are internal and can be listed
+              by running cw -V.  if a supermap and a remap are  both  defined,
+              then  the  supermap will be forcefully disabled due to potential
+              internal conflicts
+
+AUTHOR
+       Written by v9/fakehalo. [v9@fakehalo.us]
+
+BUGS
+       Report bugs to <v9@fakehalo.us>.
+
+COPYRIGHT
+       Copyright (C) 2005 v9/fakehalo.
+       This is free software; see the source for copying conditions.  There is
+       NO  warranty;  not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
+       PURPOSE.
+
+SEE ALSO
+       cw(1) cwu(1)

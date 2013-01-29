@@ -1,0 +1,22 @@
+#!/bin/sh
+# very simple script that cw will check to see if colors are desired.
+# "export NOCOLOR=1" will also work.
+# syntax is: color [on|off], if there is no argument it toggles.
+if test "$1" = "on";then
+ rm -rf ${HOME}/.nocolor
+fi
+if test "$1" = "off";then
+ touch ${HOME}/.nocolor
+fi
+if [ ! "$1" ];then
+ if [ -r ${HOME}/.nocolor ];then
+  rm -rf ${HOME}/.nocolor
+ else
+  touch ${HOME}/.nocolor
+ fi
+fi
+if [ -r ${HOME}/.nocolor ];then
+ echo "color wrapping is now: OFF"
+else 
+ echo "color wrapping is now: ON"
+fi

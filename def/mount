@@ -1,0 +1,9 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+random cyan:green
+base random
+match random&:random+ (
+match random&:default )
+ifos sunos
+base random+
+match random&:random  on 

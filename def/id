@@ -1,0 +1,17 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+# shell scripts use this alot, will cause problems being colored.
+ifnarg -g:-G:-n:-r:-u:--group:--groups:--name:--real:--user
+random cyan:green:purple:grey+
+base random
+match random:default :
+match random+:default =
+match random&:default /
+match random&:random+ [
+match random&:default ]
+match random&:random+ (
+match random&:default )
+ifarg --help
+match random:default -
+ifnarg <none>
+nopipe

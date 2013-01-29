@@ -1,0 +1,5 @@
+ANSI-ART Copyright (C) 2005 v9/fakehalo.
+
+example headers/footers for cw(color wrapper).  set by
+"CW_HEADER=/path/to/file" and "CW_FOOTER=/path/to/file" in the
+environment.

@@ -1,0 +1,12 @@
+#!/cw
+path /bin:/usr/bin:/sbin:/usr/sbin:<env>
+random green:cyan:purple
+base random
+digit random+:default
+match random+:default -
+match random&:default $
+match random&:default (
+match random&:default )
+match white:default [
+match white:default ]
+match random&:none Service
