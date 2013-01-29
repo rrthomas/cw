@@ -19,7 +19,7 @@ The \fBpath\fR (or \fBother\fR) definition instruction is the only required defi
 path list separated by colons to the program being wrapped.  \fB<env>\fR can be inserted to use the \fBPATH\fR environmental variable (traditional $PATH\-style format)
 .TP 
 \fBother\fR [\fIprogram\fR]
-uses specific program(s), in shell execution format, instead of using \fBpath\fR to find and execute the program.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments  (\fBpath\fR and \fBother\fR can not be used with eachother)
+uses specific program(s), in shell execution format, instead of using \fBpath\fR to find and execute the program.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments  (\fBpath\fR and \fBother\fR can not be used with each other)
 .TP 
 \fBifarg\fR [\fItext:text:...\fR]
 list separated by colons which will be compared against the arguments called to the program.  if the \fBtext\fR matches the arguments, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR definition instruction is used.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments)
@@ -40,7 +40,7 @@ reverse of \fBifexit\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR
 this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBifos\fR [\fItext:text:...\fR]
-list separated by colons which will be compared against the operating system name(equal to uname \-s).  if the \fBtext\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<pseudo>\fR" can be used as a constant value for non\-existent support of \fBifos\fR and \fBifnos\fR, it will only match if not supported) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBo\fR" IS INCLUDED IN THE SUPPORT}
+list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBtext\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<pseudo>\fR" can be used as a constant value for non\-existent support of \fBifos\fR and \fBifnos\fR, it will only match if not supported) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBo\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBifnos\fR [\fItext:text:...\fR]
 reverse of \fBifos\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBo\fR" IS INCLUDED IN THE SUPPORT}
@@ -71,16 +71,16 @@ changes the color before and after any uppercase letter (A\-Z)
 changes the color before and after any lowercase letter (a\-z)
 .TP 
 \fBremap\fR [\fIcolor\fR] [\fI##;##\fR | \fIcolor\fR]
-remaps the internal \fBcolor\fR value to the ANSI value "^[[\fB##;##\fRm"(where \fB#\fR is a single digit and only the \fB##;##\fR should be supplied) or \fBcolor\fR(original/un\-remapped).  the colors \fBrandom\fR, \fBrandom+\fR, \fBrandom&\fR, \fBdefault\fR and \fBnone\fR may not be remapped or used with this definition instruction (ex. "remap grey 30;47" would change the \fBgrey\fR color to a grey highlighted effect)
+remaps the internal \fBcolor\fR value to the ANSI value "^[[\fB##;##\fRm"(where \fB#\fR is a single digit and only the \fB##;##\fR should be supplied) or \fBcolor\fR (original/un\-remapped).  the colors \fBrandom\fR, \fBrandom+\fR, \fBrandom&\fR, \fBdefault\fR and \fBnone\fR may not be remapped or used with this definition instruction (ex. "remap grey 30;47" would change the \fBgrey\fR color to a grey highlighted effect)
 .TP 
 \fBsupermap\fR [\fImapname\fR]
-changes the internal color format to an entirely different color format(ie. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if \fBsupermap\fR and \fBremap\fR are both defined, then \fBsupermap\fR will be forcefully disabled due to potential internal conflicts
+changes the internal color format to an entirely different color format (i.e. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if \fBsupermap\fR and \fBremap\fR are both defined, then \fBsupermap\fR will be forcefully disabled due to potential internal conflicts
 .TP 
 \fBproctitle\fR [\fItitle\fR]
 changes the process title to the provided \fBtitle\fR, this is will change how the program appears in programs like \fBps\fR and \fBw\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBs\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBprint\fR [\fIstring\fR]
-prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions(\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR and/or \fBrandom\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
+prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions (\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR and/or \fBrandom\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
 .TP 
 \fBheader\fR [\fIfile\fR]
 displays the contents of \fBfile\fR before any output of the real program
@@ -122,13 +122,13 @@ forces color wrapping no matter what anti\-coloring measures are enabled
 turns off all coloring (the only real purpose of this is for \fBif\fR\-related definition instructions)
 .TP 
 \fBnoextendedregex\fR
-turns off extended regex(REG_EXTENDED) support (not likely to want to use this, but it's here if needed) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBr\fR" IS INCLUDED IN THE SUPPORT}
+turns off extended regex (REG_EXTENDED) support (not likely to want to use this, but it's here if needed) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBr\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBnopipe\fR
 turns off color wrapping if the program is being piped/redirected. (non\-interactive coloring measure) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBt\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBnobackground\fR
-will disable the capability to stop(\fB^Z\fR) the program {THIS MAY BE FORCED ANYWAYS, DEPENDING ON SUPPORT INCLUDED UPON COMPILE}
+will disable the capability to stop (\fB^Z\fR) the program {THIS MAY BE FORCED ANYWAYS, DEPENDING ON SUPPORT INCLUDED UPON COMPILE}
 .TP 
 \fBnoaddhelp\fR
 will not display cw help information when \fB\-\-help\fR is used in the program arguments
@@ -502,7 +502,7 @@ disables color wrapping at the next process using color wrapper.  this is mainly
 disables color wrapping if the program is being piped/redirected (non\-interactive coloring measure, any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBt\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBCW_SHLVL\fR
-disables color wrapping if the value this variable is set to does NOT equal \fBSHLVL\fR(set by bash/tcsh).  this is intended to help prevent unwanted coloring outside of the current users shell (usually should be set to 1)
+disables color wrapping if the value this variable is set to does NOT equal \fBSHLVL\fR (set by bash/tcsh).  this is intended to help prevent unwanted coloring outside of the current users shell (usually should be set to 1)
 .TP 
 \fBCW_CHK_NOCOLOR\fR
 disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
@@ -523,13 +523,13 @@ disables random colors by always using the first list choice with the \fBrandom\
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .TP 
 \fBCW_COLORIZE\fR
-defines a static colorset to override the definition file(and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+, random\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
+defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+, random\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
 .TP 
 \fBCW_REMAP\fR
 remaps one or more internal color(s) to ANSI values or other internal color values.  this is useful for remapping colors to special ANSI (code) values or more advanced color scheming (than \fBCW_COLORIZE\fR).  the colors \fBrandom\fR, \fBrandom+\fR, \fBrandom&\fR, \fBdefault\fR and \fBnone\fR may not be remapped or used.  the format is \fBCW_REMAP=color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:...\fR ('#' stands for a single digit, which forms the ANSI code; '|' stands for "or", and the '|' is not included; '[' and ']' are not included)
 .TP 
 \fBCW_SUPERMAP\fR
-changes the internal color format to an entirely different color format(ie. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if a supermap and a remap are both defined, then the supermap will be forcefully disabled due to potential internal conflicts
+changes the internal color format to an entirely different color format (i.e. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if a supermap and a remap are both defined, then the supermap will be forcefully disabled due to potential internal conflicts
 .TP 
 \fBCW_HEADER\fR
 defines the path to a text file to display before the program is launched (the \fBheader\fR definition instruction overrides this)

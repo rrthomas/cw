@@ -25,9 +25,9 @@ echo ""
 if test -z "$1" || test "$1" -ge "4";then
  echo "syntax: $0 [1|2|3]"
  echo ""
- echo "runlevel 1(unlimited coloring): appends PATH to rc file(s)."
- echo "runlevel 2(limited coloring): appends NOCOLOR_PIPE to rc file(s)."
- echo "runlevel 3(restricted coloring): appends CW_SHLVL to rc file(s)."
+ echo "runlevel 1 (unlimited coloring): appends PATH to rc file(s)."
+ echo "runlevel 2 (limited coloring): appends NOCOLOR_PIPE to rc file(s)."
+ echo "runlevel 3 (restricted coloring): appends CW_SHLVL to rc file(s)."
  echo ""
  echo "WHEN USING RUNLEVEL 3 MAKE SURE THAT THERE IS ONLY ONE INSTANCE OF"\
  "YOUR SHELL ACTIVE. (ie. no shell inside a shell)"
