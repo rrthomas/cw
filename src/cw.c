@@ -906,34 +906,6 @@ unsigned char regxcmp(char *str,char *pattern,unsigned char type){
 #endif
  return(1);
 }
-/* remaps an internal color. */
-unsigned char remap_color(char *color,char *ncolor){
- signed char x=0,y=0;
- if((x=color_atoi(color))<0)
-  return(1);
- else if(x>15)
-  return(2);
- else if((strlen(ncolor)!=5||!isdigit((unsigned char)ncolor[0])
- ||!isdigit((unsigned char)ncolor[1])||ncolor[2]!=';'||
- !isdigit((unsigned char)ncolor[3])||!isdigit((unsigned char)ncolor[4]))
- &&!((y=color_atoi(ncolor))>=0&&y<=15))
-  return(3);
- else{
-  free(pal2[x]);
-  if(!(pal2[x]=(char *)malloc(9)))
-   cwexit(1,"malloc() failed.");
-  memset(pal2[x],0,9);
-  if((y=color_atoi(ncolor))>=0&&y<=15)
-   strcpy(pal2[x],pal2_orig[y]);
-  else{
-   strcpy(pal2[x],"\x1b[");
-   strcat(pal2[x],ncolor);
-   strcat(pal2[x],"m");
-  }
-  cfgtable.ron=1;
- }
- return(0);
-}
 /* converts the color string to a numerical storage value. (0-17) */
 signed char color_atoi(char *color){
  unsigned char i=0;
