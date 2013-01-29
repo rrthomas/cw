@@ -1,6 +1,5 @@
 adm/		- administration directory for the maintainer
 bin/		- directory for compiled binaries
-doc/		- text versions of the manual pages
 def/		- generic/pre-made definition files (cw executables)
 etc/		- generic/pre-made header/footer files (placed in def dir)
 man/		- manual pages

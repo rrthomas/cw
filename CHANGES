@@ -4,6 +4,7 @@ version 1.0.17:
 * Overhauled and simplified the build system.
 * Improved the documentation.
 * Fix a potential overflow bug and a compiler warning in cw.c.
+* Removed text version of man pages.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
