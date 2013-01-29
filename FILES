@@ -9,7 +9,6 @@ CONTRIB		- how to contribute definitions
 COPYING		- the program license (GNU GPL)
 FILES		- this file
 INSTALL		- how to install color wrapper
-MD5SUM		- verification values for files (match on website)
 PLATFORM	- list of successful operating system compiles
 README		- small paragraph explaining what cw does
 VERSION		- the version value of this package
