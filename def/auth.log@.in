@@ -1,0 +1,4 @@
+path /var/log
+base cyan
+regex cyan+:cyan+ \[[0-9]+\]:
+

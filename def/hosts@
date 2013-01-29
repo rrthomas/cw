@@ -1,6 +1,0 @@
-#!/cw
-path /etc
-base cyan
-match cyan+:cyan .
-regex none:cyan+ [ 	]
-

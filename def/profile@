@@ -1,5 +1,0 @@
-#!/cw
-path /etc
-base cyan
-regex cyan+:cyan+ ^#
-

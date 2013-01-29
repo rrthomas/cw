@@ -1,5 +1,0 @@
-#!/cw
-path /proc
-base cyan
-match cyan+:default :
-token cyan+:default 0 58

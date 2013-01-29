@@ -1,6 +1,0 @@
-#!/cw
-path /etc
-base cyan
-match white:default :
-match grey:default ,
-token cyan+:default 0 58
