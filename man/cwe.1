@@ -1,0 +1,81 @@
+.\" color wrapper echo manual page.
+.TH "CWE" "1" "February 2005" "v9/fakehalo" "Text Manipulation"
+.SH "NAME"
+cwe \- (color wrapper) echo
+.SH "SYNOPSIS"
+.B cwe
+[\fIstring\fR]
+.SH "DESCRIPTION"
+.PP 
+\fBcwe\fR is a command to echo special formatted (colored) strings to standard output.  \fBcwe\fR is directly linked to the \fBcw\fR binary and \fBcw\fR recognizes that it is only designed to color a single string and exit.  if you are not familiar with \fBcw\fR you should probably consult that documentation first. (as long as the first 3 letters are "cwe" in the link name, \fBcw\fR will assume it is \fBcwe\fR)
+
+The main purpose of \fBcwe\fR's existence is to expand color to shell prompts, shell scripts, and other (non\-program/file wrapping) things while still keeping (some of) the color scheme \fBcw\fR provides.
+
+Several conversions are supported, and are the same as the \fBprint\fR definition instruction when using \fBcw\fR directly.
+
+.TP 
+\fB\\\\\fR
+ignore the current \\
+.TP 
+\fB\\e\fR
+escape conversion, usually used for ANSI (color) codes
+.TP 
+\fB\\r\fR
+carriage return conversion
+.TP 
+\fB\\n\fR
+new line conversion
+.TP 
+\fB\\t\fR
+horizontal tab conversion
+.TP 
+\fB\\v\fR
+virtical tab conversion
+.TP 
+\fB\\xNN\fR
+hexadecimal value conversion, must be followed by two bytes(00\-ff) (where available)
+.TP 
+\fB\\C[color]\fR
+color conversion, brackets are included in the \fBstring\fR
+.TP 
+the color values used are in the text form of:
+\fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default, none, random, random+, random&\fR
+.TP 
+colors with a \fB+\fR designate a brighter color.  \fBrandom\fR, \fBrandom+\fR and \fBrandom&\fR are random colors set at the start of cw or by the \fBCW_RANDOM\fR environmental variable (\fBrandom&\fR is a complementary color to \fBrandom\fR and \fBrandom+\fR)
+.SH "EXAMPLES"
+bash# export CW_RANDOM='cyan:blue'
+.br 
+bash# export PS1='$(cwe "\\C[random+]\\u\\C[default]# ")'
+.br 
+(note that \fB\\u\fR is processed by bash and not \fBcwe\fR)
+.SH "ENVIRONMENT"
+.PP 
+.TP 
+\fBCW_RANDOM\fR
+creates a new random colorset based on a list of colors separated by colons.  the random color selected will be used for the colors \fBrandom\fR, \fBrandom+\fR and \fBrandom&\fR (color values explicitly used in context to this variable are: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR)
+.TP 
+\fBCW_NORANDOM\fR
+disables random colors by always using the first list choice (any value placed in the variable will enable)
+.TP 
+\fBCW_INVERT\fR
+re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
+.TP 
+\fBCW_COLORIZE\fR
+defines a static colorset to override the definition file(and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+, random\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
+.TP 
+\fBCW_REMAP\fR
+remaps one or more internal color(s) to ANSI values or other internal color values.  this is useful for remapping colors to special ANSI (code) values or more advanced color scheming (than \fBCW_COLORIZE\fR).  the colors \fBrandom\fR, \fBrandom+\fR, \fBrandom&\fR, \fBdefault\fR and \fBnone\fR may not be remapped or used.  the format is \fBCW_REMAP=color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:...\fR ('#' stands for a single digit, which forms the ANSI code; '|' stands for "or", and the '|' is not included; '[' and ']' are not included)
+.TP 
+\fBCW_SUPERMAP\fR
+changes the internal color format to an entirely different color format(ie. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if a supermap and a remap are both defined, then the supermap will be forcefully disabled due to potential internal conflicts
+.SH "AUTHOR"
+Written by v9/fakehalo. [v9@fakehalo.us]
+.SH "BUGS"
+Report bugs to <v9@fakehalo.us>.
+.SH "COPYRIGHT"
+Copyright \(co 2005 v9/fakehalo.
+.br 
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+cw(1) cwu(1)
