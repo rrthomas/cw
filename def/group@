@@ -1,7 +1,6 @@
 #!/cw
 path /etc
-random cyan:green
-base random
+base cyan
 match white:default :
 match grey:default ,
-token random+:default 0 58
+token cyan+:default 0 58

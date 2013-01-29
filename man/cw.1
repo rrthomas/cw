@@ -71,7 +71,7 @@ changes the color before and after any uppercase letter (A\-Z)
 changes the color before and after any lowercase letter (a\-z)
 .TP 
 \fBremap\fR [\fIcolor\fR] [\fI##;##\fR | \fIcolor\fR]
-remaps the internal \fBcolor\fR value to the ANSI value "^[[\fB##;##\fRm"(where \fB#\fR is a single digit and only the \fB##;##\fR should be supplied) or \fBcolor\fR (original/un\-remapped).  the colors \fBrandom\fR, \fBrandom+\fR, \fBrandom&\fR, \fBdefault\fR and \fBnone\fR may not be remapped or used with this definition instruction (ex. "remap grey 30;47" would change the \fBgrey\fR color to a grey highlighted effect)
+remaps the internal \fBcolor\fR value to the ANSI value "^[[\fB##;##\fRm"(where \fB#\fR is a single digit and only the \fB##;##\fR should be supplied) or \fBcolor\fR (original/un\-remapped).  (ex. "remap grey 30;47" would change the \fBgrey\fR color to a grey highlighted effect)
 .TP 
 \fBsupermap\fR [\fImapname\fR]
 changes the internal color format to an entirely different color format (i.e. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if \fBsupermap\fR and \fBremap\fR are both defined, then \fBsupermap\fR will be forcefully disabled due to potential internal conflicts
@@ -80,7 +80,7 @@ changes the internal color format to an entirely different color format (i.e. no
 changes the process title to the provided \fBtitle\fR, this is will change how the program appears in programs like \fBps\fR and \fBw\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBs\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBprint\fR [\fIstring\fR]
-prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions (\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR and/or \fBrandom\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
+prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions (\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
 .TP 
 \fBheader\fR [\fIfile\fR]
 displays the contents of \fBfile\fR before any output of the real program
@@ -99,12 +99,6 @@ only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the e
 .TP 
 \fBwait\fR [\fIsecs\fR] [\fIusecs\fR]
 number of extra \fBsecs\fR and \fBusecs\fR to wait for output after the real program has exited.  this definition is rarely necessary
-.TP 
-\fBrandom\fR [\fIcolor:color:...\fR]
-creates a new random colorset based on a list of colors separated by colons.  the random color selected will be used for the colors \fBrandom\fR, \fBrandom+\fR and \fBrandom&\fR in definition instructions to come (color values explicitly used in context to the \fBrandom\fR definition instruction are: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR)
-.TP 
-\fBrandom\-goto\fR [\fIlabel:label:...\fR]
-jumps to a random \fBlabel\fR from a specified list of labels.  this is used when the \fBrandom\fR definition instruction is too limited of an environment to create a decent randomized definition file.  labels bypass \fBifexit\fR, \fBifos\fR, and \fBifarg\fR restrictions (labels are specified by a colon and placed throughout the definition file.  ie. "\fB:label1\fR" alone on a line followed by any desired instructions, the instructions to follow will be processed until the next label)
 .TP 
 \fBusepty\fR
 allocates a pty to emulate a programs natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
@@ -145,9 +139,6 @@ disables non\-critical definition file error messages for the definition instruc
 \fBwarnings\fR
 enables non\-critical definition file error messages for the definition instructions that follow.
 .TP 
-\fB:\fR[\fIlabel\fR]
-designates the start of a \fBlabel\fR to be used in conjunction with the \fBrandom\-goto\fR definition instruction
-.TP 
 \fB!\fR[\fIprogram\fR]
 executes the \fBprogram\fR string as it is placed in the definition file.  this is intended to either simply run a program before the wrapped program, or for special purposes relating to the \fBifexit\fR definition instructions.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments (the \fBprogram\fR string is in a shell execution format)
 .TP 
@@ -161,9 +152,9 @@ sets the environmental variable \fBVAR\fR to \fBVALUE\fR {THIS MAY NOT BE INCLUD
 ignores the following \fBtext\fR for processing. (for comments)
 .TP 
 The color values used are in the text form of:
-\fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default, none, random, random+, random&\fR
+\fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default, none\fR
 .TP 
-Colors with a \fB+\fR designate a brighter color.  \fBrandom\fR, \fBrandom+\fR and \fBrandom&\fR are random colors set at the start of cw or by the \fBCW_RANDOM\fR environmental variable or the \fBrandom\fR definition instruction (\fBrandom&\fR is a complementary color to \fBrandom\fR and \fBrandom+\fR)
+Colors with a \fB+\fR designate a brighter color.
 
 .SH "ARGUMENTS"
 Command\-line arguments may be inserted to change some attributes of cw.  These arguments are not for direct use with the cw binary, they are to be inserted in with any other arguments passed to the cw definition file.  For example \fBdf \-\-cw\-nocolor \-h\fR would disable coloring and run \fBdf \-h\fR.
@@ -180,315 +171,11 @@ inverts the internal color map
 \fB+nc, \-\-cw\-nocolor\fR
 disables color wrapping of the program
 .TP 
-\fB+nr, \-\-cw\-norandom\fR
-disables random colors (selects the first random choice)
-.TP 
 \fB+py, \-\-cw\-usepty\fR
 allocates a pseudo terminal {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fB+sm, \-\-cw\-supermap=mapname\fR
 changes the color format used (run \fBcw \-V\fR to see the supported supermaps)
-.SH "EXAMPLES"
-.PP 
-.TP 
-\fBFILENAME /usr/lib/cw/lsof\fR
-#!/usr/bin/cw
-.br 
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-.br 
-base cyan
-.br 
-digit cyan+:cyan
-.br 
-match yellow:default /
-.br 
-match cyan+:default \-
-.br 
-match cyan+:default +
-.br 
-match green+:default [
-.br 
-match green+:default ]
-.br 
-match green+:yellow (
-.br 
-match green+:default )
-.br 
-match white:default *
-.br 
-match blue+:default UDP
-.br 
-match blue+:default TCP
-.br 
-match blue+:default TPI
-.br 
-ifos linux:<pseudo>
-.br 
-match grey:default REG
-.br 
-match grey+:default DIR
-.br 
-match purple:default CHR
-.br 
-match purple+:default FIFO
-.br 
-match red:default DEL
-.br 
-ifos\-else
-.br 
-match grey:default VREG
-.br 
-match grey+:default VDIR
-.br 
-match purple:default VCHR
-.br 
-match purple+:default VFIFO
-.br 
-match red:default VDEL
-.br 
-ifos <any>
-.br 
-match default:default COMMAND
-.br 
-ifnarg \-h:\-\-help
-.br 
-token green+:default 0 32
-.TP 
-\fBFILENAME /usr/lib/cw/id\fR
-#!/usr/bin/cw
-.br 
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-.br 
-# shell scripts use these arguments alot, it will
-.br 
-# cause problems being colored.
-.br 
-ifnarg \-g:\-G:\-n:\-r:\-u:\-\-group:\-\-groups:\-\-name:\-\-real:\-\-user
-.br 
-base cyan
-.br 
-match cyan:default :
-.br 
-match white:default \-
-.br 
-match white:default =
-.br 
-match white:default /
-.br 
-match white:cyan+ [
-.br 
-match white:default ]
-.br 
-match white:cyan+ (
-.br 
-match white:default )
-.br 
-ifnarg <none>
-.br 
-nopipe
-.TP 
-\fBFILENAME /usr/lib/cw/arp\fR
-.br 
-#!/usr/bin/cw
-.br 
-path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-.br 
-random cyan:green:purple:brown
-.br 
-base random
-.br 
-regex white:default ([a\-fA\-F0\-9]{1,2}:){5}+[a\-fA\-F0\-9]{1,2}
-.br 
-ifos sunos
-.br 
-match random+:none Device
-.br 
-match random&:none \-\-\-\-\-
-.br 
-ifos\-else
-.br 
-match random+:none Address
-.br 
-match random+:default \-
-.br 
-ifos <any>
-.br 
-match random+:default .
-.br 
-match random+:default [
-.br 
-match random+:default ]
-.br 
-match white:default <
-.br 
-match white:default >
-.br 
-match random+:default (
-.br 
-match random+:default )
-.TP 
-\fBFILENAME /usr/lib/cw/ifconfig\fR
-#!/usr/bin/cw
-.br 
-path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-.br 
-random\-goto label1:label2
-.br 
-:label1
-.br 
-base cyan
-.br 
-digit cyan+:default
-.br 
-ucase cyan+:default
-.br 
-match white:default :
-.br 
-match white:default .
-.br 
-match yellow:default (
-.br 
-match yellow:default )
-.br 
-match cyan+:default [
-.br 
-match cyan+:default ]
-.br 
-match green+:default <
-.br 
-match green+:default >
-.br 
-:label2
-.br 
-base green
-.br 
-digit green+:default
-.br 
-ucase green+:default
-.br 
-match yellow:default :
-.br 
-match yellow:default .
-.br 
-match white:default (
-.br 
-match white:default )
-.br 
-match green+:default [
-.br 
-match green+:default ]
-.br 
-match green+:default <
-.br 
-match green+:default >
-.TP 
-\fBFILENAME /usr/lib/cw/messages@\fR
-#!/usr/bin/cw
-.br 
-path /var/log
-.br 
-base cyan
-.br 
-match white:cyan+ (
-.br 
-match white:default )
-.br 
-match white:cyan+ [
-.br 
-match white:default ]
-.br 
-token white:none 0 32
-.br 
-token green+:default 3 32
-.TP 
-\fBFILENAME /usr/lib/cw/syslog\fR
-#!/usr/bin/cw
-.br 
-other tail \-f /var/log/syslog
-.br 
-base cyan
-.br 
-match white:cyan+ (
-.br 
-match white:default )
-.br 
-match white:cyan+ [
-.br 
-match white:default ]
-.br 
-token white:none 0 32
-.br 
-token green+:default 3 32
-.TP 
-\fBFILENAME /usr/lib/cw/cw\-test.cgi\fR
-#!/usr/bin/cw
-.br 
-# this is simply a mimic of the test.cgi that (tends to)
-.br 
-# come with apache.  this file would go in cgi\-bin.
-.br 
-$SERVER_NAME=(Hidden for security purposes)
-.br 
-$SERVER_ADMIN=(Hidden for security purposes)
-.br 
-$SCRIPT_FILENAME=(Hidden for security purposes)
-.br 
-$SERVER_SOFTWARE=(Hidden for security purposes)
-.br 
-$SERVER_PORT=(Hidden for security purposes)
-.br 
-$SERVER_SIGNATURE=(Hidden for security purposes)
-.br 
-$SERVER_ADDR=(Hidden for security purposes)
-.br 
-$DOCUMENT_ROOT=(Hidden for security purposes)
-.br 
-$NOCOLOR_NEXT=1
-.br 
-# change the internal color format to html.
-.br 
-supermap html
-.br 
-# typical cw definition instructions.
-.br 
-other unset PWD;env
-.br 
-random brown:green:cyan
-.br 
-base random
-.br 
-match random+:random& (
-.br 
-match random+:default )
-.br 
-match white:default =
-.br 
-token random+:default 0 61
-.br 
-# web browser interprets this. (color conversions with the
-.br 
-# 'print' instruction need to happen after a 'supermap'
-.br 
-# and/or 'random' instruction, if they are present in the
-.br 
-# definition file)
-.br 
-print Content\-type: text/html\\n\\n
-.br 
-print <head>\\n
-.br 
-print <title>[cw\-test.cgi]: color test.cgi</title>\\n
-.br 
-print </head>\\n
-.br 
-print <body bgcolor="#000000" text="#ffffff">\\n
-.br 
-print <hr><h1>\\n
-.br 
-print \\C[random+]cw\-test.cgi\\C[random&]:\\C[random] env display\\n
-.br 
-print </h1><hr>\<br\>\\n
-
 .SH "ENVIRONMENT"
 .PP 
 .TP 
@@ -513,20 +200,14 @@ sets the internal exit code to the exit code returned by the program/shell expre
 \fBCW_USEPTY\fR
 allocates a pty to emulate a programs natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. (any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
-\fBCW_RANDOM\fR
-creates a new random colorset based on a list of colors separated by colons.  the random color selected will be used for the colors \fBrandom\fR, \fBrandom+\fR and \fBrandom&\fR in definition instructions to come (color values explicitly used in context to the \fBrandom\fR definition instruction are: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR)
-.TP 
-\fBCW_NORANDOM\fR
-disables random colors by always using the first list choice with the \fBrandom\fR and \fBrandom\-goto\fR definition instructions (any value placed in the variable will enable)
-.TP 
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .TP 
 \fBCW_COLORIZE\fR
-defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+, random\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
+defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
 .TP 
 \fBCW_REMAP\fR
-remaps one or more internal color(s) to ANSI values or other internal color values.  this is useful for remapping colors to special ANSI (code) values or more advanced color scheming (than \fBCW_COLORIZE\fR).  the colors \fBrandom\fR, \fBrandom+\fR, \fBrandom&\fR, \fBdefault\fR and \fBnone\fR may not be remapped or used.  the format is \fBCW_REMAP=color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:...\fR ('#' stands for a single digit, which forms the ANSI code; '|' stands for "or", and the '|' is not included; '[' and ']' are not included)
+remaps one or more internal color(s) to ANSI values or other internal color values.  this is useful for remapping colors to special ANSI (code) values or more advanced color scheming (than \fBCW_COLORIZE\fR).  the colors \fBdefault\fR and \fBnone\fR may not be remapped or used.  the format is \fBCW_REMAP=color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:color=\fR[\fB##;##\fR|\fBcolor\fR]\fB:...\fR ('#' stands for a single digit, which forms the ANSI code; '|' stands for "or", and the '|' is not included; '[' and ']' are not included)
 .TP 
 \fBCW_SUPERMAP\fR
 changes the internal color format to an entirely different color format (i.e. non\-ANSI), this is intended for special non\-console coloring situations.  supermaps are internal and can be listed by running \fBcw \-V\fR.  if a supermap and a remap are both defined, then the supermap will be forcefully disabled due to potential internal conflicts

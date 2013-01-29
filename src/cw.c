@@ -158,11 +158,7 @@ unsigned char strwcmp(char *,char *);
 unsigned char struncmp(char *);
 #endif
 unsigned char regxcmp(char *,char *,unsigned char);
-unsigned char setsupermap(char *);
-unsigned char remap_color(char *,char *);
 signed char color_atoi(char *);
-signed char color_rand(char *);
-signed char label_rand(char *);
 signed char make_ptypair(unsigned char v);
 unsigned char cwprintf(char *);
 unsigned char is_cwfile(char *);
@@ -192,13 +188,6 @@ struct{
 }proct;
 #endif
 #endif
-/* supermap layout table. */
-struct super_map{
- char *label;
- char *c[17];
- char *reset;
- unsigned int max;
-};
 /* configuration table. */
 struct{
  unsigned char col;
@@ -230,7 +219,6 @@ struct{
 #ifdef HAVE_REGCOMP
  signed char noer;
 #endif
- signed char norandom;
 #ifdef HAVE_ISATTY
  signed char nopipe;
 #endif
@@ -297,10 +285,6 @@ struct{
   signed char on;
  }z;
  struct{
-  unsigned char map;
-  signed char on;
- }y;
- struct{
   char *ldata;
   char *rdata;
   unsigned int llen;
@@ -335,21 +319,6 @@ static char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
-static struct super_map sm[]={
- {"html",{"<font color=#000000>","<font color=#000080>",
- "<font color=#008000>","<font color=#008080>","<font color=#800000>",
- "<font color=#800080>","<font color=#804000>","<font color=#aaaaaa>",
- "<font color=#606060>","<font color=#0000ff>","<font color=#00ff00>",
- "<font color=#00ffff>","<font color=#ff0000>","<font color=#ff00ff>",
- "<font color=#eeee00>","<font color=#ffffff>",""},"<br>",20},
- {"ctrlk",{"\00301","\00302","\00303","\00310","\00305","\00306","\00307",
- "\00315","\00314","\00312","\00309","\00311","\00304","\00313","\00308",
- "\00300",""},"\x0f",3},
- {"debug",{"<BLACK>","<BLUE>","<GREEN>","<CYAN>","<RED>","<PURPLE>",
- "<BROWN>","<GREY+>","<GREY>","<BLUE+>","<GREEN+>","<CYAN+>","<RED+>",
- "<PURPLE+>","<YELLOW>","<WHITE>",""},"<RESET>",9},
- {0,{0},0,0}
-};
 static char *cfgmsg[]={
  "invalid definition instruction.",
  "no valid 'path' or 'other' definition was defined.",
@@ -375,9 +344,9 @@ static char *cfgmsg[]={
  "environmental variable placement syntax error. (not enough arguments?)",
  "both 'path' and 'other' were defined. (one definition or the other)",
  "'path' definition needed for '@' files. ('other' is not applicable)",
- "'random' definition used an invalid color. (ignoring)",
- "'random-goto' syntax error. (not enough arguments?)",
- "'random-goto' referenced a non-existent/past label.",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "'regex' definition used an invalid color. (defaulting)",
  "'regex' too many entries. (race condition?)",
  "'regex' syntax error. (not enough arguments?)",
@@ -390,7 +359,7 @@ static char *cfgmsg[]={
  "'!'/'@' failed to execute background program.",
  "'ifexit'/'ifnexit' invalid exit level. (127--127)",
  "'ifexit-else' used before any previous comparison.",
- "'supermap' failed. (is it a valid supermap?)",
+ "NO SUCH ERROR",
  "'lborder' syntax error. (not enough arguments?)",
  "'rborder' syntax error. (not enough arguments?)",
  "'proctitle' syntax error. (not enough arguments?)",
@@ -402,7 +371,7 @@ static char *cfgmsg[]={
 /* program start. */
 signed int main(signed int argc,char **argv){
  unsigned int i=0,j=0,margc=0;
- char *bufc,*bufn,*bufo,*tmp,*ptr,**margv;
+ char *tmp,*ptr,**margv;
  cfgtable.z.l=cfgtable.z.h=-1;
  if(!(margv=(char **)malloc((sizeof(char *)*(argc+1)))))
   cwexit(1,"malloc() failed.");
@@ -416,19 +385,11 @@ signed int main(signed int argc,char **argv){
   else if(!strcmp("+py",argv[i])||!strcmp("--cw-usepty",argv[i]))
    cfgtable.pty=1;
 #endif
-  else if(!strcmp("+nr",argv[i])||!strcmp("--cw-norandom",argv[i]))
-   cfgtable.norandom=1;
   else if(!strncmp("+co=",argv[i],4)){
    if(strlen(argv[i])>4)setcolorize(argv[i]+4);
   }
   else if(!strncmp("--cw-colorize=",argv[i],14)){
    if(strlen(argv[i])>14)setcolorize(argv[i]+14);
-  }
-  else if(!strncmp("+sm=",argv[i],4)){
-   if(strlen(argv[i])>4)setsupermap(argv[i]+4);
-  }
-  else if(!strncmp("--cw-supermap=",argv[i],14)){
-   if(strlen(argv[i])>14)setsupermap(argv[i]+14);
   }
   else{
    if(!strcmp("--help",argv[i]))cfgtable.addhelp=1;
@@ -454,12 +415,6 @@ signed int main(signed int argc,char **argv){
  if(!cfgtable.po){
   if(margc>1){
    if(!strcasecmp(margv[1],"-v")){
-    if(!strcmp(margv[1],"-V")){
-     fprintf(stdout,"cw:supermaps: (");
-     for(i=0;sm[i].label;i++)
-      fprintf(stdout,"\"%s\"%s",sm[i].label,sm[i+1].label?",":"");
-     fprintf(stdout,")\n");
-    }
     cwexit(1,"cw (color wrapper) v"VERSION" (support=+"
 #ifndef NO_ENVSET
     "e"
@@ -508,7 +463,6 @@ signed int main(signed int argc,char **argv){
   memset(pal2[i],0,(strlen(pal2_orig[i])+1));
   strcpy(pal2[i],pal2_orig[i]);
  }
- if(getenv("CW_NORANDOM"))cfgtable.norandom=1;
  if(!cfgtable.po){
   if((ptr=getenv("CW_HEADER"))&&strlen(ptr)&&!access(ptr,R_OK)){
    if(cfgtable.header)free(cfgtable.header);
@@ -540,31 +494,9 @@ signed int main(signed int argc,char **argv){
 #endif
   if(getenv("CW_CLEAR"))cfgtable.clear=1;
  }
- if(!((ptr=(char *)getenv("CW_RANDOM"))&&color_rand(ptr)>=0)){
-  /* don't randomize with "black" by default. */
-  color_rand("blue:green:cyan:red:purple:brown:grey:grey+");
- }
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=1;
- if((ptr=(char *)getenv("CW_REMAP"))){
-  for(i=0;strcmp(parameter(ptr,":",i),"-1");i++){
-   if(!(bufo=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(bufo,pptr);
-   if(!(bufc=(char *)malloc(strlen(parameter(bufo,"=",0))+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(bufc,pptr);
-   if(!(bufn=(char *)malloc(strlen(parameter(bufo,"=",1))+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(bufn,pptr);
-   free(bufo);
-   remap_color(bufc,bufn);
-   free(bufc);
-   free(bufn);
-  }
- }
- if((ptr=(char *)getenv("CW_SUPERMAP")))setsupermap(ptr);
  if(cfgtable.po){
   if(cwprintf(cfgtable.cmdargs))
    cwexit(1,"write error.");
@@ -612,10 +544,9 @@ signed int main(signed int argc,char **argv){
 #ifdef HAVE_ISATTY
  }
 #endif
- if(cfgtable.ron)cfgtable.y.on=0;
  if(cfgtable.z.on)cfgtable.invert=0;
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
- if(!cfgtable.nocolor&&!cfgtable.y.on&&cfgtable.clear){
+ if(!cfgtable.nocolor&&cfgtable.clear){
   fprintf(stdout,"\x1b[H\x1b[2J");
   fflush(stdout);
  }
@@ -922,38 +853,6 @@ char *convert_string(char *line){
  ,pal2[cfgtable.base],tbuf,(cfgtable.b.rlen?cfgtable.b.rdata:""),
  (!cfgtable.noeol?pal2[16]:""));
  free(tbuf);
- if(cfgtable.y.on){
-  s=(strlen(buf)-(!cfgtable.noeol?4:0));
-  l=(!cfgtable.noeol?strlen(sm[cfgtable.y.map].reset):0);
-  if(!(tmp=(char *)malloc(s*(sm[cfgtable.y.map].max*2+1)+s+l+1)))
-   cwexit(1,"malloc() failed.");
-  memset(tmp,0,(s*(sm[cfgtable.y.map].max*2+1)+s+l+1));
-  for(j=i=0;i<s;i++){
-   if((i+7)<s&&buf[i]==0x1b&&buf[i+1]=='['
-   &&isdigit((unsigned char)buf[i+2])&&isdigit((unsigned char)buf[i+3])
-   &&buf[i+4]==';'&&isdigit((unsigned char)buf[i+5])
-   &&isdigit((unsigned char)buf[i+6])&&buf[i+7]=='m'){
-    for(k=0;k<16;k++){
-     if(!strncmp(buf+i,pal2[k],8)){
-      strcat(tmp,sm[cfgtable.y.map].c[k]);
-      j+=strlen(sm[cfgtable.y.map].c[k]);
-      k=16;
-     }
-    }
-    i+=7;
-   }
-   else{
-    tmp[j]=buf[i];
-    j++;
-   }
-  }
-  if(!cfgtable.noeol)strcat(tmp,sm[cfgtable.y.map].reset);
-  free(buf);
-  if(!(buf=(char *)malloc(strlen(tmp)+1)))
-   cwexit(1,"malloc() failed.");
-  strcpy(buf,tmp);
-  free(tmp);
- }
  free(aptr);
  return(aptr=buf);
 }
@@ -1007,30 +906,17 @@ unsigned char regxcmp(char *str,char *pattern,unsigned char type){
 #endif
  return(1);
 }
-/* finds and sets supermaps. */
-unsigned char setsupermap(char *name){
- unsigned char r=0;
- unsigned int i=0;
- for(i=0;!r&&sm[i].label;i++){
-  if(!strcmp(name,sm[i].label)){
-   cfgtable.y.map=i;
-   r=cfgtable.y.on=1;
-  }
- }
- return(r);
-}
 /* remaps an internal color. */
 unsigned char remap_color(char *color,char *ncolor){
  signed char x=0,y=0;
  if((x=color_atoi(color))<0)
   return(1);
- else if(x>15||!strcmp(color,"random")||!strcmp(color,"random+")
- ||!strcmp(color,"random&"))
+ else if(x>15)
   return(2);
  else if((strlen(ncolor)!=5||!isdigit((unsigned char)ncolor[0])
  ||!isdigit((unsigned char)ncolor[1])||ncolor[2]!=';'||
  !isdigit((unsigned char)ncolor[3])||!isdigit((unsigned char)ncolor[4]))
- &&!((y=color_atoi(ncolor))>=0&&y<=15&&strncmp(ncolor,"random",6)))
+ &&!((y=color_atoi(ncolor))>=0&&y<=15))
   return(3);
  else{
   free(pal2[x]);
@@ -1065,94 +951,10 @@ signed char color_atoi(char *color){
    else i=cfgtable.z.h;
   }
  }
- else if(!strcmp(color,"random"))i=cfgtable.r.l;
- else if(!strcmp(color,"random+"))i=cfgtable.r.h;
- else if(!strcmp(color,"random&"))i=cfgtable.r.c;
  else{
   while(strcmp(palptr[i],color)&&i<18)i++;
  }
  return(i<18?i:-1);
-}
-/* randomly selects a color from a colon-separated list of colors. */
-signed char color_rand(char *list){
- signed char tmp=0;
- signed int r=0,s=0;
- unsigned int i=0;
- struct timeval tv;
- if(!list)return(-1);
- else if(cfgtable.z.on)return(0);
- if(!cfgtable.norandom){
-  while(strcmp(parameter(list,":",i),"-1"))i++;
-  gettimeofday(&tv,0);
-  srand(tv.tv_usec);
-  i=(int)((double)i*rand()/(RAND_MAX+1.0));
- }
- tmp=cfgtable.invert;
- cfgtable.invert=0;
- r=color_atoi(parameter(list,":",i));
- cfgtable.invert=tmp;
- if(cfgtable.invert){
-  if(r==7)r=0;
-  else if(r==0)r=7;
- }
- if(r>=0&&r<8){
-  cfgtable.r.l=r;
-  cfgtable.r.h=(r+8);
- }
- else if(r==8){
-  cfgtable.r.l=8;
-  cfgtable.r.h=7;
- }
- else s=-1;
- if(s>=0){
-  if(cfgtable.invert){
-   if(!r)cfgtable.r.c=7;
-   else if(r==1)cfgtable.r.c=3;
-   else if(r==2)cfgtable.r.c=6;
-   else if(r==3)cfgtable.r.c=1;
-   else if(r==4)cfgtable.r.c=5;
-   else if(r==5)cfgtable.r.c=4;
-   else if(r==7)cfgtable.r.c=8;
-   else cfgtable.r.c=0;
-  }
-  else{
-   if(!r)cfgtable.r.c=7;
-   else if(r==1)cfgtable.r.c=11;
-   else if(r==2)cfgtable.r.c=14;
-   else if(r==3)cfgtable.r.c=9;
-   else if(r==4)cfgtable.r.c=13;
-   else if(r==5)cfgtable.r.c=12;
-   else if(r==7)cfgtable.r.c=8;
-   else cfgtable.r.c=15;
-  }
- }
- if(cfgtable.invert){
-  r=cfgtable.r.l;
-  cfgtable.r.l=cfgtable.r.h;
-  cfgtable.r.h=r;
- }
- return(s);
-}
-/* randomly selects a label, used by "random-goto". */
-signed char label_rand(char *list){
- signed int s=0;
- unsigned int i=0;
- struct timeval tv;
- if(!list)return(-1);
- if(!cfgtable.norandom){
-  while(strcmp(parameter(list,":",i),"-1"))i++;
-  gettimeofday(&tv,0);
-  srand(tv.tv_usec);
-  i=(int)((double)i*rand()/(RAND_MAX+1.0));
- }
- if(atoi(parameter(list,":",i))==-1)s=-1;
- else{
-  if(cfgtable.label)free(cfgtable.label);
-  if(!(cfgtable.label=(char *)malloc(strlen(pptr)+1)))
-   cwexit(1,"malloc() failed.");
-  strcpy(cfgtable.label,pptr);
- }
- return(s);
 }
 #ifndef NO_PTY
 /* creates a pty pair. (master/slave) */
@@ -1240,8 +1042,7 @@ unsigned char cwprintf(char *str){
  size_t p=0;
  char *tmp,*ctmp;
  j=strlen(str);
- if(cfgtable.y.on)k=(sm[cfgtable.y.map].max*j);
- else k=(8*j);
+ k=(8*j);
  if(!(tmp=(char *)malloc((j*k)+j+1)))
   cwexit(1,"malloc() failed.");
  memset(tmp,0,(j*k)+j+1);
@@ -1287,14 +1088,8 @@ unsigned char cwprintf(char *str){
        memset(ctmp,0,p+1);
        strncpy(ctmp,str+i+3,p);
        if((x=color_atoi(ctmp))>=0){
-        if(cfgtable.y.on){
-         strcat(tmp,sm[cfgtable.y.map].c[x]);
-         k+=strlen(sm[cfgtable.y.map].c[x]);
-        }
-        else{
-         strcat(tmp,pal2[x]);
-         k+=strlen(pal2[x]);
-        }
+        strcat(tmp,pal2[x]);
+        k+=strlen(pal2[x]);
         i+=(p+2);
        }
        else{
@@ -2170,14 +1965,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
   }
   else c_error(l,cfgmsg[9]);
  }
- else if(!strcmp(parameter(line," ",0),"remap")){
-  if((i=remap_color(parameter(line," ",1),parameter(line," ",2))))
-   c_error(l,cfgmsg[(32+i)]);
- }
- else if(!strcmp(parameter(line," ",0),"supermap")){
-  if(!setsupermap(parameter(line," ",1)))
-   c_error(l,cfgmsg[39]);
- }
  else if(!strcmp(parameter(line," ",0),"limit")){
   if(!strcmp(parameter(line," ",1),"columns")){
    if(getenv("COLUMNS"))cfgtable.col=atoi(getenv("COLUMNS"));
@@ -2195,17 +1982,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
    else
     cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=atoi(pptr);
   }
- }
- else if(!strcmp(parameter(line," ",0),"random")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(color_rand(ptr)<0)c_error(l,cfgmsg[24]);
- }
- else if(!strcmp(parameter(line," ",0),"random-goto")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(label_rand(ptr)<0)c_error(l,cfgmsg[25]);
-  else cfgtable.iflabel=cfgtable.iflabelf=1;
  }
  else if(!strcmp(parameter(line," ",0),"clear"))cfgtable.clear=1;
 #ifndef NO_PTY
@@ -2327,15 +2103,10 @@ void addhelp_display(void){
  fprintf(stdout,"%s\n",convert_string(
  "  +nc, --cw-nocolor                 disable color wrapping of this"
  " program."));
- fprintf(stdout,"%s\n",convert_string(
- "  +nr, --cw-norandom                disable random colors. (first"
- " selection)"));
 #ifndef NO_PTY
  fprintf(stdout,"%s\n",convert_string(
  "  +py, --cw-usepty                  allocates a pseudo terminal."));
 #endif
- fprintf(stdout,"%s\n",convert_string(
- "  +sm, --cw-supermap=mapname        changes the color format used."));
  return;
 }
 /* configuration error message. */

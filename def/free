@@ -1,13 +1,12 @@
 #!/cw
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-random cyan:green:purple
-base random
-digit random&:default
+base cyan
+digit cyan+:default
 match white:default :
-match random+:default /
-match random+:default [
-match random+:default ]
-match random+:default |
-match random&:default -
-match random&:default +
-match random+:none total
+match cyan+:default /
+match cyan+:default [
+match cyan+:default ]
+match cyan+:default |
+match cyan+:default -
+match cyan+:default +
+match cyan+:none total

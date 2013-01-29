@@ -2,11 +2,10 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 # this may be used for other purposes than coloring to stdin.
 nopipe
-random cyan:green:purple:brown:grey
-base random
-match random+:default /
+base cyan
+match cyan+:default /
 ifarg --h
-match random+:default -
+match cyan+:default -
 ifarg-else
-token random&:none 0 32
+token cyan+:none 0 32
 token none:default 1 32

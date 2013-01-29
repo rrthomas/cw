@@ -1,6 +1,5 @@
 #!/cw
 path /usr/bin:/bin:/usr/sbin:/sbin:<env>
-random brown:green:cyan
 base grey+
 ifarg --help
 match white:default ?
@@ -25,4 +24,4 @@ match white:default tty
 match white:default pts
 match grey:default LOGIN
 match white:default root
-match random+:default {?}{?}{?} {?}{?} {?}{?}:{?}{?}
+match cyan+:default {?}{?}{?} {?}{?} {?}{?}:{?}{?}

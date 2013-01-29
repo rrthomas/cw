@@ -1,6 +1,5 @@
 #!/cw
 path /var/log
-random cyan:green:purple
-base random
-regex random+:random& \[[0-9]+\]:
+base cyan
+regex cyan+:cyan+ \[[0-9]+\]:
 

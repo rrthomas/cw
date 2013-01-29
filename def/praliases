@@ -1,6 +1,5 @@
 #!/cw
 path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-random cyan:green:red:purple
-base random
-match random&:default :
-token random+:default 0 58
+base cyan
+match cyan+:default :
+token cyan+:default 0 58

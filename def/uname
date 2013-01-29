@@ -1,14 +1,13 @@
 #!/cw
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-random cyan:green:purple:grey+
-base random
-digit random+:default
-match random+:default /
-match random&:default :
-match random&:default .
-match random&:default -
-match random&:default #
+base cyan
+digit cyan+:default
+match cyan+:default /
+match cyan+:default :
+match cyan+:default .
+match cyan+:default -
+match cyan+:default #
 ifnarg --help:--version
-token random&:default 0 32
+token cyan+:default 0 32
 ifnarg -a:-all
 nopipe

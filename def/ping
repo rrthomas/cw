@@ -1,7 +1,6 @@
 #!/cw
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 usepty
-random-goto label1:label2
 :label1
 base cyan
 ifos sunos
@@ -22,23 +21,3 @@ match green+:default  ms
 match none:green+  from 
 match none:green+ From 
 match blue+:none PING
-:label2
-base green
-ifos sunos
-match green+:white ----
-match yellow:default is alive
-ifos <any>
-match green+:white ---
-ifnarg --help
-match yellow:green+ =
-ifarg <any>
-match white:green+ :
-match white:yellow (
-match white:default )
-match yellow:green+ [
-match yellow:default ]
-match green+:default ,
-match yellow:default  ms
-match none:yellow  from 
-match none:yellow From 
-match white:none PING

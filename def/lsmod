@@ -1,12 +1,11 @@
 #!/cw
 path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-random purple:cyan:green
-base random
-digit random+:default
-match random+:random& (
-match random+:default )
-match random+:default [
-match random+:default ]
-match random&:none Module
+base cyan
+digit cyan+:default
+match cyan+:cyan+ (
+match cyan+:default )
+match cyan+:default [
+match cyan+:default ]
+match cyan+:none Module
 ifarg -h:--help
-match random+:default -
+match cyan+:default -

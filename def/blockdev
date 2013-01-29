@@ -1,11 +1,10 @@
 #!/cw
 path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-random green:cyan:purple:grey+
-base random
-digit random+:default
-match random+:default -
+base cyan
+digit cyan+:default
+match cyan+:default -
 match grey:default (
 match grey:default )
 match grey:default [
 match grey:default ]
-match random&:none RO 
+match cyan+:none RO 
