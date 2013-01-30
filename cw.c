@@ -357,7 +357,7 @@ static char *cfgmsg[]={
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
- "'proctitle' syntax error. (not enough arguments?)",
+ "NO SUCH ERROR",
  "'print' syntax error. (not enough arguments?)",
  "'print' write error.",
  "#!/path/to/cw directive doesn't exist. (first line)",
@@ -1240,8 +1240,7 @@ void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    signal(SIGINT,sighandler);
 #ifndef NO_SETPROCTITLE
    initsetproctitle(oargc,oargv,environ);
-   if(cfgtable.title)setproctitle("%s",cfgtable.title);
-   else setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
+   setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
 #endif
    if(!(buf=(char *)malloc(BUFSIZE+1)))
     cwexit(1,"malloc() failed.");
@@ -1665,21 +1664,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
   }
   else c_error(l,cfgmsg[17]);
  }
-#ifndef NO_SETPROCTITLE
- else if(!strcmp(parameter(line," ",0),"proctitle")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(ptr){
-   if(cfgtable.title)free(cfgtable.title);
-   if(!(cfgtable.title=(char *)malloc(strlen(ptr)+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.title,ptr);
-  }
-  else c_error(l,cfgmsg[42]);
- }
-#else
- else if(!strcmp(parameter(line," ",0),"proctitle"));
-#endif
  else if(!strcmp(parameter(line," ",0),"match")){
   if(strcmp(parameter(line," ",1),"-1")){
    if(!(tmp=(char *)malloc(strlen(pptr)+1)))

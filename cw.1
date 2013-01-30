@@ -68,9 +68,6 @@ changes the color before and after any uppercase letter (A\-Z)
 \fBlcase\fR [\fIbefore color:after color\fR]
 changes the color before and after any lowercase letter (a\-z)
 .TP 
-\fBproctitle\fR [\fItitle\fR]
-changes the process title to the provided \fBtitle\fR, this is will change how the program appears in programs like \fBps\fR and \fBw\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBs\fR" IS INCLUDED IN THE SUPPORT}
-.TP 
 \fBprint\fR [\fIstring\fR]
 prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions (\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
 .TP 
