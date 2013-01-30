@@ -68,7 +68,7 @@ dnl Checks for functions and headers
 AC_HEADER_STDC
 AC_CHECK_LIB(util, openpty)
 AC_CHECK_FILE("/dev/ptmx", AC_DEFINE(HAVE_DEV_PTMX, 1, Have /dev/ptmx.))
-AC_CHECK_FUNCS(getpt isatty isxdigit openpty putenv regcomp setenv setproctitle setsid sigaction sscanf uname unsetenv vsnprintf waitpid)
+AC_CHECK_FUNCS(getpt isatty isxdigit openpty putenv setenv setproctitle setsid sigaction sscanf uname unsetenv vsnprintf waitpid)
 AC_CHECK_HEADERS(ctype.h fcntl.h libgen.h libutil.h pty.h signal.h string.h strings.h stropts.h unix.h util.h sys/ioctl.h sys/stat.h sys/time.h sys/types.h sys/utsname.h sys/wait.h)
 gl_INIT
 
