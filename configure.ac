@@ -3,6 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl Initialise autoconf and automake
 AC_INIT([cw], [1.0.17], [rrt@sc3d.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Checks for programs
 AM_PROG_CC_C_O
