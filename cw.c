@@ -163,7 +163,6 @@ unsigned char cwprintf(char *);
 unsigned char is_cwfile(char *);
 void setborder(char *,unsigned char);
 void setcolorize(char *);
-void catfile(unsigned char,char *);
 signed char execot(char *,unsigned char,unsigned int);
 void execcw(signed int,char **,signed int,char **);
 #ifndef NO_SETPROCTITLE
@@ -441,13 +440,6 @@ signed int main(signed int argc,char **argv){
    if(!(scrname=(char *)malloc(strlen(margv[1])+1)))
     cwexit(1,"malloc() failed.");
    strcpy(scrname,margv[1]);
-   cfgtable.cat=0;
-   if(scrname[strlen(scrname)-1]=='@'){
-    if(!(catname=(char *)malloc(strlen(scrname))))
-     cwexit(1,"malloc() failed.");
-    strncpy(catname,scrname,strlen(scrname)-1);
-    cfgtable.cat=1;
-   }
   }
   else
    cwexit(1,"this program is not intended to be used interactively.");
@@ -528,12 +520,7 @@ signed int main(signed int argc,char **argv){
   fprintf(stdout,"\x1b[H\x1b[2J");
   fflush(stdout);
  }
- if(cfgtable.cat){
-  signal(SIGINT,sighandler);
-  signal(SIGPIPE,sighandler);
-  catfile(1,cfgtable.path);
- }
- else execcw(argc,argv,margc,margv);
+ execcw(argc,argv,margc,margv);
  cwexit(0,0);
  /* won't make it here. */
  exit(0);
@@ -1124,35 +1111,6 @@ void setcolorize(char *str){
   }
   if(r>=0&&r<9)cfgtable.z.on=1;
  }
- return;
-}
-/* reads a file and dumps it to stdout, used for @'s. */
-void catfile(unsigned char conv,char *file){
- unsigned int s=0;
- char buf[BUFSIZE+1];
- FILE *fs;
- if(!(fs=fopen(file,"r"))){
-  if(conv)cwexit(1,"text file could not be opened.");
-  return;
- }
- for(memset(buf,0,BUFSIZE);fgets(buf,BUFSIZE,fs);memset(buf,0,BUFSIZE)){
-  s=strlen(buf);
-  if(s&&!isprint((unsigned char)buf[s-1])){
-   buf[s-1]=0;
-   s--;
-  }
-  if(s&&!isprint((unsigned char)buf[s-1])){
-   buf[s-1]=0;
-   s--;
-  }
-  if(s){
-   if(cfgtable.col&&!cfgtable.nocolor&&cfgtable.col<strlen(buf))
-    buf[cfgtable.col]=0;
-   fprintf(stdout,"%s\n",(conv&&!cfgtable.nocolor?convert_string(buf):buf));
-   fflush(stdout);
-  }
- }
- fclose(fs);
  return;
 }
 /* handles and executes other programs. */

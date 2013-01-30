@@ -1,5 +1,0 @@
-path /etc
-base cyan
-regex cyan+:none ^[A-Za-z0-9]+=
-regex cyan+:cyan+ ([0-9\*]+[ 	]+){5}
-
