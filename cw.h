@@ -16,6 +16,4 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 **/
 
-#define VERSION "1.0.17"
-#define CMPTIME "2013/01/29 11:02:26 GMT"
 #define BUFSIZE 1024

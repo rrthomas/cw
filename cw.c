@@ -297,7 +297,7 @@ struct{
  struct itimerval w;
 }cfgtable;
 
-char id[]="$Id: cw.c,v "VERSION" "CMPTIME" v9/fakehalo Exp $";
+char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 unsigned char ext=0,rexit=0;
 char *pal2[18],*aptr,*fptr,*pptr,*catname,*progname,*scrname;
