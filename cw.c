@@ -152,7 +152,6 @@ unsigned char regxcmp(char *,char *,unsigned char);
 signed char color_atoi(char *);
 signed char make_ptypair(unsigned char v);
 unsigned char cwprintf(char *);
-unsigned char is_cwfile(char *);
 void setcolorize(char *);
 signed char execot(char *,unsigned char,unsigned int);
 void execcw(signed int,char **,signed int,char **);
@@ -346,7 +345,7 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "'print' syntax error. (not enough arguments?)",
  "'print' write error.",
- "#!/path/to/cw directive doesn't exist. (first line)",
+ "NO SUCH ERROR",
  "configuration contained critical errors."};
 
 /* program start. */
@@ -1030,21 +1029,6 @@ unsigned char cwprintf(char *str){
  free(tmp);
  return(i==k?0:1);
 }
-/* reads the first line of the file to check if it's a cw definition file. */
-unsigned char is_cwfile(char *file){
- unsigned int s=0;
- char buf[BUFSIZE+1];
- FILE *fs;
- if(!(fs=fopen(file,"r")))return(0);
- memset(buf,0,BUFSIZE);
- if(fgets(buf,BUFSIZE,fs)){/*Avoid compiler warning.*/};
- fclose(fs);
- s=strlen(buf);
- if(buf[s]=='\n')s--;
- if(buf[s]=='\r')s--;
- if(s>4&&!strncmp(buf,"#!",2)&&!strncmp(buf+(s-4),"/cw",3))return(1);
- return(0);
-}
 /* sets colorize values. */
 void setcolorize(char *str){
  signed char r=0;
@@ -1529,7 +1513,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
     strlen(strpname(cfgtable.cat?catname:scrname))+2)))
      cwexit(1,"malloc() failed.");
     sprintf(tmppath,"%s/%s",pptr,strpname(cfgtable.cat?catname:scrname));
-    if(!access(tmppath,(cfgtable.cat?R_OK:X_OK))&&!is_cwfile(tmppath)){
+    if(!access(tmppath,(cfgtable.cat?R_OK:X_OK))){
      if(cfgtable.path)free(cfgtable.path);
      if(!(cfgtable.path=(char *)malloc(strlen(tmppath)+1)))
       cwexit(1,"malloc() failed.");
@@ -1820,10 +1804,6 @@ void c_read(char *file,signed int argc){
  unsigned int j=0,k=0;
  char buf[BUFSIZE+1];
  FILE *fs;
- if(!is_cwfile(file)){
-  c_error(0,cfgmsg[45]);
-  cwexit(1,cfgmsg[46]);
- }
  if(!(fs=fopen(file,"r")))cwexit(1,"failed opening config file.");
  for(i=0;i<2;i++){
   /* reset the reading location, it goes through the config file twice. */
