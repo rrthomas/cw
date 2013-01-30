@@ -336,7 +336,7 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "'!'/'@' failed to execute background program.",
- "'ifexit'/'ifnexit' invalid exit level. (127--127)",
+ "'ifexit'/'ifnexit' invalid exit level. (-127..127)",
  "'ifexit-else' used before any previous comparison.",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
