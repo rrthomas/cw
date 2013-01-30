@@ -2,10 +2,12 @@ dnl Process this file with autoconf to produce a configure script.
 
 dnl Initialise autoconf and automake
 AC_INIT([cw], [1.0.17], [rrt@sc3d.org])
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Checks for programs
+gl_EARLY
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MKDIR_P
@@ -26,9 +28,10 @@ AC_HEADER_STDC
 AC_CHECK_LIB(util, openpty)
 AC_CHECK_FILE("/dev/ptmx", AC_DEFINE(HAVE_DEV_PTMX, 1, Have /dev/ptmx.))
 AC_CHECK_FUNCS(getpt isatty isxdigit openpty putenv regcomp setenv setproctitle setsid sigaction sscanf uname unsetenv vsnprintf waitpid)
-AC_CHECK_HEADERS(ctype.h fcntl.h libgen.h libutil.h pty.h regex.h signal.h string.h strings.h stropts.h unix.h util.h sys/ioctl.h sys/stat.h sys/time.h sys/types.h sys/utsname.h sys/wait.h)
+AC_CHECK_HEADERS(ctype.h fcntl.h libgen.h libutil.h pty.h signal.h string.h strings.h stropts.h unix.h util.h sys/ioctl.h sys/stat.h sys/time.h sys/types.h sys/utsname.h sys/wait.h)
+gl_INIT
 
 dnl Generate output
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile])
 AC_OUTPUT

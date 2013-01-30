@@ -74,11 +74,9 @@
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif
-#ifdef HAVE_REGEX_H
 #include <regex.h>
 #ifndef REG_EXTENDED
 #define REG_EXTENDED 1
-#endif
 #endif
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
@@ -203,9 +201,7 @@ struct{
  signed char ec;
  signed char eint;
  signed char fc;
-#ifdef HAVE_REGCOMP
  signed char ifregex;
-#endif
  signed char ign;
  signed char invert;
 #ifdef HAVE_SIGACTION
@@ -213,9 +209,7 @@ struct{
 #endif
  signed char nocolor;
  signed char noeol;
-#ifdef HAVE_REGCOMP
  signed char noer;
-#endif
 #ifdef HAVE_ISATTY
  signed char nopipe;
 #endif
@@ -237,7 +231,6 @@ struct{
   unsigned int cur;
   unsigned int tot;
  }m;
-#ifdef HAVE_REGCOMP
  struct{
   char **data;
   unsigned char *b;
@@ -245,7 +238,6 @@ struct{
   unsigned int cur;
   unsigned int tot;
  }x;
-#endif
  struct{
   unsigned char *slot;
   unsigned char *delim;
@@ -420,9 +412,7 @@ signed int main(signed int argc,char **argv){
 #ifndef NO_PTY
     "p"
 #endif
-#ifdef HAVE_REGCOMP
     "r"
-#endif
 #ifndef NO_SETPROCTITLE
     "s"
 #endif
@@ -564,11 +554,9 @@ char *convert_string(char *line){
  unsigned char on=0;
  unsigned int i=0,j=0,k=0,l=0,s=0;
  char *buf,*tbuf,*tmp;
-#ifdef HAVE_REGCOMP
  char *tmpcmp;
  regex_t re;
  regmatch_t pm;
-#endif
  s=strlen(line);
  if(!(tbuf=(char *)malloc(s+1)))
   cwexit(1,"malloc() failed.");
@@ -747,7 +735,6 @@ char *convert_string(char *line){
   strcpy(tbuf,tmp);
   free(tmp);
  }
-#ifdef HAVE_REGCOMP
  /* start processing the 'regex' definitions. */
  if(cfgtable.x.tot){
   for(j=i=0;i<cfgtable.x.tot;i++){
@@ -807,7 +794,6 @@ char *convert_string(char *line){
    }
   }
  }
-#endif
  if(!(buf=(char *)malloc(strlen(pal2[cfgtable.base])+strlen(tbuf)
  +cfgtable.b.llen+cfgtable.b.rlen+(!cfgtable.noeol?4:0)+1)))
   cwexit(1,"malloc() failed.");
@@ -844,7 +830,6 @@ unsigned char struncmp(char *cmp){
 #endif
 /* checks for a regex match of a string, or strcmp-like if not supported. */
 unsigned char regxcmp(char *str,char *pattern,unsigned char type){
-#ifdef HAVE_REGCOMP
  signed int r=0;
  regex_t re;
  if(cfgtable.ifregex){
@@ -856,16 +841,13 @@ unsigned char regxcmp(char *str,char *pattern,unsigned char type){
   return(0);
  }
  else{
-#endif
   if(!type){
    if(!strcasecmp(str,pattern))return(0);
   }
   else{
    if(strstr(str,pattern))return(0);
   }
-#ifdef HAVE_REGCOMP
  }
-#endif
  return(1);
 }
 /* converts the color string to a numerical storage value. (0-17) */
@@ -1152,9 +1134,7 @@ void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
  struct sigaction sa;
 #endif
  if(!(cfgtable.m.tot+
-#ifdef HAVE_REGCOMP
  cfgtable.x.tot+
-#endif
  cfgtable.t.tot+cfgtable.n.on+cfgtable.u.on+cfgtable.l.on))
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
@@ -1712,7 +1692,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
   }
   else c_error(l,cfgmsg[4]);
  }
-#ifdef HAVE_REGCOMP
  else if(!strcmp(parameter(line," ",0),"regex")){
   if(strcmp(parameter(line," ",1),"-1")){
    if(!(tmp=(char *)malloc(strlen(pptr)+1)))
@@ -1753,9 +1732,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
   }
   else c_error(l,cfgmsg[29]);
  }
-#else
- else if(!strcmp(parameter(line," ",0),"regex"));
-#endif
  else if(!strcmp(parameter(line," ",0),"token")){
   if(strcmp(parameter(line," ",1),"-1")){
    if(!(tmp=(char *)malloc(strlen(pptr)+1)))
@@ -1822,13 +1798,8 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
 #else
  else if(!strcmp(parameter(line," ",0),"usepty"));
 #endif
-#ifdef HAVE_REGCOMP
  else if(!strcmp(parameter(line," ",0),"noextendedregex"))cfgtable.noer=1;
  else if(!strcmp(parameter(line," ",0),"useifregex"))cfgtable.ifregex=1;
-#else
- else if(!strcmp(parameter(line," ",0),"noextendedregex"));
- else if(!strcmp(parameter(line," ",0),"useifregex"));
-#endif
 #ifdef HAVE_ISATTY
  else if(!strcmp(parameter(line," ",0),"nopipe"))cfgtable.nopipe=1;
 #else
@@ -1871,14 +1842,12 @@ void c_read(char *file,signed int argc,char **argv){
     cwexit(1,"malloc() failed.");
    if(!(cfgtable.m.a=(unsigned char *)malloc(cfgtable.m.tot+1)))
     cwexit(1,"malloc() failed.");
-#ifdef HAVE_REGCOMP
    if(!(cfgtable.x.data=(char **)malloc(cfgtable.x.tot*sizeof(char *)+1)))
     cwexit(1,"malloc() failed.");
    if(!(cfgtable.x.b=(unsigned char *)malloc(cfgtable.x.tot+1)))
     cwexit(1,"malloc() failed.");
    if(!(cfgtable.x.a=(unsigned char *)malloc(cfgtable.x.tot+1)))
     cwexit(1,"malloc() failed.");
-#endif
    if(!(cfgtable.t.slot=(unsigned char *)malloc(cfgtable.t.tot+1)))
     cwexit(1,"malloc() failed.");
    if(!(cfgtable.t.delim=(unsigned char *)malloc(cfgtable.t.tot+1)))
@@ -1892,9 +1861,7 @@ void c_read(char *file,signed int argc,char **argv){
    /* find the amount of definitions to store in memory. */
    if(!i){
     if(!strcmp(parameter(buf," ",0),"match"))cfgtable.m.tot++;
-#ifdef HAVE_REGCOMP
     else if(!strcmp(pptr,"regex"))cfgtable.x.tot++;
-#endif
     else if(!strcmp(pptr,"token"))cfgtable.t.tot++;
    }
    /* begin actual processing/handling of the config file. (c_handler) */
@@ -1912,9 +1879,7 @@ void c_read(char *file,signed int argc,char **argv){
  fclose(fs);
  if(cfgtable.base<0)cfgtable.base=7;
  cfgtable.m.tot=cfgtable.m.cur;
-#ifdef HAVE_REGCOMP
  cfgtable.x.tot=cfgtable.x.cur;
-#endif
  cfgtable.t.tot=cfgtable.t.cur;
  if(!cfgtable.path&&!cfgtable.cmd)c_error(0,cfgmsg[1]);
  else if(cfgtable.path&&cfgtable.cmd)c_error(0,cfgmsg[22]);
