@@ -189,7 +189,6 @@ struct{
  signed char ifos;
  signed char ifosa;
  signed char base;
- signed char cat;
  signed char clear;
  signed char ec;
  signed char eint;
@@ -285,7 +284,7 @@ struct{
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 unsigned char ext=0,rexit=0;
-char *pal2[18],*aptr,*fptr,*pptr,*catname,*progname,*scrname;
+char *pal2[18],*aptr,*fptr,*pptr,*progname,*scrname;
 pid_t pid_p,pid_c;
 extern char **environ;
 
@@ -323,7 +322,7 @@ static const char *cfgmsg[]={
  "'other' syntax error. (not enough arguments?)",
  "environment variable placement syntax error. (not enough arguments?)",
  "both 'path' and 'other' were defined. (one definition or the other)",
- "'path' definition needed for '@' files. ('other' is not applicable)",
+ "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
@@ -1512,10 +1511,10 @@ void c_handler(char *line,unsigned int l,signed int argc){
    i=0;
    while(strcmp(parameter(tmp,":",i++),"-1")){
     if(!(tmppath=(char *)malloc(strlen(pptr)+
-    strlen(strpname(cfgtable.cat?catname:scrname))+2)))
+    strlen(strpname(scrname))+2)))
      cwexit(1,"malloc() failed.");
-    sprintf(tmppath,"%s/%s",pptr,strpname(cfgtable.cat?catname:scrname));
-    if(!access(tmppath,(cfgtable.cat?R_OK:X_OK))){
+    sprintf(tmppath,"%s/%s",pptr,strpname(scrname));
+    if(!access(tmppath,X_OK)){
      if(cfgtable.path)free(cfgtable.path);
      if(!(cfgtable.path=(char *)malloc(strlen(tmppath)+1)))
       cwexit(1,"malloc() failed.");
@@ -1859,7 +1858,6 @@ void c_read(char *file,signed int argc){
  cfgtable.t.tot=cfgtable.t.cur;
  if(!cfgtable.path&&!cfgtable.cmd)c_error(0,cfgmsg[1]);
  else if(cfgtable.path&&cfgtable.cmd)c_error(0,cfgmsg[22]);
- else if(!cfgtable.path&&cfgtable.cat)c_error(0,cfgmsg[23]);
  else if(cfgtable.iflabelf)c_error(0,cfgmsg[26]);
  else return;
  cwexit(1,cfgmsg[46]);
@@ -1888,8 +1886,7 @@ void c_error(unsigned int l,const char *text){
 /* exit with or without a reason, resets color too. */
 noreturn void cwexit(signed char level,const char *reason){
  if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
- else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cat&&!cfgtable.cmd
- &&!cfgtable.po)
+ else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cmd&&!cfgtable.po)
   addhelp_display();
  fflush(stdout);
  exit(level);
