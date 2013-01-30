@@ -1,0 +1,22 @@
+man_MANS = cw.1 cwe.1
+
+bin_PROGRAMS = cw
+dist_bin_SCRIPTS = colorcfg
+
+cw_SOURCES = cw.c
+
+install-data-local:
+	$(MKDIR_P) $(pkglibdir)/
+	for FILE in def/*.in; do \
+	  printf "#!$(bindir)/cw\n" > $${FILE%.in};\
+	  cat $$FILE >> $${FILE%.in};\
+	  $(INSTALL) $${FILE%.in} $(pkglibdir)/;\
+	done
+	$(MKDIR_P) $(pkglibdir)/etc
+	for FILE in etc/*; do $(INSTALL) -m 644 $$FILE $(pkglibdir)/etc; done
+
+install-exec-local:
+	cd $(bindir) && rm cwe$(EXEEXT) && $(LN_S) cw$(EXEEXT) cwe$(EXEEXT)
+
+uninstall-local:
+	rm -rf $(bindir)/cwe$(EXEEXT) $(pkglibdir)/cw

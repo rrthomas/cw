@@ -1,6 +1,17 @@
+*~
+*.o
 Makefile
+/.deps
+/aclocal.m4
 /autom4te.cache
+/compile
 /configure
 /config.h
+/config.h.in
 /config.log
 /config.status
+/cw
+/depcomp
+/missing
+/Makefile.in
+/stamp-h1
