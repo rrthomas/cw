@@ -69,9 +69,7 @@
 #ifdef HAVE_PTY_H
 #include <pty.h>
 #endif
-#ifdef HAVE_CTYPE_H
 #include <ctype.h>
-#endif
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif
