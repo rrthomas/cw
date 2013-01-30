@@ -161,7 +161,6 @@ signed char color_atoi(char *);
 signed char make_ptypair(unsigned char v);
 unsigned char cwprintf(char *);
 unsigned char is_cwfile(char *);
-void setborder(char *,unsigned char);
 void setcolorize(char *);
 signed char execot(char *,unsigned char,unsigned int);
 void execcw(signed int,char **,signed int,char **);
@@ -356,8 +355,8 @@ static char *cfgmsg[]={
  "'ifexit'/'ifnexit' invalid exit level. (127--127)",
  "'ifexit-else' used before any previous comparison.",
  "NO SUCH ERROR",
- "'lborder' syntax error. (not enough arguments?)",
- "'rborder' syntax error. (not enough arguments?)",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "'proctitle' syntax error. (not enough arguments?)",
  "'print' syntax error. (not enough arguments?)",
  "'print' write error.",
@@ -453,8 +452,6 @@ signed int main(signed int argc,char **argv){
   strcpy(pal2[i],pal2_orig[i]);
  }
  if(!cfgtable.po){
-  if((ptr=getenv("CW_LBORDER"))&&strlen(ptr))setborder(ptr,0);
-  if((ptr=getenv("CW_RBORDER"))&&strlen(ptr))setborder(ptr,1);
 #ifdef HAVE_WAITPID
   if(getenv("CW_CHK_SETCODE"))
    cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
@@ -1072,26 +1069,6 @@ unsigned char is_cwfile(char *file){
  if(s>4&&!strncmp(buf,"#!",2)&&!strncmp(buf+(s-4),"/cw",3))return(1);
  return(0);
 }
-/* sets left and right borders. */
-void setborder(char *data,unsigned char right){
- if(right){
-  if(cfgtable.b.rlen)free(cfgtable.b.rdata);
-  if((cfgtable.b.rlen=strlen(data))){
-   if(!(cfgtable.b.rdata=(char *)malloc(cfgtable.b.rlen+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.b.rdata,data);
-  }
- }
- else{
-  if(cfgtable.b.llen)free(cfgtable.b.ldata);
-  if((cfgtable.b.llen=strlen(data))){
-   if(!(cfgtable.b.ldata=(char *)malloc(cfgtable.b.llen+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.b.ldata,data);
-  }
- }
- return;
-}
 /* sets colorize values. */
 void setcolorize(char *str){
  signed char r=0;
@@ -1687,18 +1664,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
    cfgtable.l.on=1;
   }
   else c_error(l,cfgmsg[17]);
- }
- else if(!strcmp(parameter(line," ",0),"lborder")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(ptr)setborder(ptr,0);
-  else c_error(l,cfgmsg[40]);
- }
- else if(!strcmp(parameter(line," ",0),"rborder")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(ptr)setborder(ptr,1);
-  else c_error(l,cfgmsg[41]);
  }
 #ifndef NO_SETPROCTITLE
  else if(!strcmp(parameter(line," ",0),"proctitle")){

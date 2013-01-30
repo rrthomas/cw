@@ -74,12 +74,6 @@ changes the process title to the provided \fBtitle\fR, this is will change how t
 \fBprint\fR [\fIstring\fR]
 prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions (\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
 .TP 
-\fBlborder\fR [\fIstring\fR]
-prepends the \fBstring\fR to each (colored) line, this is intended for special processing outside of cw.  the \fBstring\fR is not colored
-.TP 
-\fBrborder\fR [\fIstring\fR]
-appends the \fBstring\fR to each (colored) line, this is intended for special processing outside of cw.  the \fBstring\fR is not colored
-.TP 
 \fBlimit\fR [\fInumber\fR]
 only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the environment variable $COLUMNS instead of a static value)
 .TP 
@@ -191,12 +185,6 @@ re\-defines the internal colormap to the opposite colors.  this is intended to h
 .TP 
 \fBCW_COLORIZE\fR
 defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
-.TP 
-\fBCW_LBORDER\fR
-prepends the data in the variable to each (colored) line, this is intended for special processing outside of cw.  the data in the variable is not colored
-.TP 
-\fBCW_RBORDER\fR
-appends the data in the variable to each (colored) line, this is intended for special processing outside of cw.  the data in the variable is not colored
 .TP 
 \fBCW_CLEAR\fR
 clears the screen before any program (wrapped by cw) starts (any value placed in the variable will enable)

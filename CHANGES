@@ -10,6 +10,7 @@ version 1.0.17:
 ! Removed remapping.
 ! Removed headers and footers.
 ! Removed file-coloring definitions (ending in @).
+! Removed borders.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
