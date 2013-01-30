@@ -1,6 +1,8 @@
 SUBDIRS = lib
 ACLOCAL_AMFLAGS = -I m4
 
+AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
+
 dist_man_MANS = cw.1 cwe.1
 
 bin_PROGRAMS = cw

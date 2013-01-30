@@ -19,6 +19,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdnoreturn.h>
 #ifndef __USE_BSD
 #define __USE_BSD
 #endif
@@ -126,11 +127,6 @@
 #undef INT_SETPROCTITLE
 #endif
 #endif
-#ifdef INT_SETPROCTITLE
-#ifndef LINEBUFFER
-#define LINEBUFFER 4096
-#endif
-#endif
 #ifndef INT_SETPROCTITLE
 #ifndef HAVE_SETPROCTITLE
 #define NO_SETPROCTITLE
@@ -147,8 +143,6 @@
 
 /* prototypes. */
 void sighandler(signed int);
-char *parameter(char *,char *,unsigned int);
-char *convert_string(char *);
 char *strpname(char *);
 unsigned char strwcmp(char *,char *);
 #ifdef HAVE_UNAME
@@ -168,10 +162,10 @@ void initsetproctitle(signed int,char **,char **);
 void setproctitle(const char *,...);
 #endif
 #endif
-void c_handler(char *,unsigned int,signed int,char **);
-void c_read(char *,signed int,char **);
-void c_error(unsigned int,char *);
-void cwexit(signed char,char *);
+void c_handler(char *,unsigned int,signed int);
+void c_read(char *,signed int);
+void c_error(unsigned int,const char *);
+void cwexit(signed char,const char *);
 
 /* pseudo-setproctitle table. */
 #ifndef HAVE_SETPROCTITLE
@@ -296,17 +290,17 @@ char *pal2[18],*aptr,*fptr,*pptr,*catname,*progname,*scrname;
 pid_t pid_p,pid_c;
 extern char **environ;
 
-static char *pal1[]={"black","blue","green","cyan","red","purple","brown",
+static const char *pal1[]={"black","blue","green","cyan","red","purple","brown",
  "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",
  "default","none",""};
-static char *pal1_invert[]={"white","blue+","green+","cyan+","red+","purple+",
+static const char *pal1_invert[]={"white","blue+","green+","cyan+","red+","purple+",
  "yellow","grey","grey+","blue","green","cyan","red","purple","brown","black",
  "default","none",""};
-static char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
+static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
-static char *cfgmsg[]={
+static const char *cfgmsg[]={
  "invalid definition instruction.",
  "no valid 'path' or 'other' definition was defined.",
  "'match' definition used an invalid color. (defaulting)",
@@ -357,7 +351,7 @@ static char *cfgmsg[]={
 
 /* program start. */
 signed int main(signed int argc,char **argv){
- unsigned int i=0,j=0,margc=0;
+ int i=0,j=0, margc=0;
  char *ptr,**margv;
  cfgtable.z.l=cfgtable.z.h=-1;
  if(!(margv=(char **)malloc((sizeof(char *)*(argc+1)))))
@@ -466,7 +460,7 @@ signed int main(signed int argc,char **argv){
    cwexit(1,"write error.");
   cwexit(0,0);
  }
- c_read(scrname,margc,margv);
+ c_read(scrname,margc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0);
  if(getenv("CW_SHLVL")&&getenv("SHLVL")&&
@@ -533,7 +527,7 @@ void sighandler(signed int sig){
  return;
 }
 /* plucks a requested token out of a string. */
-char *parameter(char *string,char *delim,unsigned int p){
+static char *parameter(const char *string,const char *delim,unsigned int p){
  unsigned int n=p;
  char *arg;
  free(fptr);
@@ -550,7 +544,7 @@ char *parameter(char *string,char *delim,unsigned int p){
  return(pptr=arg);
 }
 /* converts the original string to a color string based on the config file. */
-char *convert_string(char *line){
+static char *convert_string(const char *line){
  unsigned char on=0;
  unsigned int i=0,j=0,k=0,l=0,s=0;
  char *buf,*tbuf,*tmp;
@@ -805,12 +799,12 @@ char *convert_string(char *line){
  return(aptr=buf);
 }
 /* just like basename(), except no conflicts on different systems. */
-char *strpname(char *file){
+_GL_ATTRIBUTE_PURE char *strpname(char *file){
  char *ptr=strrchr(file,'/');
  return(ptr?ptr+1:file);
 }
 /* scans for the match/wildcard in a string. */
-unsigned char strwcmp(char *line1,char *line2){
+_GL_ATTRIBUTE_PURE unsigned char strwcmp(char *line1,char *line2){
  unsigned int i=0,s=0,t=0;
  s=strlen(line1);
  t=strlen(line2);
@@ -851,9 +845,9 @@ unsigned char regxcmp(char *str,char *pattern,unsigned char type){
  return(1);
 }
 /* converts the color string to a numerical storage value. (0-17) */
-signed char color_atoi(char *color){
+_GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
  unsigned char i=0;
- char **palptr;
+ const char **palptr;
  if(cfgtable.invert)palptr=pal1_invert;
  else palptr=pal1;
  if(cfgtable.z.on){
@@ -1043,7 +1037,7 @@ unsigned char is_cwfile(char *file){
  FILE *fs;
  if(!(fs=fopen(file,"r")))return(0);
  memset(buf,0,BUFSIZE);
- fgets(buf,BUFSIZE,fs);
+ if(fgets(buf,BUFSIZE,fs)){/*Avoid compiler warning.*/};
  fclose(fs);
  s=strlen(buf);
  if(buf[s]=='\n')s--;
@@ -1120,9 +1114,9 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
  return(r);
 }
 /* handles and executes the desired program. */
-void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
+noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
  unsigned char on=0,son=0;
- unsigned int i=0,j=0,k=0;
+ int i=0,j=0,k=0;
 #ifdef HAVE_WAITPID
  signed char re=0;
  signed int e=0;
@@ -1308,14 +1302,14 @@ void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
 #endif
    break;
  }
- return;
 }
 #ifndef NO_SETPROCTITLE
 #ifndef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
 /* pseudo-setproctitle startup. */
 void initsetproctitle(signed int argc,char **argv,char **envp){
- unsigned int i=0,envpsize=0;
+ int i=0;
+ size_t envpsize=0;
  char *s;
  for(i=0;envp[i]!=0;i++)
   envpsize+=(strlen(envp[i])+1);
@@ -1378,7 +1372,7 @@ void initsetproctitle(signed int argc,char **argv,char **envp){return;}
 #endif
 #endif
 /* handles each config file line. (data sizes allocated in c_read()) */
-void c_handler(char *line,unsigned int l,signed int argc,char **argv){
+void c_handler(char *line,unsigned int l,signed int argc){
  unsigned char o=0,on=0;
  unsigned int i=0,j=0,k=0,s=0;
  char *tmp,*tmppath,*ptr;
@@ -1821,7 +1815,7 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
  return;
 }
 /* reads (and allocates space) the config file to be passed to c_handler(). */
-void c_read(char *file,signed int argc,char **argv){
+void c_read(char *file,signed int argc){
  unsigned char i=0;
  unsigned int j=0,k=0;
  char buf[BUFSIZE+1];
@@ -1871,7 +1865,7 @@ void c_read(char *file,signed int argc,char **argv){
      /* remove excess characters read, ex. \r\n. */
      if(!isprint((unsigned char)buf[j-1]))buf[j-1]=0;
      if(!isprint((unsigned char)buf[j-2]))buf[j-2]=0;
-     c_handler(buf,k++,argc,argv);
+     c_handler(buf,k++,argc);
     }
    }
   }
@@ -1890,7 +1884,7 @@ void c_read(char *file,signed int argc,char **argv){
  return;
 }
 /* this get appended to "--help" displays/ */
-void addhelp_display(void){
+static void addhelp_display(void){
  fprintf(stdout,"\n%s\n",convert_string("color wrapper(cw) options:"));
  /* using spaces instead of /t to deal with terminal emulation issues. */
  fprintf(stdout,"%s\n",convert_string(
@@ -1908,13 +1902,13 @@ void addhelp_display(void){
  return;
 }
 /* configuration error message. */
-void c_error(unsigned int l,char *text){
+void c_error(unsigned int l,const char *text){
  if(!cfgtable.ign)
   fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
  return;
 }
 /* exit with or without a reason, resets color too. */
-void cwexit(signed char level,char *reason){
+noreturn void cwexit(signed char level,const char *reason){
  if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
  else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cat&&!cfgtable.cmd
  &&!cfgtable.po)
