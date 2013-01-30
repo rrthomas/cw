@@ -8,6 +8,7 @@ version 1.0.17:
 ! Removed random colors.
 ! Removed supermaps.
 ! Removed remapping.
+! Removed headers and footers.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

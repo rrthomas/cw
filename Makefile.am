@@ -12,8 +12,6 @@ install-data-local:
 	  cat $$FILE >> $${FILE%.in};\
 	  $(INSTALL) $${FILE%.in} $(pkglibdir)/;\
 	done
-	$(MKDIR_P) $(pkglibdir)/etc
-	for FILE in etc/*; do $(INSTALL) -m 644 $$FILE $(pkglibdir)/etc; done
 
 install-exec-local:
 	cd $(bindir) && rm cwe$(EXEEXT) && $(LN_S) cw$(EXEEXT) cwe$(EXEEXT)

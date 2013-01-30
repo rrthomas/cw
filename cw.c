@@ -228,8 +228,6 @@ struct{
  char *path;
  char *cmd;
  char *cmdargs;
- char *header;
- char *footer;
  char *label;
 #ifndef NO_SETPROCTITLE
  char *title;
@@ -331,8 +329,8 @@ static char *cfgmsg[]={
  "'token' syntax error. (not enough arguments?)",
  "'path' definition contained no existing/usable paths.",
  "'base' definition used an invalid color.",
- "'header' definition contained an invalid file.",
- "'footer' definition contained an invalid file.",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "'digit' definition used an invalid color. (defaulting)",
  "'wait' definition used an invalid time value.",
  "'ucase' definition used an invalid color. (defaulting)",
@@ -463,18 +461,6 @@ signed int main(signed int argc,char **argv){
   strcpy(pal2[i],pal2_orig[i]);
  }
  if(!cfgtable.po){
-  if((ptr=getenv("CW_HEADER"))&&strlen(ptr)&&!access(ptr,R_OK)){
-   if(cfgtable.header)free(cfgtable.header);
-   if(!(cfgtable.header=(char *)malloc(strlen(ptr)+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.header,ptr);
-  }
-  if((ptr=getenv("CW_FOOTER"))&&strlen(ptr)&&!access(ptr,R_OK)){
-   if(cfgtable.footer)free(cfgtable.footer);
-   if(!(cfgtable.footer=(char *)malloc(strlen(ptr)+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.footer,ptr);
-  }
   if((ptr=getenv("CW_LBORDER"))&&strlen(ptr))setborder(ptr,0);
   if((ptr=getenv("CW_RBORDER"))&&strlen(ptr))setborder(ptr,1);
 #ifdef HAVE_WAITPID
@@ -1140,7 +1126,7 @@ void setcolorize(char *str){
  }
  return;
 }
-/* reads a file and dumps it to stdout, used for header, footer and @'s. */
+/* reads a file and dumps it to stdout, used for @'s. */
 void catfile(unsigned char conv,char *file){
  unsigned int s=0;
  char buf[BUFSIZE+1];
@@ -1234,8 +1220,7 @@ void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
 #ifdef HAVE_REGCOMP
  cfgtable.x.tot+
 #endif
- cfgtable.t.tot+cfgtable.n.on+cfgtable.u.on+cfgtable.l.on+(
- cfgtable.footer?1:0)+(cfgtable.header?1:0)))
+ cfgtable.t.tot+cfgtable.n.on+cfgtable.u.on+cfgtable.l.on))
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
@@ -1328,7 +1313,6 @@ void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    /* minimum catch-up time. */
    if(!cfgtable.w.it_interval.tv_sec&&cfgtable.w.it_interval.tv_usec<100000)
     cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=100000;
-   if(!cfgtable.nocolor&&cfgtable.header)catfile(0,cfgtable.header);
 #ifndef NO_PTY
    if(cfgtable.p.on){
     close(fds[0]);
@@ -1746,28 +1730,6 @@ void c_handler(char *line,unsigned int l,signed int argc,char **argv){
   }
   else c_error(l,cfgmsg[17]);
  }
- else if(!strcmp(parameter(line," ",0),"header")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(!access(ptr,R_OK)){
-   if(cfgtable.header)free(cfgtable.header);
-   if(!(cfgtable.header=(char *)malloc(strlen(ptr)+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.header,ptr);
-  }
-  else c_error(l,cfgmsg[12]);
- }
- else if(!strcmp(parameter(line," ",0),"footer")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(!access(ptr,R_OK)){
-   if(!cfgtable.nocolor&&cfgtable.footer)free(cfgtable.footer);
-   if(!(cfgtable.footer=(char *)malloc(strlen(ptr)+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(cfgtable.footer,ptr);
-  }
-  else c_error(l,cfgmsg[13]);
- }
  else if(!strcmp(parameter(line," ",0),"lborder")){
   ptr=strtok(line," ");
   ptr=strtok(0,"");
@@ -2085,7 +2047,6 @@ void cwexit(signed char level,char *reason){
  else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cat&&!cfgtable.cmd
  &&!cfgtable.po)
   addhelp_display();
- if(cfgtable.footer)catfile(0,cfgtable.footer);
  fflush(stdout);
  exit(level);
 }

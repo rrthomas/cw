@@ -7,14 +7,11 @@ FAQ-style readme:
 5. How do I turn cw off?
 6. Is there a more system-specific way to turn coloring on and off?
 7. How can I make/modify the coloring of a specific program?
-8. Can ncurses programs be color wrapped? 
-9. There are too many different colors, how do I get static colors?
-10. What are headers and footers, and how do I use them? 
-11. My terminal has a white background, why can't I see text?
-12. The program I'm running doesn't look/run like it normally does, why?
-13. I get "bad interpreter" errors when I run definition files, why? 
-14. Is cw only intended to color in ANSI?
-15. What is "cwe" used for?
+8. Can curses programs be color wrapped? 
+9. There are too many different colors!
+10. My terminal has a white background, why can't I see text?
+11. The program I'm running doesn't look/run like it normally does, why?
+12. What is "cwe" used for?
 
 
 
@@ -25,9 +22,9 @@ commands on GNU/linux.  cw is designed to simulate the environment of the
 commands being executed, so that if a person types 'du', 'df', 'ping', etc.
 in their shell it will automatically color the output in real-time according
 to a definition file containing the color format desired.  cw has support for
-wildcard match coloring, tokenized coloring, headers/footers, case scenario
-coloring, command line dependent definition coloring, and includes over 50
-pre-made definition files.
+wildcard match coloring, tokenized coloring, case scenario coloring, command
+line dependent definition coloring, and includes over 50 pre-made definition
+files.
 
 
 2. How does cw work?
@@ -85,39 +82,24 @@ creating the selected definition file (e.g. /usr/local/lib/cw/df) in your
 favorite text editor and making the desired changes.
 
 
-8. Can ncurses programs be color wrapped? 
+8. Can curses programs be color wrapped? 
 
 it depends.  for example the 'top' program can be color wrapped (with
 the use of the "nostrip" definition instruction), but for most ncurses
 programs it is too unstable to properly color wrap.  generally speaking,
-it is on a program-by-program basis. (the "nostrip" definition instruction
+it is on a program-by-program basis.  (the "nostrip" definition instruction
 will almost always need to be used in relation to wrapping ncurses programs,
 and in some cases the "usepty" definition instruction will need to be used)
 
 
-9. There are too many different colors, how do I get static colors?
+9. There are too many different colors!
 
 if you find that there are too many color schemes for each program
 then you may want to set CW_COLORIZE in your environment.  see the
 "cw" manual page for the proper syntax of CW_COLORIZE.
 
 
-10. What are headers and footers, and how do I use them? 
-
-headers and footers are (paths to) text files placed before the program
-begins and after it has completed.  these files are typically going to
-be ANSI art.  the headers and footers can be defined via definition
-instructions inside a definition file (see the "cw" manual page), or by
-being placed in the environment under CW_HEADER and CW_FOOTER.
-definition instructions override the environment.  there
-are generic headers and footers that come with the cw package in the
-etc directory (installed into the definition files directory).  headers
-and footers can take up a lot of screen room; setting CW_CLEAR=1
-in the environment (to clear the screen before the program starts) may 
-improve the appearance.
-
-
-11. My terminal has a white background, why can't I see text?
+10. My terminal has a white background, why can't I see text?
 
 cw is designed, by default, to expect a black background.  however, 
 you may set CW_INVERT=1 in your environment to invert cw's internal
@@ -125,7 +107,7 @@ colorset.  this will make black become white and the lighter colors
 become the darker colors.
 
 
-12. The program I'm running doesn't look/run like it normally does, why?
+11. The program I'm running doesn't look/run like it normally does, why?
 
 depending on the program you are running it may expect to be executed in
 a terminal.  symptoms of this may appear as text dumping in large chunks
@@ -136,24 +118,7 @@ environment, or by using the "usepty" definition instruction in your
 definition file.
 
 
-13. I get "bad interpreter" errors when I run definition files, why? 
-
-this usually means the "cw" binary has moved or never been set to the
-definition file(s).  see the "cwu" manpage to update the definition file
-directory.  generally this is as simple as typing
-"cwu /path/to/new/def/dir `which cw`" in your shell.
-
-
-14. Is cw only intended to color in ANSI?
-
-yes and no, the main intention of cw is to color in ANSI.  however,
-additions have been made to color in other formats via "supermapping". 
-these supermaps can be set via the definition file using the "supermap"
-definition instruction, or the environment using CW_SUPERMAP.  all
-supermaps are internal and can be listed by running "cw -V".
-
-
-15. What is "cwe" used for?
+12. What is "cwe" used for?
 
 cwe interprets a single string passed via the command-line and
 outputs a formated version to standard output, similar to that of

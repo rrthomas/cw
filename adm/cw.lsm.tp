@@ -8,7 +8,7 @@ environment of the commands being executed, so that if a person types 'du',
 'df', 'ping', etc. in their shell it will automatically color the output
 in real-time according to a definition file containing the color format
 desired.  cw has support for wildcard match coloring, tokenized coloring,
-headers/footers, case scenario coloring, command line dependent definition
+case scenario coloring, command line dependent definition
 coloring, and includes over 50 pre-made definition files.
 Keywords:	cw, color wrapper, cwrapper, ansi, colorizer, colourizer
 Copying-policy:	GPL
