@@ -5,6 +5,11 @@ dist_bin_SCRIPTS = colorcfg
 
 cw_SOURCES = cw.c
 
+clean-local:
+	for FILE in def/*.in; do \
+	  rm -f $${FILE%.in};\
+	done
+
 install-data-local:
 	$(MKDIR_P) $(pkglibdir)/
 	for FILE in def/*.in; do \
