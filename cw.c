@@ -371,31 +371,11 @@ signed int main(signed int argc,char **argv){
   else if(!strncmp("--cw-colorize=",argv[i],14)){
    if(strlen(argv[i])>14)setcolorize(argv[i]+14);
   }
-  else{
-   if(!strcmp("--help",argv[i]))cfgtable.addhelp=1;
-   margv[margc++]=argv[i];
+  else if(!strcmp("--help",argv[i])){
+   cfgtable.addhelp=1;
   }
- }
- margv[margc]=0;
- if(!(progname=(char *)malloc(strlen(margv[0])+1)))
-  cwexit(1,"malloc() failed.");
- strcpy(progname,margv[0]);
- cfgtable.po=0;
- if(strlen(progname)>2&&!strncmp(strpname(progname),"cwe",3))
-  cfgtable.po=1;
- for(i=(cfgtable.po?1:2);margc>i;i++)j+=(strlen(margv[i])+1);
- if(!(cfgtable.cmdargs=(char *)malloc(j+1)))
-  cwexit(1,"malloc() failed.");
- memset(cfgtable.cmdargs,0,(j+1));
- j=0;
- for(i=(cfgtable.po?1:2);margc>i;i++){
-  sprintf(cfgtable.cmdargs+j,"%s%c",margv[i],(margc-i==1?0:32));
-  j+=(strlen(margv[i])+1);
- }
- if(!cfgtable.po){
-  if(margc>1){
-   if(!strcasecmp(margv[1],"-v")){
-    cwexit(1,"cw (color wrapper) v"VERSION" (support=+"
+  else if(!strcmp("-v",argv[i])){
+   cwexit(1,"cw (color wrapper) v"VERSION" (support=+"
 #ifndef NO_ENVSET
     "e"
 #endif
@@ -417,14 +397,36 @@ signed int main(signed int argc,char **argv){
 #endif
     ")");
    }
+  else margv[margc++]=argv[i];
+ }
+ margv[margc]=0;
+ if(!(progname=(char *)malloc(strlen(margv[0])+1)))
+  cwexit(1,"malloc() failed.");
+ strcpy(progname,margv[0]);
+ cfgtable.po=0;
+ if(strlen(progname)>2&&!strncmp(strpname(progname),"cwe",3))
+  cfgtable.po=1;
+ for(i=(cfgtable.po?1:2);margc>i;i++)j+=(strlen(margv[i])+1);
+ if(!(cfgtable.cmdargs=(char *)malloc(j+1)))
+  cwexit(1,"malloc() failed.");
+ memset(cfgtable.cmdargs,0,(j+1));
+ j=0;
+ for(i=(cfgtable.po?1:2);margc>i;i++){
+  sprintf(cfgtable.cmdargs+j,"%s%c",margv[i],(margc-i==1?0:32));
+  j+=(strlen(margv[i])+1);
+ }
+ if(!cfgtable.po){
+  if(margc>1){
    if(access(margv[1],F_OK))
     cwexit(1,"non-existent path to definition file.");
    if(!(scrname=(char *)malloc(strlen(margv[1])+1)))
     cwexit(1,"malloc() failed.");
    strcpy(scrname,margv[1]);
   }
-  else
+  else if (argc == 1)
    cwexit(1,"this program is not intended to be used interactively.");
+  else
+   cwexit(0,0);
  }
  else if(cfgtable.po&&margc<2)
   cwexit(1,"no argument(s) supplied.");
@@ -1865,19 +1867,15 @@ void c_read(char *file,signed int argc){
 }
 /* this get appended to "--help" displays/ */
 static void addhelp_display(void){
- fprintf(stdout,"\n%s\n",convert_string("color wrapper(cw) options:"));
+ fprintf(stdout,"\n%s\n","color wrapper (cw) options:");
  /* using spaces instead of /t to deal with terminal emulation issues. */
- fprintf(stdout,"%s\n",convert_string(
- "  +co, --cw-colorize=color[:color]  sets colors to the provided argument(s"
- ")."));
- fprintf(stdout,"%s\n",convert_string(
- "  +iv, --cw-invert                  invert the internal colormap."));
- fprintf(stdout,"%s\n",convert_string(
- "  +nc, --cw-nocolor                 disable color wrapping of this"
- " program."));
+ fprintf(stdout,"%s\n","  +co, --cw-colorize=color[:color]  sets colors to the provided argument(s"
+ ").");
+ fprintf(stdout,"%s\n","  +iv, --cw-invert                  invert the internal colormap.");
+ fprintf(stdout,"%s\n","  +nc, --cw-nocolor                 disable color wrapping of this"
+ " program.");
 #ifndef NO_PTY
- fprintf(stdout,"%s\n",convert_string(
- "  +py, --cw-usepty                  allocates a pseudo terminal."));
+ fprintf(stdout,"%s\n","  +py, --cw-usepty                  allocates a pseudo terminal.");
 #endif
  return;
 }

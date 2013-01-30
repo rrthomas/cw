@@ -4,7 +4,7 @@
 cw \- color wrapper for common unix commands
 .SH "SYNOPSIS"
 .B cw
-[\fI\-v\fR|\fI\-V\fR]
+[\fI\-v\fR]
 .SH "DESCRIPTION"
 .PP 
 \fBcw\fR is a free color wrapper designed to be a color gateway between programs and the output they produce.  
@@ -69,7 +69,7 @@ changes the color before and after any uppercase letter (A\-Z)
 changes the color before and after any lowercase letter (a\-z)
 .TP 
 \fBprint\fR [\fIstring\fR]
-prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.  if color conversions (\fB\\C\fR) are used in the \fBstring\fR, then the \fBprint\fR definition instruction should be placed after the \fBsupermap\fR definition instruction, if they are present in the definition file (\fB\\x\fR where available)
+prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.
 .TP 
 \fBlimit\fR [\fInumber\fR]
 only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the environment variable $COLUMNS instead of a static value)
@@ -150,9 +150,6 @@ disables color wrapping of the program
 .TP 
 \fB+py, \-\-cw\-usepty\fR
 allocates a pseudo terminal {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
-.TP 
-\fB+sm, \-\-cw\-supermap=mapname\fR
-changes the color format used (run \fBcw \-V\fR to see the supported supermaps)
 .SH "ENVIRONMENT"
 .PP 
 .TP 
