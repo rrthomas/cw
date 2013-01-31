@@ -62,9 +62,6 @@
 #endif
 #include <ctype.h>
 #include <regex.h>
-#ifndef REG_EXTENDED
-#define REG_EXTENDED 1
-#endif
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
