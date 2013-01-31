@@ -355,7 +355,6 @@ signed int main(signed int argc,char **argv){
 #ifndef NO_PTY
     "p"
 #endif
-    "r"
 #ifndef NO_SETPROCTITLE
     "s"
 #endif

@@ -53,7 +53,7 @@ color used if no other definitions state otherwise (if this is the only definiti
 changes the color before and after the \fBmatch text\fR, if the \fBmatch text\fR matched output from the program.  \fB{?}\fR is a single character wildcard that can be placed in \fBmatch text\fR.  the \fBregex\fR definition instruction is recommended for more complex matching
 .TP 
 \fBregex\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
-changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  it is recommended to use the \fBmatch\fR definition instruction if pattern matching is not necessary, this is  because (cpu) processing is much faster with the \fBmatch\fR definition instruction (see the regex.7 manual page, which should already be on your system, for matching guidelines) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBr\fR" IS INCLUDED IN THE SUPPORT}
+changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  it is recommended to use the \fBmatch\fR definition instruction if pattern matching is not necessary, this is  because (cpu) processing is much faster with the \fBmatch\fR definition instruction (see regex(7) for matching guidelines)
 .TP 
 \fBtoken\fR [\fIbefore color:after color\fR] [\fIslot value\fR] [\fIdelim value\fR] 
 changes the color before and after the \fBslot value\fR based on the \fBdelim value\fR.  the \fBdelim value\fR is equal to a single ASCII character in the form of 1\-255 which is used as a start/stop point to assign each \fBslot value\fR
@@ -81,7 +81,7 @@ number of extra \fBsecs\fR and \fBusecs\fR to wait for output after the real pro
 allocates a pty to emulate a programs natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBuseifregex\fR
-enables use of regex comparisons instead of standard string comparisons for the \fBifarg\fR and \fBifos\fR definition instructions {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBr\fR" IS INCLUDED IN THE SUPPORT}
+enables use of regex comparisons instead of standard string comparisons for the \fBifarg\fR and \fBifos\fR definition instructions
 .TP 
 \fBclear\fR
 clears the screen before the program is started
@@ -93,10 +93,10 @@ forces color wrapping no matter what anti\-coloring measures are enabled
 turns off all coloring (the only real purpose of this is for \fBif\fR\-related definition instructions)
 .TP 
 \fBnoextendedregex\fR
-turns off extended regex (REG_EXTENDED) support (not likely to want to use this, but it's here if needed) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBr\fR" IS INCLUDED IN THE SUPPORT}
+turns off extended regex (REG_EXTENDED) support (not likely to want to use this, but it's here if needed)
 .TP 
 \fBnopipe\fR
-turns off color wrapping if the program is being piped/redirected. (non\-interactive coloring measure) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBt\fR" IS INCLUDED IN THE SUPPORT}
+turns off color wrapping if the program is being piped/redirected. (non\-interactive coloring measure)
 .TP 
 \fBnoaddhelp\fR
 will not display cw help information when \fB\-\-help\fR is used in the program arguments
