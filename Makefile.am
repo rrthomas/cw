@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
 
-dist_man_MANS = cw.1 cwe.1
+dist_man_MANS = cw.1
 
 bin_PROGRAMS = cw
 dist_bin_SCRIPTS = colorcfg
@@ -29,8 +29,5 @@ install-data-local:
 	  $(INSTALL) $$out $(DESTDIR)$(pkglibdir)/; \
 	done
 
-install-exec-hook:
-	cd $(DESTDIR)$(bindir) && rm -f cwe$(EXEEXT) && $(LN_S) cw$(EXEEXT) cwe$(EXEEXT)
-
 uninstall-local:
-	rm -rf $(DESTDIR)$(bindir)/cwe$(EXEEXT) $(DESTDIR)$(pkglibdir)
+	rm -rf $(DESTDIR)$(pkglibdir)

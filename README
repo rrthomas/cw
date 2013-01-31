@@ -11,7 +11,6 @@ FAQ-style readme:
 9. There are too many different colors!
 10. My terminal has a white background, why can't I see text?
 11. The program I'm running doesn't look/run like it normally does, why?
-12. What is "cwe" used for?
 
 
 
@@ -116,13 +115,3 @@ completely different layout of the text output.  to help resolve the
 issue you may emulate a pty terminal by setting CW_USEPTY=1 in your
 environment, or by using the "usepty" definition instruction in your
 definition file.
-
-
-12. What is "cwe" used for?
-
-cwe interprets a single string passed via the command-line and
-outputs a formated version to standard output, similar to that of
-"echo -e".  this is useful for special purposes such as coloring
-shell prompts, use in shell scripts, and other misc. things while
-still keeping with (some of) the color scheme of cw.  for more
-information see the "cwe" manpage.

@@ -120,7 +120,6 @@ struct{
  signed char noeol;
  signed char nopipe;
  signed char nostrip;
- signed char po;
  signed char pty;
  signed char ron;
  char *path;
@@ -305,62 +304,48 @@ signed int main(signed int argc,char **argv){
  if(!(progname=(char *)malloc(strlen(margv[0])+1)))
   cwexit(1,"malloc() failed.");
  strcpy(progname,margv[0]);
- cfgtable.po=0;
- if(strlen(progname)>2&&!strncmp(strpname(progname),"cwe",3))
-  cfgtable.po=1;
- for(i=(cfgtable.po?1:2);margc>i;i++)j+=(strlen(margv[i])+1);
+ for(i=2;margc>i;i++)j+=(strlen(margv[i])+1);
  if(!(cfgtable.cmdargs=(char *)malloc(j+1)))
   cwexit(1,"malloc() failed.");
  memset(cfgtable.cmdargs,0,(j+1));
  j=0;
- for(i=(cfgtable.po?1:2);margc>i;i++){
+ for(i=2;margc>i;i++){
   sprintf(cfgtable.cmdargs+j,"%s%c",margv[i],(margc-i==1?0:32));
   j+=(strlen(margv[i])+1);
  }
- if(!cfgtable.po){
-  if(margc>1){
-   if(access(margv[1],F_OK))
-    cwexit(1,"non-existent path to definition file.");
-   if(!(scrname=(char *)malloc(strlen(margv[1])+1)))
-    cwexit(1,"malloc() failed.");
-   strcpy(scrname,margv[1]);
-  }
-  else if (argc == 1)
-   cwexit(1,"this program is not intended to be used interactively.");
-  else
-   cwexit(0,0);
+ if(margc>1){
+  if(access(margv[1],F_OK))
+   cwexit(1,"non-existent path to definition file.");
+  if(!(scrname=(char *)malloc(strlen(margv[1])+1)))
+   cwexit(1,"malloc() failed.");
+  strcpy(scrname,margv[1]);
  }
- else if(cfgtable.po&&margc<2)
-  cwexit(1,"no argument(s) supplied.");
+ else if (argc == 1)
+  cwexit(1,"this program is not intended to be used interactively.");
+ else
+  cwexit(0,0);
  for(i=0;18>i;i++){
   if(!(pal2[i]=(char *)malloc(strlen(pal2_orig[i])+1)))
    cwexit(1,"malloc() failed.");
   memset(pal2[i],0,(strlen(pal2_orig[i])+1));
   strcpy(pal2[i],pal2_orig[i]);
  }
- if(!cfgtable.po){
-  if(getenv("CW_CHK_SETCODE"))
-   cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
-  cfgtable.base=-1;
-  cfgtable.col=cfgtable.ifarg=cfgtable.ifarga=0;
-  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
-  cfgtable.ron=cfgtable.iflabel=cfgtable.m.cur=cfgtable.t.cur=0;
-  cfgtable.w.it_interval.tv_sec=cfgtable.w.it_value.tv_sec=0;
-  cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=0;
+ if(getenv("CW_CHK_SETCODE"))
+  cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
+ cfgtable.base=-1;
+ cfgtable.col=cfgtable.ifarg=cfgtable.ifarga=0;
+ cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
+ cfgtable.ron=cfgtable.iflabel=cfgtable.m.cur=cfgtable.t.cur=0;
+ cfgtable.w.it_interval.tv_sec=cfgtable.w.it_value.tv_sec=0;
+ cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=0;
 #ifndef NO_PTY
-  cfgtable.p.on=0;
-  if(getenv("CW_USEPTY"))cfgtable.pty=1;
+ cfgtable.p.on=0;
+ if(getenv("CW_USEPTY"))cfgtable.pty=1;
 #endif
-  if(getenv("CW_CLEAR"))cfgtable.clear=1;
- }
+ if(getenv("CW_CLEAR"))cfgtable.clear=1;
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=1;
- if(cfgtable.po){
-  if(cwprintf(cfgtable.cmdargs))
-   cwexit(1,"write error.");
-  cwexit(0,0);
- }
  c_read(scrname,margc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0);
@@ -1696,7 +1681,7 @@ void c_error(unsigned int l,const char *text){
 /* exit with or without a reason, resets color too. */
 noreturn void cwexit(signed char level,const char *reason){
  if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
- else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cmd&&!cfgtable.po)
+ else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cmd)
   addhelp_display();
  fflush(stdout);
  exit(level);
