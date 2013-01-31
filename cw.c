@@ -117,7 +117,6 @@ struct{
  signed char invert;
  signed char nocolor;
  signed char noeol;
- signed char nopipe;
  signed char nostrip;
  signed char pty;
  signed char ron;
@@ -353,13 +352,11 @@ signed int main(signed int argc,char **argv){
   setenv("NOCOLOR","1",1);
   unsetenv("NOCOLOR_NEXT");
  }
- if(getenv("NOCOLOR_PIPE"))cfgtable.nopipe=1;
  /* from patch submitted by <komar@ukr.net>. (modified from original) */
  if(!isatty(STDOUT_FILENO)||!isatty(STDERR_FILENO)){
-  if(cfgtable.nopipe)
-   cfgtable.nocolor=1;
+  cfgtable.nocolor=1;
 #ifndef NO_PTY
-  else if(cfgtable.pty)cfgtable.pty=0;
+  cfgtable.pty=0;
 #endif
  }
  if(cfgtable.z.on)cfgtable.invert=0;
@@ -1575,7 +1572,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"usepty"));
 #endif
  else if(!strcmp(parameter(line," ",0),"useifregex"))cfgtable.ifregex=1;
- else if(!strcmp(parameter(line," ",0),"nopipe"))cfgtable.nopipe=1;
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
  else if(!strcmp(parameter(line," ",0),"nostrip"))cfgtable.nostrip=1;

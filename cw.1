@@ -89,9 +89,6 @@ forces color wrapping no matter what anti\-coloring measures are enabled
 \fBnocolor\fR
 turns off all coloring (the only real purpose of this is for \fBif\fR\-related definition instructions)
 .TP 
-\fBnopipe\fR
-turns off color wrapping if the program is being piped/redirected. (non\-interactive coloring measure)
-.TP 
 \fBnoaddhelp\fR
 will not display cw help information when \fB\-\-help\fR is used in the program arguments
 .TP 
@@ -149,9 +146,6 @@ disables color wrapping (any value placed in the variable will enable)
 .TP 
 \fBNOCOLOR_NEXT\fR
 disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is not like stripping, it is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
-.TP 
-\fBNOCOLOR_PIPE\fR
-disables color wrapping if the program is being piped/redirected (non\-interactive coloring measure, any value placed in the variable will enable)
 .TP 
 \fBCW_CHK_NOCOLOR\fR
 disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
