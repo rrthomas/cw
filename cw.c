@@ -65,9 +65,6 @@
 #include <pty.h>
 #endif
 #include <ctype.h>
-#ifdef HAVE_LIBGEN_H
-#include <libgen.h>
-#endif
 #include <regex.h>
 #ifndef REG_EXTENDED
 #define REG_EXTENDED 1
