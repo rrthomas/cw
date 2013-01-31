@@ -6,7 +6,6 @@ AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
 dist_man_MANS = cw.1
 
 bin_PROGRAMS = cw
-dist_bin_SCRIPTS = colorcfg
 
 cw_SOURCES = cw.c
 cw_LDADD = lib/lib$(PACKAGE).a $(LIBINTL)

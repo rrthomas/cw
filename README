@@ -3,14 +3,13 @@ FAQ-style readme:
 1. What is cw (color wrapper)?
 2. How does cw work?
 3. How do I install cw?
-4. How do I enable use of cw?
-5. How do I turn cw off?
-6. Is there a more system-specific way to turn coloring on and off?
-7. How can I make/modify the coloring of a specific program?
-8. Can curses programs be color wrapped? 
-9. There are too many different colors!
-10. My terminal has a white background, why can't I see text?
-11. The program I'm running doesn't look/run like it normally does, why?
+4. How do I turn cw off?
+5. Is there a more system-specific way to turn coloring on and off?
+6. How can I make/modify the coloring of a specific program?
+7. Can curses programs be color wrapped?
+8. There are too many different colors!
+9. My terminal has a white background, why can't I see text?
+10. The program I'm running doesn't look/run like it normally does, why?
 
 
 
@@ -43,24 +42,15 @@ binary.
 see the INSTALL file.
 
 
-4. How do I enable use of cw?
+4. How do I turn cw off?
 
-if cw has been installed, a shell script named "colorcfg" was also
-installed, the syntax is [1|2].  the higher the number the more precautions
-are taken to stop "unwanted" coloring.  1 takes no precautions.  2 will
-stop coloring if the program has been piped/redirected (NOCOLOR_PIPE=1).
-usually 1 is fine, but if unwanted coloring occurs try 2.
-if the "colorcfg" script is not available these can be set manually (see the
-"cw" manpage).
+to stop coloring if the program has been piped/redirected, set
+NOCOLOR_PIPE=1 in your environment.
 
-
-5. How do I turn cw off?
-
-(see question 4 if you haven't read it already, to get to this point.)
 set NOCOLOR=1 in your environment to turn cw off.
 
 
-6. Is there a more system-specific way to turn coloring on and off?
+5. Is there a more system-specific way to turn coloring on and off?
 
 if all the anti-coloring precautions implemented into cw are not
 enough, you may make your own program/shell expression to test the 
@@ -71,7 +61,7 @@ CW_CHK_NOCOLOR='if [ "`whoami`" = "root" ];then exit 1;fi' would disable
 coloring for the root user only.
 
 
-7. How can I make/modify the coloring of a specific program?
+6. How can I make/modify the coloring of a specific program?
 
 first off I recommend reading the "cw" manpage for a little understanding
 of the instructions available to use.  after that it's as simple as opening/
@@ -79,7 +69,7 @@ creating the selected definition file (e.g. /usr/local/lib/cw/df) in your
 favorite text editor and making the desired changes.
 
 
-8. Can curses programs be color wrapped? 
+7. Can curses programs be color wrapped?
 
 it depends.  for example the 'top' program can be color wrapped (with
 the use of the "nostrip" definition instruction), but for most ncurses
@@ -89,14 +79,14 @@ will almost always need to be used in relation to wrapping ncurses programs,
 and in some cases the "usepty" definition instruction will need to be used)
 
 
-9. There are too many different colors!
+8. There are too many different colors!
 
 if you find that there are too many color schemes for each program
 then you may want to set CW_COLORIZE in your environment.  see the
 "cw" manual page for the proper syntax of CW_COLORIZE.
 
 
-10. My terminal has a white background, why can't I see text?
+9. My terminal has a white background, why can't I see text?
 
 cw is designed, by default, to expect a black background.  however, 
 you may set CW_INVERT=1 in your environment to invert cw's internal
@@ -104,7 +94,7 @@ colorset.  this will make black become white and the lighter colors
 become the darker colors.
 
 
-11. The program I'm running doesn't look/run like it normally does, why?
+10. The program I'm running doesn't look/run like it normally does, why?
 
 depending on the program you are running it may expect to be executed in
 a terminal.  symptoms of this may appear as text dumping in large chunks
