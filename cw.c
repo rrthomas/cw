@@ -1256,11 +1256,7 @@ void setproctitle(const char *fmt,...){
  char *p;
  va_list param;
  va_start(param,fmt);
-#if HAVE_VNSPRINTF
  vsnprintf(buf,sizeof(buf),fmt,param);
-#else
- vsprintf(buf,fmt,param);
-#endif
  va_end(param);
  sprintf(buf2,"cw: %s",buf);
  memset(buf,0,sizeof(buf));
