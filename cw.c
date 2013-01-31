@@ -261,7 +261,7 @@ static const char *cfgmsg[]={
  "configuration contained critical errors."};
 
 static void *cwmalloc(size_t n) {
- void *p = malloc(n);
+ void *p = calloc(1, n);
  if (!p) cwexit(1,"malloc() failed.");
  return p;
 }
@@ -308,7 +308,6 @@ signed int main(signed int argc,char **argv){
  strcpy(progname,margv[0]);
  for(i=2;margc>i;i++)j+=(strlen(margv[i])+1);
  cfgtable.cmdargs=(char *)cwmalloc(j+1);
- memset(cfgtable.cmdargs,0,(j+1));
  j=0;
  for(i=2;margc>i;i++){
   sprintf(cfgtable.cmdargs+j,"%s%c",margv[i],(margc-i==1?0:32));
@@ -326,7 +325,6 @@ signed int main(signed int argc,char **argv){
  }
  for(i=0;18>i;i++){
   pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
-  memset(pal2[i],0,(strlen(pal2_orig[i])+1));
   strcpy(pal2[i],pal2_orig[i]);
  }
  if(getenv("CW_CHK_SETCODE"))
@@ -416,7 +414,6 @@ static char *convert_string(const char *line){
  /* start processing the 'digit' definition. */
  if(cfgtable.n.on){
   tmp=(char *)cwmalloc(s*16+1);
-  memset(tmp,0,(s*16+1));
   for(k=j=i=0;s>i;i++){
    if(isdigit((unsigned char)tbuf[i])){
     if(!on){
@@ -446,7 +443,6 @@ static char *convert_string(const char *line){
  /* start processing the 'ucase' definition. */
  if(cfgtable.u.on){
   tmp=(char *)cwmalloc(s*16+1);
-  memset(tmp,0,(s*16+1));
   for(k=j=i=0;s>i;i++){
    if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
    &&isupper((unsigned char)tbuf[i])){
@@ -477,7 +473,6 @@ static char *convert_string(const char *line){
  /* start processing the 'lcase' definition. */
  if(cfgtable.l.on){
   tmp=(char *)cwmalloc(s*16+1);
-  memset(tmp,0,(s*16+1));
   for(k=j=i=0;s>i;i++){
    if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
    &&islower((unsigned char)tbuf[i])){
@@ -509,7 +504,6 @@ static char *convert_string(const char *line){
  for(i=0;i<cfgtable.t.tot;i++){
   s=strlen(tbuf);
   tmp=(char *)cwmalloc(s+strlen(tbuf)+16+1);
-  memset(tmp,0,(s+strlen(tbuf)+16+1));
   if(!cfgtable.t.slot[i])on=3;
   else on=0;
   for(l=k=j=0;j<s;j++){
@@ -553,7 +547,6 @@ static char *convert_string(const char *line){
  if(cfgtable.m.tot){
   s=strlen(tbuf);
   tmp=(char *)cwmalloc(s*(cfgtable.m.tot*16+1)+strlen(tbuf)+1);
-  memset(tmp,0,(s*(cfgtable.m.tot*16+1)+strlen(tbuf)+1));
   for(k=i=0;i<s;i++){
    for(j=0;j<cfgtable.m.tot;j++){
     if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
@@ -584,7 +577,6 @@ static char *convert_string(const char *line){
   for(j=i=0;i<cfgtable.x.tot;i++){
    s=strlen(tbuf);
    tmp=(char *)cwmalloc(s*(cfgtable.x.tot*16+1)+s+1);
-   memset(tmp,0,(s*(cfgtable.x.tot*16+1)+s+1));
    on=j=l=k=0;
    if(regcomp(&re,cfgtable.x.data[i],REG_EXTENDED))
     free(tmp);
@@ -592,7 +584,6 @@ static char *convert_string(const char *line){
     while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
      if(pm.rm_so){
       tmpcmp=(char *)cwmalloc(pm.rm_so+1);
-      memset(tmpcmp,0,pm.rm_so+1);
       strncpy(tmpcmp,tbuf+k,pm.rm_so);
       strcpy(tmp+j,tmpcmp);
       j+=strlen(tmpcmp);
@@ -604,7 +595,6 @@ static char *convert_string(const char *line){
      }
      l=(pm.rm_eo-pm.rm_so);
      tmpcmp=(char *)cwmalloc(l+1);
-     memset(tmpcmp,0,l+1);
      k+=pm.rm_so;
      strncpy(tmpcmp,tbuf+k,l);
      if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))
@@ -795,7 +785,6 @@ unsigned char cwprintf(char *str){
  j=strlen(str);
  k=(8*j);
  tmp=(char *)cwmalloc((j*k)+j+1);
- memset(tmp,0,(j*k)+j+1);
  for(k=i=0;j>i;i++){
   if(str[i]=='\\'){
    if(j>=(i+2)){
@@ -829,7 +818,6 @@ unsigned char cwprintf(char *str){
       p-=((size_t)str+i+3);
       if(p>1){
        ctmp=(char *)cwmalloc(p+1);
-       memset(ctmp,0,p+1);
        strncpy(ctmp,str+i+3,p);
        if((x=color_atoi(ctmp))>=0){
         strcat(tmp,pal2[x]);
@@ -893,7 +881,6 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
  pid_t p=0;
  k=strlen(prog);
  str=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
- memset(str,0,(k+strlen(cfgtable.cmdargs)+1));
  for(on=j=i=0;k>i;i++){
   if(!on&&!strncmp(prog+i,"{}",2)){
    strcpy(str+j,cfgtable.cmdargs);
@@ -1053,7 +1040,6 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
       if(!on){
        j=0;
        tmp=(char *)cwmalloc(s+1);
-       memset(tmp,0,s);
        on=1;
       }
       else{
@@ -1080,7 +1066,6 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
         on=0;
         if(s>i){
          tmp=(char *)cwmalloc(s-i+1);
-         memset(tmp,0,s-i);
          on=1;
         }
         j=0;
@@ -1261,7 +1246,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   if(ptr&&(k=strlen(ptr))){
    s=(getenv("PATH")?strlen(getenv("PATH")):0);
    tmp=(char *)cwmalloc(k+s+1);
-   memset(tmp,0,(k+s+1));
    for(on=i=j=0;k>i;i++){
     if(!on&&s&&!strncmp(ptr+i,"<env>",5)){
      strcpy(tmp+j,getenv("PATH"));
@@ -1297,7 +1281,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   if((k=strlen(ptr))){
    if(cfgtable.cmd)free(cfgtable.cmd);
    cfgtable.cmd=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
-   memset(cfgtable.cmd,0,(k+strlen(cfgtable.cmdargs)+1));
    for(on=j=i=0;k>i;i++){
     if(!on&&!strncmp(ptr+i,"{}",2)){
      strcpy(cfgtable.cmd+j,cfgtable.cmdargs);
