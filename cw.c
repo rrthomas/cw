@@ -363,8 +363,6 @@ signed int main(signed int argc,char **argv){
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
  execcw(argc,argv,margc,margv);
  cwexit(0,0);
- /* won't make it here. */
- exit(0);
 }
 /* all-purpose signal handler. */
 void sighandler(signed int sig){
