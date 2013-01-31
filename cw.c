@@ -49,7 +49,6 @@
 #ifdef HAVE_UNIX_H
 #include <unix.h>
 #endif
-#include "cw.h"
 
 #ifndef HAVE_GETPT
 #ifndef HAVE_OPENPTY
@@ -202,6 +201,8 @@ unsigned char ext=0,rexit=0;
 char *pal2[18],*aptr,*fptr,*pptr,*progname,*scrname;
 pid_t pid_p,pid_c;
 extern char **environ;
+
+#define BUFSIZE 1024
 
 static const char *pal1[]={"black","blue","green","cyan","red","purple","brown",
  "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",

@@ -8,7 +8,7 @@ dist_man_MANS = cw.1 cwe.1
 bin_PROGRAMS = cw
 dist_bin_SCRIPTS = colorcfg
 
-cw_SOURCES = cw.c cw.h
+cw_SOURCES = cw.c
 cw_LDADD = lib/lib$(PACKAGE).a $(LIBINTL)
 
 EXTRA_DIST = $(srcdir)/def/*.in m4/gnulib-cache.m4
