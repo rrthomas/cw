@@ -12,6 +12,8 @@ version 1.0.17:
 ! Removed file-coloring definitions (ending in @).
 ! Removed borders.
 ! Removed proctitle instruction (keeping setproctitle support)
+! Removed background instruction
+! Use gnulib to solve portability problems, not ad-hoc code
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
