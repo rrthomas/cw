@@ -169,7 +169,7 @@ disables color wrapping if the program/shell expression placed in the variable r
 sets the internal exit code to the exit code returned by the program/shell expression placed in the variable to be used with the \fBifexit\fR definition instructions, provided no \fB!\fR or \fB@\fR definition instructions are called before.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBCW_USEPTY\fR
-allocates a pty to emulate a programs natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. (any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
+allocates a pty to emulate a program's natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. (any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
