@@ -151,7 +151,6 @@ struct{
  signed char invert;
  signed char nocolor;
  signed char noeol;
- signed char noer;
  signed char nopipe;
  signed char nostrip;
  signed char po;
@@ -679,7 +678,7 @@ static char *convert_string(const char *line){
     cwexit(1,"malloc() failed.");
    memset(tmp,0,(s*(cfgtable.x.tot*16+1)+s+1));
    on=j=l=k=0;
-   if(regcomp(&re,cfgtable.x.data[i],(cfgtable.noer?0:REG_EXTENDED)))
+   if(regcomp(&re,cfgtable.x.data[i],REG_EXTENDED))
     free(tmp);
    else{
     while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
@@ -769,7 +768,7 @@ unsigned char regxcmp(char *str,char *pattern,unsigned char type){
  signed int r=0;
  regex_t re;
  if(cfgtable.ifregex){
-  if(regcomp(&re,pattern,(cfgtable.noer?0:REG_EXTENDED)|REG_NOSUB))
+  if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
    return(1);
   r=regexec(&re,str,0,0,0);
   regfree(&re);
@@ -1705,7 +1704,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
 #else
  else if(!strcmp(parameter(line," ",0),"usepty"));
 #endif
- else if(!strcmp(parameter(line," ",0),"noextendedregex"))cfgtable.noer=1;
  else if(!strcmp(parameter(line," ",0),"useifregex"))cfgtable.ifregex=1;
  else if(!strcmp(parameter(line," ",0),"nopipe"))cfgtable.nopipe=1;
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
