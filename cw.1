@@ -29,13 +29,13 @@ reverse of \fBifarg\fR
 this will use the definitions to follow if the previous \fBifarg\fR or \fBifnarg\fR was false
 .TP 
 \fBifexit\fR [\fIvalue\fR]
-compares the \fBvalue\fR to the last returned exit code from the \fB!\fR and \fB@\fR definition instructions.  if the \fBvalue\fR matches, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifexit\fR, \fBifnexit\fR or \fBifexit\-else\fR definition instruction is used.  this definition instruction is intended to create a gateway to the system to check for special scenarios in the form of user\-made scripts/programs.  \fBifexit\fR definition instructions are a higher priority than \fBifarg\fR.  \fBvalue\fR must be a numerical value between \-127 and 127, if nothing is placed in \fBvalue\fR it will default to \-1 ("\fB<any>\fR" can be used as a constant value for any value.  "\fB<pseudo>\fR" can be used as a constant value for non\-existent support of \fBifexit\fR and \fBifnexit\fR, it will only match if not supported) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
+compares the \fBvalue\fR to the last returned exit code from the \fB!\fR and \fB@\fR definition instructions.  if the \fBvalue\fR matches, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifexit\fR, \fBifnexit\fR or \fBifexit\-else\fR definition instruction is used.  this definition instruction is intended to create a gateway to the system to check for special scenarios in the form of user\-made scripts/programs.  \fBifexit\fR definition instructions are a higher priority than \fBifarg\fR.  \fBvalue\fR must be a numerical value between \-127 and 127, if nothing is placed in \fBvalue\fR it will default to \-1 ("\fB<any>\fR" can be used as a constant value for any value.)
 .TP 
 \fBifnexit\fR [\fIvalue\fR]
-reverse of \fBifexit\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
+reverse of \fBifexit\fR
 .TP 
 \fBifexit\-else\fR
-this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
+this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false
 .TP 
 \fBifos\fR [\fItext:text:...\fR]
 list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBtext\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.)
@@ -160,10 +160,10 @@ disables color wrapping if the program is being piped/redirected (non\-interacti
 disables color wrapping if the value this variable is set to does NOT equal \fBSHLVL\fR (set by bash/tcsh).  this is intended to help prevent unwanted coloring outside of the current users shell (usually should be set to 1)
 .TP 
 \fBCW_CHK_NOCOLOR\fR
-disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
+disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
 .TP 
 \fBCW_CHK_SETCODE\fR
-sets the internal exit code to the exit code returned by the program/shell expression placed in the variable to be used with the \fBifexit\fR definition instructions, provided no \fB!\fR or \fB@\fR definition instructions are called before.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
+sets the internal exit code to the exit code returned by the program/shell expression placed in the variable to be used with the \fBifexit\fR definition instructions, provided no \fB!\fR or \fB@\fR definition instructions are called before.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
 .TP 
 \fBCW_USEPTY\fR
 allocates a pty to emulate a program's natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. (any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}

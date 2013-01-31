@@ -68,8 +68,8 @@ dnl Checks for functions and headers
 AC_HEADER_STDC
 AC_CHECK_LIB(util, openpty)
 AC_CHECK_FILE("/dev/ptmx", AC_DEFINE(HAVE_DEV_PTMX, 1, Have /dev/ptmx.))
-AC_CHECK_FUNCS(getpt openpty setproctitle setsid waitpid)
-AC_CHECK_HEADERS(fcntl.h libutil.h pty.h stropts.h unix.h util.h sys/ioctl.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
+AC_CHECK_FUNCS(getpt openpty setproctitle setsid)
+AC_CHECK_HEADERS(fcntl.h libutil.h pty.h stropts.h unix.h util.h)
 gl_INIT
 
 dnl Generate output

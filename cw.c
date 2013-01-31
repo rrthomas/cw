@@ -42,22 +42,12 @@
 #endif
 #include <ctype.h>
 #include <regex.h>
-#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
-#endif
 #include <sys/utsname.h>
-#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif
 #ifdef HAVE_UNIX_H
 #include <unix.h>
 #endif
@@ -319,9 +309,6 @@ signed int main(signed int argc,char **argv){
 #ifndef NO_SETPROCTITLE
     "s"
 #endif
-#ifdef HAVE_WAITPID
-    "w"
-#endif
     ")");
    }
   else margv[margc++]=argv[i];
@@ -364,10 +351,8 @@ signed int main(signed int argc,char **argv){
   strcpy(pal2[i],pal2_orig[i]);
  }
  if(!cfgtable.po){
-#ifdef HAVE_WAITPID
   if(getenv("CW_CHK_SETCODE"))
    cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
-#endif
   cfgtable.base=-1;
   cfgtable.col=cfgtable.ifarg=cfgtable.ifarga=0;
   cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
@@ -394,10 +379,8 @@ signed int main(signed int argc,char **argv){
  if(getenv("CW_SHLVL")&&getenv("SHLVL")&&
  strcmp(getenv("CW_SHLVL"),getenv("SHLVL")))
   cfgtable.nocolor=1;
-#ifdef HAVE_WAITPID
  if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
   cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
-#endif
  if(getenv("NOCOLOR_NEXT")){
   setenv("NOCOLOR","1",1);
   unsetenv("NOCOLOR_NEXT");
@@ -965,9 +948,7 @@ void setcolorize(char *str){
 /* handles and executes other programs. */
 signed char execot(char *prog,unsigned char type,unsigned int l){
  signed char r=0,on=0;
-#ifdef HAVE_WAITPID
  signed int e=0;
-#endif
  unsigned int i=0,j=0,k=0;
  char *str;
  pid_t p=0;
@@ -999,12 +980,10 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
     close(STDERR_FILENO);
    }
    execle("/bin/sh","sh","-c",str,(char *)0,environ);
-#ifdef HAVE_WAITPID
   default:
     if(waitpid(p,&e,0)>=0&&WIFEXITED(e))
      r=WEXITSTATUS(e);
     else r=0;
-#endif
  }
  free(str);
  return(r);
@@ -1013,11 +992,8 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
 noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
  unsigned char on=0,son=0;
  int i=0,j=0,k=0;
-#ifdef HAVE_WAITPID
  signed char re=0;
- signed int e=0;
-#endif
- signed int fds[2],fde[2],fdm=0,fd=0,s=0;
+ signed int fds[2],fde[2],fdm=0,fd=0,s=0,e=0;
  char **nargv,*buf,*tmp;
  fd_set rfds;
 #ifdef SIGCHLD
@@ -1181,14 +1157,10 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    free(buf);
    if(on)free(tmp);
    rexit=1;
-#ifdef HAVE_WAITPID
    if(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e))
     re=WEXITSTATUS(e);
    else re=0;
    cwexit(re,0);
-#else
-   cwexit(0,0);
-#endif
    break;
  }
 }
@@ -1301,11 +1273,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   if(atoi(parameter(line," ",1))>127||atoi(pptr)<-127)
    c_error(l,cfgmsg[37]);
   else{
-#ifdef HAVE_WAITPID
    if(!strcmp(pptr,"<any>")||atoi(pptr)==cfgtable.ec)cfgtable.ifexit=1;
-#else
-   if(!strcmp(pptr,"<any>")||!strcmp(pptr,"<pseudo>"))cfgtable.ifexit=1;
-#endif
    if(!strcmp(parameter(line," ",0),"ifexit"))
     cfgtable.ifexit=(cfgtable.ifexit?0:1);
   }
