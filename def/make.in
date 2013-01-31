@@ -3,7 +3,6 @@
 # colors(ANSI) included.  this will simply turn the color off during the
 # make process.
 $NOCOLOR_NEXT=1
-nopipe
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 # don't want to color kernel dialog compiling.
 ifnarg menuconfig

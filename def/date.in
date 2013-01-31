@@ -10,5 +10,3 @@ match cyan+:default =
 match green+:white [
 match green+:default ]
 match yellow:default %{?} 
-ifnarg <none>
-nopipe

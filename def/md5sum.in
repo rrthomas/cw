@@ -1,6 +1,4 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-# this may be used for other purposes than coloring to stdin.
-nopipe
 base cyan
 match cyan+:default /
 ifarg --h

@@ -11,5 +11,3 @@ match cyan+:cyan+ (
 match cyan+:default )
 ifarg --help
 match cyan+:default -
-ifnarg <none>
-nopipe

@@ -1,5 +1,4 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-nopipe
 base grey+
 digit white:default
 match yellow:default :

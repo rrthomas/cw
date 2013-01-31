@@ -1,5 +1,4 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-nopipe
 ifarg -h:--help
 base cyan
 match cyan+:default >
