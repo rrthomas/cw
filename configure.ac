@@ -9,8 +9,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 dnl Checks for programs
 gl_EARLY
 AM_PROG_CC_C_O
-AC_PROG_INSTALL
-AC_PROG_MKDIR_P
+AC_PROG_SED
 
 dnl Checks for C compiler flags
 AC_ARG_ENABLE([gcc-warnings],

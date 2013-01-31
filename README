@@ -29,7 +29,7 @@ files.
 
 cw works by prepending the a of the cw definition directory to the PATH
 environment variable. this is usually set by
-"export PATH=/usr/local/lib/cw:$PATH" (in bash).  in the cw definition
+"export PATH=/usr/local/libexec/cw:$PATH" (in bash).  in the cw definition
 directory you will see file(s) under the very same name of the program
 they are designed to color.  these files appear as the common executable
 binaries you may be used to using, but they are just text files that
@@ -39,7 +39,7 @@ binary.
 
 3. How do I install cw?
 
-see the INSTALL file.
+see the INSTALL file.  note that you need GNU Make to build it.
 
 
 4. How do I turn cw off?
@@ -65,7 +65,7 @@ coloring for the root user only.
 
 first off I recommend reading the "cw" manpage for a little understanding
 of the instructions available to use.  after that it's as simple as opening/
-creating the selected definition file (e.g. /usr/local/lib/cw/df) in your
+creating the selected definition file (e.g. /usr/local/libexec/cw/df) in your
 favorite text editor and making the desired changes.
 
 

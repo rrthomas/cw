@@ -10,23 +10,10 @@ bin_PROGRAMS = cw
 cw_SOURCES = cw.c
 cw_LDADD = lib/lib$(PACKAGE).a $(LIBINTL) $(PTY_LIB)
 
-EXTRA_DIST = $(srcdir)/def/*.in m4/gnulib-cache.m4
+EXTRA_DIST = $(srcdir)/def/*.cw m4/gnulib-cache.m4
 
-clean-local:
-	for FILE in def/*.in; do \
-	  rm -f $${FILE%.in};\
-	done
+pkglibexec_SCRIPTS = $(basename $(wildcard def/*.cw))
 
-install-data-local:
-	$(MKDIR_P) $(DESTDIR)$(pkglibdir)/
-	$(MKDIR_P) def
-	for i in $(srcdir)/def/*.in; do \
-	  out=$${i#$(srcdir)/}; \
-	  out=$${out%.in}; \
-	  printf "#!$(bindir)/cw\n" > "$$out"; \
-	  cat $$i >> "$$out"; \
-	  $(INSTALL) $$out $(DESTDIR)$(pkglibdir)/; \
-	done
-
-uninstall-local:
-	rm -rf $(DESTDIR)$(pkglibdir)
+.cw:
+	printf "#!$(bindir)/cw\n" > $@
+	cat $< >> $@
