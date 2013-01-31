@@ -349,9 +349,6 @@ signed int main(signed int argc,char **argv){
  c_read(scrname,margc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0);
- if(getenv("CW_SHLVL")&&getenv("SHLVL")&&
- strcmp(getenv("CW_SHLVL"),getenv("SHLVL")))
-  cfgtable.nocolor=1;
  if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
   cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
  if(getenv("NOCOLOR_NEXT")){

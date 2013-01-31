@@ -156,9 +156,6 @@ disables color wrapping at the next process using color wrapper.  this is mainly
 \fBNOCOLOR_PIPE\fR
 disables color wrapping if the program is being piped/redirected (non\-interactive coloring measure, any value placed in the variable will enable)
 .TP 
-\fBCW_SHLVL\fR
-disables color wrapping if the value this variable is set to does NOT equal \fBSHLVL\fR (set by bash/tcsh).  this is intended to help prevent unwanted coloring outside of the current users shell (usually should be set to 1)
-.TP 
 \fBCW_CHK_NOCOLOR\fR
 disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
 .TP 
