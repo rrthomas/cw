@@ -109,7 +109,6 @@ struct{
  signed char ifos;
  signed char ifosa;
  signed char base;
- signed char clear;
  signed char ec;
  signed char eint;
  signed char fc;
@@ -342,7 +341,6 @@ signed int main(signed int argc,char **argv){
  cfgtable.p.on=0;
  if(getenv("CW_USEPTY"))cfgtable.pty=1;
 #endif
- if(getenv("CW_CLEAR"))cfgtable.clear=1;
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=1;
@@ -358,20 +356,14 @@ signed int main(signed int argc,char **argv){
  if(getenv("NOCOLOR_PIPE"))cfgtable.nopipe=1;
  /* from patch submitted by <komar@ukr.net>. (modified from original) */
  if(!isatty(STDOUT_FILENO)||!isatty(STDERR_FILENO)){
-  if(cfgtable.nopipe){
+  if(cfgtable.nopipe)
    cfgtable.nocolor=1;
-   cfgtable.clear=0;
-  }
 #ifndef NO_PTY
   else if(cfgtable.pty)cfgtable.pty=0;
 #endif
  }
  if(cfgtable.z.on)cfgtable.invert=0;
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
- if(!cfgtable.nocolor&&cfgtable.clear){
-  fprintf(stdout,"\x1b[H\x1b[2J");
-  fflush(stdout);
- }
  execcw(argc,argv,margc,margv);
  cwexit(0,0);
  /* won't make it here. */
@@ -1577,7 +1569,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
     cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=atoi(pptr);
   }
  }
- else if(!strcmp(parameter(line," ",0),"clear"))cfgtable.clear=1;
 #ifndef NO_PTY
  else if(!strcmp(parameter(line," ",0),"usepty"))cfgtable.pty=1;
 #else

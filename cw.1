@@ -83,9 +83,6 @@ allocates a pty to emulate a programs natural environment.  this can be useful f
 \fBuseifregex\fR
 enables use of regex comparisons instead of standard string comparisons for the \fBifarg\fR and \fBifos\fR definition instructions
 .TP 
-\fBclear\fR
-clears the screen before the program is started
-.TP 
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
 .TP 
@@ -170,9 +167,6 @@ re\-defines the internal colormap to the opposite colors.  this is intended to h
 .TP 
 \fBCW_COLORIZE\fR
 defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
-.TP 
-\fBCW_CLEAR\fR
-clears the screen before any program (wrapped by cw) starts (any value placed in the variable will enable)
 .SH "AUTHOR"
 Written by v9/fakehalo. [v9@fakehalo.us]
 .SH "BUGS"
