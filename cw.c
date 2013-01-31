@@ -60,16 +60,9 @@
 #endif
 #endif
 #endif
+#if !defined(HAVE_SETPROCTITLE) && (defined(__APPLE_CC__) || defined(__linux__))
 #define INT_SETPROCTITLE
-#ifndef __APPLE_CC__
-#ifndef __linux__
-#undef INT_SETPROCTITLE
-#endif
-#endif
-#ifndef INT_SETPROCTITLE
-#ifndef HAVE_SETPROCTITLE
-#define NO_SETPROCTITLE
-#endif
+#define HAVE_SETPROCTITLE
 #endif
 #ifndef I_PUSH
 #define I_PUSH 21250
@@ -87,11 +80,9 @@ unsigned char cwprintf(char *);
 void setcolorize(char *);
 signed char execot(char *,unsigned char,unsigned int);
 void execcw(signed int,char **,signed int,char **);
-#ifndef NO_SETPROCTITLE
+#ifdef INT_SETPROCTITLE
 void initsetproctitle(signed int,char **,char **);
-#ifndef HAVE_SETPROCTITLE
 void setproctitle(const char *,...);
-#endif
 #endif
 void c_handler(char *,unsigned int,signed int);
 void c_read(char *,signed int);
@@ -99,14 +90,12 @@ void c_error(unsigned int,const char *);
 void cwexit(signed char,const char *);
 
 /* pseudo-setproctitle table. */
-#ifndef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
 struct{
  char **argv;
  char *largv;
  char *name;
 }proct;
-#endif
 #endif
 /* configuration table. */
 struct{
@@ -139,7 +128,7 @@ struct{
  char *cmd;
  char *cmdargs;
  char *label;
-#ifndef NO_SETPROCTITLE
+#ifdef HAVE_SETPROCTITLE
  char *title;
 #endif
  struct{
@@ -304,7 +293,7 @@ signed int main(signed int argc,char **argv){
 #ifndef NO_PTY
     "p"
 #endif
-#ifndef NO_SETPROCTITLE
+#ifdef HAVE_SETPROCTITLE
     "s"
 #endif
     ")");
@@ -1073,8 +1062,10 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    /* parent process to read the programs output. (sends INT to child) */
    cfgtable.eint=1;
    signal(SIGINT,sighandler);
-#ifndef NO_SETPROCTITLE
+#ifdef HAVE_SETPROCTITLE
+#ifdef INT_SETPROCTITLE
    initsetproctitle(oargc,oargv,environ);
+#endif
    setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
 #endif
    if(!(buf=(char *)malloc(BUFSIZE+1)))
@@ -1160,8 +1151,6 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    break;
  }
 }
-#ifndef NO_SETPROCTITLE
-#ifndef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
 /* pseudo-setproctitle startup. */
 void initsetproctitle(signed int argc,char **argv,char **envp){
@@ -1214,13 +1203,6 @@ void setproctitle(const char *fmt,...){
  while(p<proct.largv)*p++=0;
  proct.argv[1]=0;
 }
-#else
-void initsetproctitle(signed int argc,char **argv,char **envp){return;}
-void setproctitle (const char *fmt,...){return;}
-#endif
-#else
-void initsetproctitle(signed int argc,char **argv,char **envp){return;}
-#endif
 #endif
 /* handles each config file line. (data sizes allocated in c_read()) */
 void c_handler(char *line,unsigned int l,signed int argc){
