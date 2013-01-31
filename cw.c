@@ -260,13 +260,18 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "configuration contained critical errors."};
 
+static void *cwmalloc(size_t n) {
+ void *p = malloc(n);
+ if (!p) cwexit(1,"malloc() failed.");
+ return p;
+}
+
 /* program start. */
 signed int main(signed int argc,char **argv){
  int i=0,j=0, margc=0;
  char *ptr,**margv;
  cfgtable.z.l=cfgtable.z.h=-1;
- if(!(margv=(char **)malloc((sizeof(char *)*(argc+1)))))
-  cwexit(1,"malloc() failed.");
+ margv=(char **)cwmalloc((sizeof(char *)*(argc+1)));
  margv[0]=argv[0];
  for(margc=i=1;i<argc;i++){
   if(!strcmp("+nc",argv[i])||!strcmp("--cw-nocolor",argv[i]))
@@ -299,12 +304,10 @@ signed int main(signed int argc,char **argv){
   else margv[margc++]=argv[i];
  }
  margv[margc]=0;
- if(!(progname=(char *)malloc(strlen(margv[0])+1)))
-  cwexit(1,"malloc() failed.");
+ progname=(char *)cwmalloc(strlen(margv[0])+1);
  strcpy(progname,margv[0]);
  for(i=2;margc>i;i++)j+=(strlen(margv[i])+1);
- if(!(cfgtable.cmdargs=(char *)malloc(j+1)))
-  cwexit(1,"malloc() failed.");
+ cfgtable.cmdargs=(char *)cwmalloc(j+1);
  memset(cfgtable.cmdargs,0,(j+1));
  j=0;
  for(i=2;margc>i;i++){
@@ -314,8 +317,7 @@ signed int main(signed int argc,char **argv){
  if(margc>1){
   if(access(margv[1],F_OK))
    cwexit(1,"non-existent path to definition file.");
-  if(!(scrname=(char *)malloc(strlen(margv[1])+1)))
-   cwexit(1,"malloc() failed.");
+  scrname=(char *)cwmalloc(strlen(margv[1])+1);
   strcpy(scrname,margv[1]);
  }
  else {
@@ -323,8 +325,7 @@ signed int main(signed int argc,char **argv){
   cwexit(0,0);
  }
  for(i=0;18>i;i++){
-  if(!(pal2[i]=(char *)malloc(strlen(pal2_orig[i])+1)))
-   cwexit(1,"malloc() failed.");
+  pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
   memset(pal2[i],0,(strlen(pal2_orig[i])+1));
   strcpy(pal2[i],pal2_orig[i]);
  }
@@ -390,14 +391,13 @@ static char *parameter(const char *string,const char *delim,unsigned int p){
  unsigned int n=p;
  char *arg;
  free(fptr);
- if(!(fptr=arg=(char *)malloc(strlen(string)+1)))
-  cwexit(1,"malloc() failed.");
+ fptr=arg=(char *)cwmalloc(strlen(string)+1);
  strcpy(arg,string);
  arg=strtok(arg,delim);
  while(n&&(arg=strtok(0,delim)))n--;
  if(!arg){
   free(fptr);
-  if(!(fptr=arg=(char *)malloc(3)))cwexit(1,"malloc() failed.");
+  fptr=arg=(char *)cwmalloc(3);
   strcpy(arg,"-1");
  }
  return(pptr=arg);
@@ -411,13 +411,11 @@ static char *convert_string(const char *line){
  regex_t re;
  regmatch_t pm;
  s=strlen(line);
- if(!(tbuf=(char *)malloc(s+1)))
-  cwexit(1,"malloc() failed.");
+ tbuf=(char *)cwmalloc(s+1);
  strcpy(tbuf,line);
  /* start processing the 'digit' definition. */
  if(cfgtable.n.on){
-  if(!(tmp=(char *)malloc(s*16+1)))
-   cwexit(1,"malloc() failed.");
+  tmp=(char *)cwmalloc(s*16+1);
   memset(tmp,0,(s*16+1));
   for(k=j=i=0;s>i;i++){
    if(isdigit((unsigned char)tbuf[i])){
@@ -440,15 +438,14 @@ static char *convert_string(const char *line){
   }
   free(tbuf);
   s=strlen(tmp);
-  if(!(tbuf=(char *)malloc(s+1)))
-   cwexit(1,"malloc() failed.");
+  tbuf=(char *)cwmalloc(s+1);
   strcpy(tbuf,tmp);
   free(tmp);
   on=0;
  }
  /* start processing the 'ucase' definition. */
  if(cfgtable.u.on){
-  if(!(tmp=(char *)malloc(s*16+1)))cwexit(1,"malloc() failed.");
+  tmp=(char *)cwmalloc(s*16+1);
   memset(tmp,0,(s*16+1));
   for(k=j=i=0;s>i;i++){
    if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
@@ -472,16 +469,14 @@ static char *convert_string(const char *line){
   }
   free(tbuf);
   s=strlen(tmp);
-  if(!(tbuf=(char *)malloc(s+1)))
-   cwexit(1,"malloc() failed.");
+  tbuf=(char *)cwmalloc(s+1);
   strcpy(tbuf,tmp);
   free(tmp);
   on=0;
  }
  /* start processing the 'lcase' definition. */
  if(cfgtable.l.on){
-  if(!(tmp=(char *)malloc(s*16+1)))
-   cwexit(1,"malloc() failed.");
+  tmp=(char *)cwmalloc(s*16+1);
   memset(tmp,0,(s*16+1));
   for(k=j=i=0;s>i;i++){
    if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
@@ -505,7 +500,7 @@ static char *convert_string(const char *line){
   }
   free(tbuf);
   s=strlen(tmp);
-  if(!(tbuf=(char *)malloc(s+1)))cwexit(1,"malloc() failed.");
+  tbuf=(char *)cwmalloc(s+1);
   strcpy(tbuf,tmp);
   free(tmp);
   on=0;
@@ -513,8 +508,7 @@ static char *convert_string(const char *line){
  /* start processing the 'token' definitions. */
  for(i=0;i<cfgtable.t.tot;i++){
   s=strlen(tbuf);
-  if(!(tmp=(char *)malloc(s+strlen(tbuf)+16+1)))
-   cwexit(1,"malloc() failed.");
+  tmp=(char *)cwmalloc(s+strlen(tbuf)+16+1);
   memset(tmp,0,(s+strlen(tbuf)+16+1));
   if(!cfgtable.t.slot[i])on=3;
   else on=0;
@@ -551,16 +545,14 @@ static char *convert_string(const char *line){
    on=0;
   }
   free(tbuf);
-  if(!(tbuf=(char *)malloc(strlen(tmp)+1)))
-   cwexit(1,"malloc() failed.");
+  tbuf=(char *)cwmalloc(strlen(tmp)+1);
   strcpy(tbuf,tmp);
   free(tmp);
  }
  /* start processing the 'match' definitions. */
  if(cfgtable.m.tot){
   s=strlen(tbuf);
-  if(!(tmp=(char *)malloc(s*(cfgtable.m.tot*16+1)+strlen(tbuf)+1)))
-   cwexit(1,"malloc() failed.");
+  tmp=(char *)cwmalloc(s*(cfgtable.m.tot*16+1)+strlen(tbuf)+1);
   memset(tmp,0,(s*(cfgtable.m.tot*16+1)+strlen(tbuf)+1));
   for(k=i=0;i<s;i++){
    for(j=0;j<cfgtable.m.tot;j++){
@@ -583,8 +575,7 @@ static char *convert_string(const char *line){
    tmp[k++]=tbuf[i];
   }
   free(tbuf);
-  if(!(tbuf=(char *)malloc(strlen(tmp)+1)))
-   cwexit(1,"malloc() failed.");
+  tbuf=(char *)cwmalloc(strlen(tmp)+1);
   strcpy(tbuf,tmp);
   free(tmp);
  }
@@ -592,8 +583,7 @@ static char *convert_string(const char *line){
  if(cfgtable.x.tot){
   for(j=i=0;i<cfgtable.x.tot;i++){
    s=strlen(tbuf);
-   if(!(tmp=(char *)malloc(s*(cfgtable.x.tot*16+1)+s+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(s*(cfgtable.x.tot*16+1)+s+1);
    memset(tmp,0,(s*(cfgtable.x.tot*16+1)+s+1));
    on=j=l=k=0;
    if(regcomp(&re,cfgtable.x.data[i],REG_EXTENDED))
@@ -601,8 +591,7 @@ static char *convert_string(const char *line){
    else{
     while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
      if(pm.rm_so){
-      if(!(tmpcmp=(char *)malloc(pm.rm_so+1)))
-       cwexit(1,"malloc() failed.");
+      tmpcmp=(char *)cwmalloc(pm.rm_so+1);
       memset(tmpcmp,0,pm.rm_so+1);
       strncpy(tmpcmp,tbuf+k,pm.rm_so);
       strcpy(tmp+j,tmpcmp);
@@ -614,8 +603,7 @@ static char *convert_string(const char *line){
       on=1;
      }
      l=(pm.rm_eo-pm.rm_so);
-     if(!(tmpcmp=(char *)malloc(l+1)))
-      cwexit(1,"malloc() failed.");
+     tmpcmp=(char *)cwmalloc(l+1);
      memset(tmpcmp,0,l+1);
      k+=pm.rm_so;
      strncpy(tmpcmp,tbuf+k,l);
@@ -639,17 +627,15 @@ static char *convert_string(const char *line){
     regfree(&re);
     if(s>k)strcpy(tmp+j,tbuf+k);
     free(tbuf);
-    if(!(tbuf=(char *)malloc(strlen(tmp)+1)))
-     cwexit(1,"malloc() failed.");
+    tbuf=(char *)cwmalloc(strlen(tmp)+1);
     strcpy(tbuf,tmp);
     free(tmp);
     on=0;
    }
   }
  }
- if(!(buf=(char *)malloc(strlen(pal2[cfgtable.base])+strlen(tbuf)
- +cfgtable.b.llen+cfgtable.b.rlen+(!cfgtable.noeol?4:0)+1)))
-  cwexit(1,"malloc() failed.");
+ buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)
+                      +cfgtable.b.llen+cfgtable.b.rlen+(!cfgtable.noeol?4:0)+1);
  sprintf(buf,"%s%s%s%s%s",(cfgtable.b.llen?cfgtable.b.ldata:"")
  ,pal2[cfgtable.base],tbuf,(cfgtable.b.rlen?cfgtable.b.rdata:""),
  (!cfgtable.noeol?pal2[16]:""));
@@ -808,8 +794,7 @@ unsigned char cwprintf(char *str){
  char *tmp,*ctmp;
  j=strlen(str);
  k=(8*j);
- if(!(tmp=(char *)malloc((j*k)+j+1)))
-  cwexit(1,"malloc() failed.");
+ tmp=(char *)cwmalloc((j*k)+j+1);
  memset(tmp,0,(j*k)+j+1);
  for(k=i=0;j>i;i++){
   if(str[i]=='\\'){
@@ -843,8 +828,7 @@ unsigned char cwprintf(char *str){
      &&(p=(size_t)strchr(str+i+4,']'))){
       p-=((size_t)str+i+3);
       if(p>1){
-       if(!(ctmp=(char *)malloc(p+1)))
-        cwexit(1,"malloc() failed.");
+       ctmp=(char *)cwmalloc(p+1);
        memset(ctmp,0,p+1);
        strncpy(ctmp,str+i+3,p);
        if((x=color_atoi(ctmp))>=0){
@@ -908,8 +892,7 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
  char *str;
  pid_t p=0;
  k=strlen(prog);
- if(!(str=(char *)malloc(k+strlen(cfgtable.cmdargs)+1)))
-  cwexit(1,"malloc() failed.");
+ str=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
  memset(str,0,(k+strlen(cfgtable.cmdargs)+1));
  for(on=j=i=0;k>i;i++){
   if(!on&&!strncmp(prog+i,"{}",2)){
@@ -1017,8 +1000,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    if(cfgtable.cmd)
     execle("/bin/sh",strpname(scrname),"-c",cfgtable.cmd,(char *)0,environ);
    else{
-    if(!(nargv=(char **)malloc((sizeof(char *)*argc))))
-     cwexit(1,"malloc() failed.");
+    nargv=(char **)cwmalloc((sizeof(char *)*argc));
     nargv[0]=strpname(scrname);
     for(i=2;i<argc;i++)
      nargv[i-1]=argv[i];
@@ -1038,8 +1020,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
 #endif
    setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
 #endif
-   if(!(buf=(char *)malloc(BUFSIZE+1)))
-    cwexit(1,"malloc() failed.");
+   buf=(char *)cwmalloc(BUFSIZE+1);
    /* minimum catch-up time. */
    if(!cfgtable.w.it_interval.tv_sec&&cfgtable.w.it_interval.tv_usec<100000)
     cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=100000;
@@ -1071,8 +1052,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
      if((s=read(fd,buf,BUFSIZE))&&s>0){
       if(!on){
        j=0;
-       if(!(tmp=(char *)malloc(s+1)))
-        cwexit(1,"malloc() failed.");
+       tmp=(char *)cwmalloc(s+1);
        memset(tmp,0,s);
        on=1;
       }
@@ -1099,8 +1079,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
         free(tmp);
         on=0;
         if(s>i){
-         if(!(tmp=(char *)malloc(s-i+1)))
-          cwexit(1,"malloc() failed.");
+         tmp=(char *)cwmalloc(s-i+1);
          memset(tmp,0,s-i);
          on=1;
         }
@@ -1129,8 +1108,7 @@ void initsetproctitle(signed int argc,char **argv,char **envp){
  char *s;
  for(i=0;envp[i]!=0;i++)
   envpsize+=(strlen(envp[i])+1);
- if(!(environ=(char **)malloc((sizeof(char *)*(i+1))+envpsize+1)))
-  cwexit(1,"malloc() failed.");
+ environ=(char **)cwmalloc((sizeof(char *)*(i+1))+envpsize+1);
  s=((char *)environ)+((sizeof(char *)*(i+1)));
  for(i=0;envp[i]!=0;i++){
   strcpy(s,envp[i]);
@@ -1138,8 +1116,7 @@ void initsetproctitle(signed int argc,char **argv,char **envp){
   s+=(strlen(s)+1);
  }
  environ[i]=0;
- if(!(proct.name=(char *)malloc(strlen(argv[0])+1)))
-  cwexit(1,"malloc() failed.");
+ proct.name=(char *)cwmalloc(strlen(argv[0])+1);
  strcpy(proct.name,argv[0]);
  proct.argv=argv;
  for(i=0;i<argc;i++){
@@ -1194,8 +1171,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   cfgtable.ifosa=o=1;
   if(!strcmp(parameter(line," ",1),"-1"))c_error(l,cfgmsg[30]);
   else{
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    for(j=i=0;!j&&strcmp(parameter(tmp,":",i),"-1");i++){
     if(!strcmp(pptr,"<any>"))j=1;
@@ -1236,8 +1212,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   cfgtable.ifarga=o=1;
   if(!strcmp(parameter(line," ",1),"-1"))c_error(l,cfgmsg[18]);
   else{
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    for(j=i=0;!j&&strcmp(parameter(tmp,":",i),"-1");i++){
     if(!strcmp(pptr,"<any>")||(!strcmp(pptr,"<none>")&&argc<3))j=1;
@@ -1257,8 +1232,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   for(i=0;j>i;i++)line[i]=line[i+1];
   line=strtok(line,"=");
   if(line&&strlen(line)){
-   if(!(tmp=(char *)malloc(strlen(line)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(line)+1);
    strcpy(tmp,line);
    line=strtok(0,"");
    if(line&&strlen(line))
@@ -1286,8 +1260,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   ptr=strtok(0,"");
   if(ptr&&(k=strlen(ptr))){
    s=(getenv("PATH")?strlen(getenv("PATH")):0);
-   if(!(tmp=(char *)malloc(k+s+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(k+s+1);
    memset(tmp,0,(k+s+1));
    for(on=i=j=0;k>i;i++){
     if(!on&&s&&!strncmp(ptr+i,"<env>",5)){
@@ -1303,14 +1276,11 @@ void c_handler(char *line,unsigned int l,signed int argc){
    }
    i=0;
    while(strcmp(parameter(tmp,":",i++),"-1")){
-    if(!(tmppath=(char *)malloc(strlen(pptr)+
-    strlen(strpname(scrname))+2)))
-     cwexit(1,"malloc() failed.");
+    tmppath=(char *)cwmalloc(strlen(pptr)+strlen(strpname(scrname))+2);
     sprintf(tmppath,"%s/%s",pptr,strpname(scrname));
     if(!access(tmppath,X_OK)){
      if(cfgtable.path)free(cfgtable.path);
-     if(!(cfgtable.path=(char *)malloc(strlen(tmppath)+1)))
-      cwexit(1,"malloc() failed.");
+     cfgtable.path=(char *)cwmalloc(strlen(tmppath)+1);
      strcpy(cfgtable.path,tmppath);
      free(tmppath);
      break;
@@ -1326,8 +1296,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   ptr=strtok(0,"");
   if((k=strlen(ptr))){
    if(cfgtable.cmd)free(cfgtable.cmd);
-   if(!(cfgtable.cmd=(char *)malloc(k+strlen(cfgtable.cmdargs)+1)))
-    cwexit(1,"malloc() failed.");
+   cfgtable.cmd=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
    memset(cfgtable.cmd,0,(k+strlen(cfgtable.cmdargs)+1));
    for(on=j=i=0;k>i;i++){
     if(!on&&!strncmp(ptr+i,"{}",2)){
@@ -1352,8 +1321,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  }
  else if(!strcmp(parameter(line," ",0),"digit")){
   if(strcmp(parameter(line," ",1),"-1")){
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.n.b=color_atoi(parameter(tmp,":",0));
@@ -1374,8 +1342,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  }
  else if(!strcmp(parameter(line," ",0),"ucase")){
   if(strcmp(parameter(line," ",1),"-1")){
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.u.b=color_atoi(parameter(tmp,":",0));
@@ -1396,8 +1363,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  }
  else if(!strcmp(parameter(line," ",0),"lcase")){
   if(strcmp(parameter(line," ",1),"-1")){
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.l.b=color_atoi(parameter(tmp,":",0));
@@ -1418,8 +1384,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  }
  else if(!strcmp(parameter(line," ",0),"match")){
   if(strcmp(parameter(line," ",1),"-1")){
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.m.b[cfgtable.m.cur]=color_atoi(parameter(tmp,":",0));
@@ -1435,8 +1400,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
    }
    free(tmp);
    if(strcmp(parameter(line," ",2),"-1")){
-    if(!(tmp=(char *)malloc(strlen(line)+1)))
-     cwexit(1,"malloc() failed.");
+    tmp=(char *)cwmalloc(strlen(line)+1);
     strcpy(tmp,line);
     ptr=tmp;
     tmp=strtok(tmp," ");
@@ -1453,8 +1417,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
     if(cfgtable.m.cur>cfgtable.m.tot)
      c_error(l,cfgmsg[3]);
     else{
-     if(!(cfgtable.m.data[cfgtable.m.cur]=(char *)malloc(strlen(tmp)+1)))
-      cwexit(1,"malloc() failed.");
+     cfgtable.m.data[cfgtable.m.cur]=(char *)cwmalloc(strlen(tmp)+1);
      strcpy(cfgtable.m.data[cfgtable.m.cur],tmp);
      cfgtable.m.cur++;
     }
@@ -1466,8 +1429,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  }
  else if(!strcmp(parameter(line," ",0),"regex")){
   if(strcmp(parameter(line," ",1),"-1")){
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.x.b[cfgtable.x.cur]=color_atoi(parameter(tmp,":",0));
@@ -1483,8 +1445,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
    }
    free(tmp);
    if(strcmp(parameter(line," ",2),"-1")){
-    if(!(tmp=(char *)malloc(strlen(line)+1)))
-     cwexit(1,"malloc() failed.");
+    tmp=(char *)cwmalloc(strlen(line)+1);
     strcpy(tmp,line);
      ptr=tmp;
     tmp=strtok(tmp," ");
@@ -1493,8 +1454,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
     if(cfgtable.x.cur>cfgtable.x.tot)
      c_error(l,cfgmsg[28]);
     else{
-     if(!(cfgtable.x.data[cfgtable.x.cur]=(char *)malloc(strlen(tmp)+1)))
-      cwexit(1,"malloc() failed.");
+     cfgtable.x.data[cfgtable.x.cur]=(char *)cwmalloc(strlen(tmp)+1);
      strcpy(cfgtable.x.data[cfgtable.x.cur],tmp);
      cfgtable.x.cur++;
     }
@@ -1506,8 +1466,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  }
  else if(!strcmp(parameter(line," ",0),"token")){
   if(strcmp(parameter(line," ",1),"-1")){
-   if(!(tmp=(char *)malloc(strlen(pptr)+1)))
-    cwexit(1,"malloc() failed.");
+   tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.t.b[cfgtable.t.cur]=color_atoi(parameter(tmp,":",0));
@@ -1591,26 +1550,16 @@ void c_read(char *file,signed int argc){
   rewind(fs);
   if(i){
    /* build array sizes. */
-   if(!(cfgtable.m.data=(char **)malloc(cfgtable.m.tot*sizeof(char *)+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.m.b=(unsigned char *)malloc(cfgtable.m.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.m.a=(unsigned char *)malloc(cfgtable.m.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.x.data=(char **)malloc(cfgtable.x.tot*sizeof(char *)+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.x.b=(unsigned char *)malloc(cfgtable.x.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.x.a=(unsigned char *)malloc(cfgtable.x.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.t.slot=(unsigned char *)malloc(cfgtable.t.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.t.delim=(unsigned char *)malloc(cfgtable.t.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.t.b=(unsigned char *)malloc(cfgtable.t.tot+1)))
-    cwexit(1,"malloc() failed.");
-   if(!(cfgtable.t.a=(unsigned char *)malloc(cfgtable.t.tot+1)))
-    cwexit(1,"malloc() failed.");
+   cfgtable.m.data=(char **)cwmalloc(cfgtable.m.tot*sizeof(char *)+1);
+   cfgtable.m.b=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
+   cfgtable.m.a=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
+   cfgtable.x.data=(char **)cwmalloc(cfgtable.x.tot*sizeof(char *)+1);
+   cfgtable.x.b=(unsigned char *)cwmalloc(cfgtable.x.tot+1);
+   cfgtable.x.a=(unsigned char *)cwmalloc(cfgtable.x.tot+1);
+   cfgtable.t.slot=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
+   cfgtable.t.delim=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
+   cfgtable.t.b=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
+   cfgtable.t.a=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
   }
   for(memset(buf,0,BUFSIZE);fgets(buf,BUFSIZE,fs);memset(buf,0,BUFSIZE)){
    /* find the amount of definitions to store in memory. */
