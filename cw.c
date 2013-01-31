@@ -359,7 +359,6 @@ signed int main(signed int argc,char **argv){
 #ifndef NO_SETPROCTITLE
     "s"
 #endif
-    "t"
 #ifdef HAVE_WAITPID
     "w"
 #endif
