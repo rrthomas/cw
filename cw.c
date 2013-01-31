@@ -120,11 +120,6 @@
 #define NO_SETPROCTITLE
 #endif
 #endif
-#ifdef HAVE_SSCANF
-#ifdef HAVE_ISXDIGIT
-#define USE_XCONV
-#endif
-#endif
 #ifndef I_PUSH
 #define I_PUSH 21250
 #endif
@@ -932,9 +927,7 @@ signed char make_ptypair(unsigned char v){
 /* prints a formated line to stdout. */
 unsigned char cwprintf(char *str){
  signed char x=0;
-#ifdef USE_XCONV
  unsigned int c=0;
-#endif
  unsigned int i=0,j=0,k=0;
  size_t p=0;
  char *tmp,*ctmp;
@@ -955,7 +948,6 @@ unsigned char cwprintf(char *str){
      else if(str[i+1]=='t')tmp[k++]='\t';
      else if(str[i+1]=='v')tmp[k++]='\v';
      else if(str[i+1]=='x'){
-#ifdef USE_XCONV
       if(j>(i+3)&&isxdigit((unsigned char)str[i+2])
       &&isxdigit((unsigned char)str[i+3])){
        if(sscanf(str+(i+2),"%2x",&c)>0){
@@ -971,10 +963,6 @@ unsigned char cwprintf(char *str){
        tmp[k++]='\\';
        i--;
       }
-#else
-      tmp[k++]='\\';
-      i--;
-#endif
      }
      else if(j>=(i+4)&&str[i+1]=='C'&&str[i+2]=='['
      &&(p=(size_t)strchr(str+i+4,']'))){
