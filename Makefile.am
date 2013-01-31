@@ -8,7 +8,7 @@ dist_man_MANS = cw.1
 bin_PROGRAMS = cw
 
 cw_SOURCES = cw.c
-cw_LDADD = lib/lib$(PACKAGE).a $(LIBINTL)
+cw_LDADD = lib/lib$(PACKAGE).a $(LIBINTL) $(PTY_LIB)
 
 EXTRA_DIST = $(srcdir)/def/*.in m4/gnulib-cache.m4
 

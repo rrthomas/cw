@@ -50,21 +50,12 @@
 #include <unix.h>
 #endif
 
-#ifndef HAVE_GETPT
 #ifndef HAVE_OPENPTY
-#ifndef HAVE_LIBUTIL
-#ifndef HAVE_DEV_PTMX
 #define NO_PTY
-#endif
-#endif
-#endif
 #endif
 #if !defined(HAVE_SETPROCTITLE) && (defined(__APPLE_CC__) || defined(__linux__))
 #define INT_SETPROCTITLE
 #define HAVE_SETPROCTITLE
-#endif
-#ifndef I_PUSH
-#define I_PUSH 21250
 #endif
 
 /* prototypes. */
@@ -702,76 +693,12 @@ _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
 #ifndef NO_PTY
 /* creates a pty pair. (master/slave) */
 signed char make_ptypair(unsigned char v){
-#ifdef HAVE_GETPT
- signed int master,slave;
- char *name;
- if((master=getpt())<0)return(0);
- if(grantpt(master)<0||unlockpt(master)<0){
-  close(master);
-  return(0);
- }
- if(!(name=ptsname(master))){
-  close(master);
-  return(0);
- }
- if((slave=open(name,O_RDWR))==-1){
-  close(master);
-  return(0);
- }
- if(isastream(slave)){
-  if(ioctl(slave,I_PUSH,"ptem")<0||ioctl(slave,I_PUSH,"ldterm")<0){
-   close(master);
-   close(slave);
-   return(0);
-  }
- }
- if(v){
-  cfgtable.p.merr=master;
-  cfgtable.p.serr=slave;
- }
- else{
-  cfgtable.p.mout=master;
-  cfgtable.p.sout=slave;
- }
-#elif HAVE_OPENPTY
  if(v){
   if(openpty(&cfgtable.p.merr,&cfgtable.p.serr,0,0,0))return(0);
  }
  else{
   if(openpty(&cfgtable.p.mout,&cfgtable.p.sout,0,0,0))return(0);
  }
-#elif HAVE_DEV_PTMX
- signed int master,slave;
- char *name;
- if((master=open("/dev/ptmx",O_RDWR))<0)return(0);
- if(grantpt(master)<0||unlockpt(master)<0){
-  close(master);
-  return(0);
- }
- if(!(name=ptsname(master))){
-  close(master);
-  return(0);
- }
- if((slave=open(name,O_RDWR))==-1){
-  close(master);
-  return(0);
- }
- if(isastream(slave)){
-  if(ioctl(slave,I_PUSH,"ptem")<0||ioctl(slave,I_PUSH,"ldterm")<0){
-   close(master);
-   close(slave);
-   return(0);
-  }
- }
- if(v){
-  cfgtable.p.merr=master;
-  cfgtable.p.serr=slave;
- }
- else{
-  cfgtable.p.mout=master;
-  cfgtable.p.sout=slave;
- }
-#endif
  return(1);
 }
 #endif
