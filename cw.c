@@ -175,9 +175,7 @@ struct{
  signed char nocolor;
  signed char noeol;
  signed char noer;
-#ifdef HAVE_ISATTY
  signed char nopipe;
-#endif
  signed char nostrip;
  signed char po;
  signed char pty;
@@ -361,9 +359,7 @@ signed int main(signed int argc,char **argv){
 #ifndef NO_SETPROCTITLE
     "s"
 #endif
-#ifdef HAVE_ISATTY
     "t"
-#endif
 #ifdef HAVE_WAITPID
     "w"
 #endif
@@ -453,7 +449,6 @@ signed int main(signed int argc,char **argv){
   unsetenv("NOCOLOR_NEXT");
 #endif
  }
-#ifdef HAVE_ISATTY
  if(getenv("NOCOLOR_PIPE"))cfgtable.nopipe=1;
  /* from patch submitted by <komar@ukr.net>. (modified from original) */
  if(!isatty(STDOUT_FILENO)||!isatty(STDERR_FILENO)){
@@ -461,13 +456,10 @@ signed int main(signed int argc,char **argv){
    cfgtable.nocolor=1;
    cfgtable.clear=0;
   }
-#endif
 #ifndef NO_PTY
   else if(cfgtable.pty)cfgtable.pty=0;
 #endif
-#ifdef HAVE_ISATTY
  }
-#endif
  if(cfgtable.z.on)cfgtable.invert=0;
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
  if(!cfgtable.nocolor&&cfgtable.clear){
@@ -1740,11 +1732,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
 #endif
  else if(!strcmp(parameter(line," ",0),"noextendedregex"))cfgtable.noer=1;
  else if(!strcmp(parameter(line," ",0),"useifregex"))cfgtable.ifregex=1;
-#ifdef HAVE_ISATTY
  else if(!strcmp(parameter(line," ",0),"nopipe"))cfgtable.nopipe=1;
-#else
- else if(!strcmp(parameter(line," ",0),"nopipe"));
-#endif
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
  else if(!strcmp(parameter(line," ",0),"nostrip"))cfgtable.nostrip=1;
