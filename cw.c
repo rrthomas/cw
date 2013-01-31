@@ -54,9 +54,7 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-#ifdef HAVE_SYS_UTSNAME_H
 #include <sys/utsname.h>
-#endif
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
@@ -93,9 +91,7 @@
 void sighandler(signed int);
 char *strpname(char *);
 unsigned char strwcmp(char *,char *);
-#ifdef HAVE_UNAME
 unsigned char struncmp(char *);
-#endif
 unsigned char regxcmp(char *,char *,unsigned char);
 signed char color_atoi(char *);
 signed char make_ptypair(unsigned char v);
@@ -317,9 +313,6 @@ signed int main(signed int argc,char **argv){
   }
   else if(!strcmp("-v",argv[i])){
    cwexit(1,"cw (color wrapper) v"VERSION" (support=+"
-#ifdef HAVE_UNAME
-    "o"
-#endif
 #ifndef NO_PTY
     "p"
 #endif
@@ -740,7 +733,6 @@ _GL_ATTRIBUTE_PURE unsigned char strwcmp(char *line1,char *line2){
   if(line1[i]!=line2[i]&&!(line1[i]!='\x1b'&&line2[i]==-1))return(1);
  return(i==t?0:1);
 }
-#ifdef HAVE_UNAME
 /* scans for a system name match. */
 unsigned char struncmp(char *cmp){
  struct utsname un;
@@ -748,7 +740,6 @@ unsigned char struncmp(char *cmp){
  if(!regxcmp(un.sysname,cmp,0))return(0);
  return(1);
 }
-#endif
 /* checks for a regex match of a string, or strcmp-like if not supported. */
 unsigned char regxcmp(char *str,char *pattern,unsigned char type){
  signed int r=0;
@@ -1290,11 +1281,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
    strcpy(tmp,pptr);
    for(j=i=0;!j&&strcmp(parameter(tmp,":",i),"-1");i++){
     if(!strcmp(pptr,"<any>"))j=1;
-#ifdef HAVE_UNAME
     else j=(struncmp(pptr)?0:1);
-#else
-    else j=(strcasecmp(pptr,"<pseudo>")?0:1);
-#endif
    }
    free(tmp);
    cfgtable.ifos=j;

@@ -38,13 +38,13 @@ reverse of \fBifexit\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR
 this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBw\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBifos\fR [\fItext:text:...\fR]
-list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBtext\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<pseudo>\fR" can be used as a constant value for non\-existent support of \fBifos\fR and \fBifnos\fR, it will only match if not supported) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBo\fR" IS INCLUDED IN THE SUPPORT}
+list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBtext\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.)
 .TP 
 \fBifnos\fR [\fItext:text:...\fR]
-reverse of \fBifos\fR {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBo\fR" IS INCLUDED IN THE SUPPORT}
+reverse of \fBifos\fR
 .TP 
 \fBifos\-else\fR
-this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\fR was false {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBo\fR" IS INCLUDED IN THE SUPPORT}
+this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\fR was false
 .TP 
 \fBbase\fR [\fIcolor\fR]
 color used if no other definitions state otherwise (if this is the only definition used it will be ignored)
