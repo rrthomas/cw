@@ -42,12 +42,7 @@
 #define __USE_POSIX
 #endif
 #include <stdarg.h>
-#ifdef HAVE_SIGNAL_H
 #include <signal.h>
-#ifndef SA_NOCLDSTOP
-#define SA_NOCLDSTOP 1
-#endif
-#endif
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
@@ -112,11 +107,6 @@
 #ifndef HAVE_SETENV
 #ifndef HAVE_PUTENV
 #define NO_ENVSET
-#endif
-#endif
-#ifdef __CYGWIN__
-#ifdef HAVE_SIGACTION
-#undef HAVE_SIGACTION
 #endif
 #endif
 #define INT_SETPROCTITLE
@@ -194,9 +184,6 @@ struct{
  signed char ifregex;
  signed char ign;
  signed char invert;
-#ifdef HAVE_SIGACTION
- signed char nobg;
-#endif
  signed char nocolor;
  signed char noeol;
  signed char noer;
@@ -512,9 +499,11 @@ void sighandler(signed int sig){
    cfgtable.eint=0;
   }
  }
+#ifdef SIGCHLD
  else if(sig==SIGCHLD){
   if(pid_p)kill(pid_p,SIGUSR1);
  }
+#endif
  else if(sig==SIGUSR1)ext=1;
  else if(sig==SIGALRM)ext=2;
  else if(sig==SIGPIPE||sig==SIGINT){
@@ -1107,7 +1096,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
  signed int fds[2],fde[2],fdm=0,fd=0,s=0;
  char **nargv,*buf,*tmp;
  fd_set rfds;
-#ifdef HAVE_SIGACTION
+#ifdef SIGCHLD
  struct sigaction sa;
 #endif
  if(!(cfgtable.m.tot+
@@ -1125,23 +1114,16 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
   pid_p=getpid();
  }
-#ifdef HAVE_SIGACTION
- if(cfgtable.nobg){
+#ifdef SIGCHLD
+ sa.sa_handler=sighandler;
+ sigemptyset(&sa.sa_mask);
+ sa.sa_flags=SA_NOCLDSTOP;
+ if(sigaction(SIGCHLD,&sa,0)<0){
+#endif
   signal(SIGTSTP,SIG_IGN);
+#ifdef SIGCHLD
   signal(SIGCHLD,sighandler);
  }
- else{
-  sa.sa_handler=sighandler;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags=SA_NOCLDSTOP;
-  if(sigaction(SIGCHLD,&sa,0)<0){
-   signal(SIGTSTP,SIG_IGN);
-   signal(SIGCHLD,sighandler);
-  }
- }
-#else
- signal(SIGTSTP,SIG_IGN);
- signal(SIGCHLD,sighandler);
 #endif
  signal(SIGUSR1,sighandler);
  signal(SIGALRM,sighandler);
@@ -1781,11 +1763,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"nopipe"))cfgtable.nopipe=1;
 #else
  else if(!strcmp(parameter(line," ",0),"nopipe"));
-#endif
-#ifdef HAVE_SIGACTION
- else if(!strcmp(parameter(line," ",0),"nobackground"))cfgtable.nobg=1;
-#else
- else if(!strcmp(parameter(line," ",0),"nobackground"));
 #endif
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
