@@ -74,11 +74,6 @@
 #endif
 #endif
 #endif
-#ifndef HAVE_SETENV
-#ifndef HAVE_PUTENV
-#define NO_ENVSET
-#endif
-#endif
 #define INT_SETPROCTITLE
 #ifndef __APPLE_CC__
 #ifndef __linux__
@@ -322,9 +317,6 @@ signed int main(signed int argc,char **argv){
   }
   else if(!strcmp("-v",argv[i])){
    cwexit(1,"cw (color wrapper) v"VERSION" (support=+"
-#ifndef NO_ENVSET
-    "e"
-#endif
 #ifdef HAVE_UNAME
     "o"
 #endif
@@ -414,14 +406,8 @@ signed int main(signed int argc,char **argv){
   cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
 #endif
  if(getenv("NOCOLOR_NEXT")){
-#ifdef HAVE_SETENV
   setenv("NOCOLOR","1",1);
-#elif HAVE_PUTENV
-  putenv("NOCOLOR=1");
-#endif
-#ifdef HAVE_UNSETENV
   unsetenv("NOCOLOR_NEXT");
-#endif
  }
  if(getenv("NOCOLOR_PIPE"))cfgtable.nopipe=1;
  /* from patch submitted by <komar@ukr.net>. (modified from original) */
@@ -1284,11 +1270,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  unsigned char o=0,on=0;
  unsigned int i=0,j=0,k=0,s=0;
  char *tmp,*tmppath,*ptr;
-#ifndef HAVE_SETENV
-#ifdef HAVE_PUTENV
- char *tmpput;
-#endif
-#endif
  if(cfgtable.label&&line[0]==':'){
   o=1;
   if(strlen(line)<2||strcmp(cfgtable.label,line+1))cfgtable.iflabel=1;
@@ -1371,7 +1352,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   return;
  if(line[0]=='#')return;
  else if(line[0]=='$'){
-#ifndef NO_ENVSET
   j=strlen(line);
   for(i=0;j>i;i++)line[i]=line[i+1];
   line=strtok(line,"=");
@@ -1380,23 +1360,12 @@ void c_handler(char *line,unsigned int l,signed int argc){
     cwexit(1,"malloc() failed.");
    strcpy(tmp,line);
    line=strtok(0,"");
-   if(line&&strlen(line)){
-#ifdef HAVE_SETENV
+   if(line&&strlen(line))
     setenv(tmp,line,1);
-#elif HAVE_PUTENV
-    if(!(tmpput=(char *)malloc(strlen(tmp)+strlen(line)+2)))
-     cwexit(1,"malloc() failed.");
-    memset(tmpput,0,(strlen(tmp)+strlen(line)+2));
-    sprintf(tmpput,"%s=%s",tmp,line);
-    putenv(tmpput);
-    /* do not free(tmpput), it is part of the environment. */
-#endif
-   }
    else c_error(l,cfgmsg[21]);
    free(tmp);
   }
   else c_error(l,cfgmsg[21]);
-#endif
  }
  else if(line[0]=='!'||line[0]=='@'){
   if(strlen(line)>1)
