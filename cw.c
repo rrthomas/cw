@@ -318,10 +318,10 @@ signed int main(signed int argc,char **argv){
    cwexit(1,"malloc() failed.");
   strcpy(scrname,margv[1]);
  }
- else if (argc == 1)
-  cwexit(1,"this program is not intended to be used interactively.");
- else
+ else {
+  cfgtable.addhelp=1;
   cwexit(0,0);
+ }
  for(i=0;18>i;i++){
   if(!(pal2[i]=(char *)malloc(strlen(pal2_orig[i])+1)))
    cwexit(1,"malloc() failed.");
