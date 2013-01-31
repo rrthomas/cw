@@ -425,7 +425,6 @@ void sighandler(signed int sig){
   fflush(stderr);
   cwexit(0,0);
  }
- return;
 }
 /* plucks a requested token out of a string. */
 static char *parameter(const char *string,const char *delim,unsigned int p){
@@ -941,7 +940,6 @@ void setcolorize(char *str){
   }
   if(r>=0&&r<9)cfgtable.z.on=1;
  }
- return;
 }
 /* handles and executes other programs. */
 signed char execot(char *prog,unsigned char type,unsigned int l){
@@ -1193,7 +1191,6 @@ void initsetproctitle(signed int argc,char **argv,char **envp){
   if(proct.largv+1==envp[i])
    proct.largv=(envp[i]+strlen(envp[i]));
  }
- return;
 }
 /* pseudo-setproctitle set. */
 void setproctitle(const char *fmt,...){
@@ -1216,7 +1213,6 @@ void setproctitle(const char *fmt,...){
  p=&proct.argv[0][i];
  while(p<proct.largv)*p++=0;
  proct.argv[1]=0;
- return;
 }
 #else
 void initsetproctitle(signed int argc,char **argv,char **envp){return;}
@@ -1632,7 +1628,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"warnings"))cfgtable.ign=0;
  else if(!strcmp(parameter(line," ",0),"nowarnings"))cfgtable.ign=1;
  else if(!o)c_error(l,cfgmsg[0]);
- return;
 }
 /* reads (and allocates space) the config file to be passed to c_handler(). */
 void c_read(char *file,signed int argc){
@@ -1696,7 +1691,6 @@ void c_read(char *file,signed int argc){
  else if(cfgtable.iflabelf)c_error(0,cfgmsg[26]);
  else return;
  cwexit(1,cfgmsg[46]);
- return;
 }
 /* this get appended to "--help" displays/ */
 static void addhelp_display(void){
@@ -1710,13 +1704,11 @@ static void addhelp_display(void){
 #ifndef NO_PTY
  fprintf(stdout,"%s\n","  +py, --cw-usepty                  allocates a pseudo terminal.");
 #endif
- return;
 }
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){
  if(!cfgtable.ign)
   fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
- return;
 }
 /* exit with or without a reason, resets color too. */
 noreturn void cwexit(signed char level,const char *reason){
