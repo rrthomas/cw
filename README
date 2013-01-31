@@ -46,7 +46,7 @@ see the INSTALL file.
 4. How do I enable use of cw?
 
 if cw has been installed, a shell script named "colorcfg" was also
-installed, the syntax is [1|2|3].  the higher the number the more precautions
+installed, the syntax is [1|2].  the higher the number the more precautions
 are taken to stop "unwanted" coloring.  1 takes no precautions.  2 will
 stop coloring if the program has been piped/redirected (NOCOLOR_PIPE=1).
 usually 1 is fine, but if unwanted coloring occurs try 2.
