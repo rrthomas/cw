@@ -7,33 +7,24 @@ TCSH_PROFILE="${HOME}/.login"
 
 echo "[ cw/color wrapper: user setup script. ]"
 
-if test -x "${HOME}/.cw/bin/colorcfg";then
- CWLIB="${HOME}/.cw/def"
+SED="`which sed 2>/dev/null`"
+if test -z "$SED";then
+ CWLIB="/usr/local/lib/cw"
+ echo "(NOTE: using static cw library path, this could be invalid)"
 else
- SED="`which sed 2>/dev/null`"
- if test -z "$SED";then
-  CWLIB="/usr/local/lib/cw"
-  echo "(NOTE: using static cw library path, this could be invalid)"
- else
-  CWLIB="`echo \"$0/lib/cw\"|sed \"s/\/bin\/colorcfg//g\"`"
- fi
+ CWLIB="`echo \"$0/lib/cw\"|sed \"s/\/bin\/colorcfg//g\"`"
 fi
 
 echo "[ cw library path: $CWLIB ]"
 echo ""
 
-if test -z "$1" || test "$1" -ge "4";then
- echo "syntax: $0 [1|2|3]"
+if test -z "$1" || test "$1" -ge "3";then
+ echo "syntax: $0 [1|2]"
  echo ""
  echo "runlevel 1 (unlimited coloring): appends PATH to rc file(s)."
  echo "runlevel 2 (limited coloring): appends NOCOLOR_PIPE to rc file(s)."
- echo "runlevel 3 (restricted coloring): appends CW_SHLVL to rc file(s)."
  echo ""
- echo "WHEN USING RUNLEVEL 3 MAKE SURE THAT THERE IS ONLY ONE INSTANCE OF"\
- "YOUR SHELL ACTIVE. (ie. no shell inside a shell)"
- echo ""
- echo "the higher runlevels also run the runlevels beneath them. (ie."\
- "runlevel 3 runs 1 and 2, and runlevel 2 runs 1)"
+ echo "runlevel 2 also runs runlevel 1."
  echo ""
  echo "NOTE: usually runlevel 1 is all that is needed, but if unwanted"\
  "coloring occurs try the higher runlevels."
@@ -69,24 +60,6 @@ if test "$1" -ge "2";then
   echo "* added NOCOLOR_PIPE environment variable to $TCSH_PROFILE"
  else
   echo "* entry already exists for runlevel 2($TCSH_PROFILE). (NOCOLOR_PIPE)"
-  WARN=1
- fi
-fi
-if test "$1" -ge "3";then
- if test -z "`grep CW_SHLVL \"$BASH_PROFILE\" 2>/dev/null`";then
-  TMP_SHLVL=`expr $SHLVL - 1`
-  echo "export CW_SHLVL=$TMP_SHLVL" >>"$BASH_PROFILE"
-  echo "* added CW_SHLVL environment variable to $BASH_PROFILE"
- else
-  echo "* entry already exists for runlevel 3($BASH_PROFILE). (CW_SHLVL)"
-  WARN=1
- fi
- if test -z "`grep CW_SHLVL \"$TCSH_PROFILE\" 2>/dev/null`";then
-  TMP_SHLVL=`expr $SHLVL - 1`
-  echo "setenv CW_SHLVL $TMP_SHLVL" >>"$TCSH_PROFILE"
-  echo "* added CW_SHLVL environment variable to $TCSH_PROFILE"
- else
-  echo "* entry already exists for runlevel 3($TCSH_PROFILE). (CW_SHLVL)"
   WARN=1
  fi
 fi
