@@ -20,27 +20,7 @@
 
 #include <stdio.h>
 #include <stdnoreturn.h>
-#ifndef __USE_BSD
-#define __USE_BSD
-#endif
-#ifndef __USE_GNU
-#define __USE_GNU
-#endif
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-#ifndef __EXTENSIONS__
-#define __EXTENSIONS__
-#endif
-#ifdef __CYGWIN__
-#ifdef __STRICT_ANSI__
-#undef __STRICT_ANSI__
-#endif
-#endif
 #include <stdlib.h>
-#ifndef __USE_POSIX
-#define __USE_POSIX
-#endif
 #include <stdarg.h>
 #include <signal.h>
 #include <string.h>
