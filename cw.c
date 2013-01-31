@@ -29,9 +29,7 @@
 #ifdef HAVE_STROPTS_H
 #include <stropts.h>
 #endif
-#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
-#endif
 #ifdef HAVE_UTIL_H
 #include <util.h>
 #elif HAVE_LIBUTIL_H

@@ -69,7 +69,7 @@ AC_HEADER_STDC
 AC_CHECK_LIB(util, openpty)
 AC_CHECK_FILE("/dev/ptmx", AC_DEFINE(HAVE_DEV_PTMX, 1, Have /dev/ptmx.))
 AC_CHECK_FUNCS(getpt openpty setproctitle setsid)
-AC_CHECK_HEADERS(fcntl.h libutil.h pty.h stropts.h unix.h util.h)
+AC_CHECK_HEADERS(libutil.h pty.h stropts.h unix.h util.h)
 gl_INIT
 
 dnl Generate output
