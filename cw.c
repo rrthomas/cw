@@ -44,9 +44,7 @@
 #include <stdarg.h>
 #include <signal.h>
 #include <string.h>
-#ifdef HAVE_STRINGS_H
 #include <strings.h>
-#endif
 #include <unistd.h>
 #ifdef HAVE_STROPTS_H
 #include <stropts.h>

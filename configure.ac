@@ -69,7 +69,7 @@ AC_HEADER_STDC
 AC_CHECK_LIB(util, openpty)
 AC_CHECK_FILE("/dev/ptmx", AC_DEFINE(HAVE_DEV_PTMX, 1, Have /dev/ptmx.))
 AC_CHECK_FUNCS(getpt isatty openpty putenv setenv setproctitle setsid uname unsetenv vsnprintf waitpid)
-AC_CHECK_HEADERS(fcntl.h libutil.h pty.h strings.h stropts.h unix.h util.h sys/ioctl.h sys/stat.h sys/time.h sys/types.h sys/utsname.h sys/wait.h)
+AC_CHECK_HEADERS(fcntl.h libutil.h pty.h stropts.h unix.h util.h sys/ioctl.h sys/stat.h sys/time.h sys/types.h sys/utsname.h sys/wait.h)
 gl_INIT
 
 dnl Generate output
