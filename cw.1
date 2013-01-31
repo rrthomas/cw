@@ -154,7 +154,7 @@ disables color wrapping (any value placed in the variable will enable)
 disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is not like stripping, it is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
 .TP 
 \fBNOCOLOR_PIPE\fR
-disables color wrapping if the program is being piped/redirected (non\-interactive coloring measure, any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBt\fR" IS INCLUDED IN THE SUPPORT}
+disables color wrapping if the program is being piped/redirected (non\-interactive coloring measure, any value placed in the variable will enable)
 .TP 
 \fBCW_SHLVL\fR
 disables color wrapping if the value this variable is set to does NOT equal \fBSHLVL\fR (set by bash/tcsh).  this is intended to help prevent unwanted coloring outside of the current users shell (usually should be set to 1)
