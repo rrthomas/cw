@@ -3,17 +3,17 @@
 other cat
 base cyan
 digit cyan+:default
-match grey:default .
+match grey:default \.
 match grey:default "
 match grey:default '
 match grey:default `
 match cyan+:default :
-match cyan+:default *
+match cyan+:default \*
 match cyan+:default -
 match cyan+:default \
 match cyan+:default /
-match cyan+:default [
-match cyan+:default ]
+match cyan+:default \[
+match cyan+:default \]
 match cyan+:default <
 match cyan+:default >
 match cyan+:default (

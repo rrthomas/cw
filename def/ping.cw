@@ -11,8 +11,8 @@ ifarg <any>
 match white:cyan+ :
 match white:green+ (
 match white:default )
-match green+:cyan+ [
-match green+:default ]
+match green+:cyan+ \[
+match green+:default \]
 match cyan+:default ,
 match green+:default  ms
 match none:green+  from 

@@ -49,11 +49,8 @@ this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\f
 \fBbase\fR [\fIcolor\fR]
 color used if no other definitions state otherwise (if this is the only definition used it will be ignored)
 .TP 
-\fBmatch\fR [\fIbefore color:after color\fR] [\fImatch text\fR]
-changes the color before and after the \fBmatch text\fR, if the \fBmatch text\fR matched output from the program.  \fB{?}\fR is a single character wildcard that can be placed in \fBmatch text\fR.  the \fBregex\fR definition instruction is recommended for more complex matching
-.TP 
-\fBregex\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
-changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  it is recommended to use the \fBmatch\fR definition instruction if pattern matching is not necessary, as it is much faster than regex matching. see regex(7) for the syntax of regular expressions.
+\fBmatch\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
+changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  see regex(7) for the syntax of regular expressions.
 .TP 
 \fBtoken\fR [\fIbefore color:after color\fR] [\fIslot value\fR] [\fIdelim value\fR] 
 changes the color before and after the \fBslot value\fR based on the \fBdelim value\fR.  the \fBdelim value\fR is equal to a single ASCII character in the form of 1\-255 which is used as a start/stop point to assign each \fBslot value\fR

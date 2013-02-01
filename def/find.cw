@@ -4,10 +4,10 @@ $NOCOLOR_NEXT=1
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base cyan
 match cyan+:default /
-match cyan+:default [
-match cyan+:default ]
+match cyan+:default \[
+match cyan+:default \]
 match cyan+:default (
 match cyan+:default )
 match grey:default :
 match grey:default ;
-match grey:default .
+match grey:default \.

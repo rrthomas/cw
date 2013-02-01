@@ -3,12 +3,12 @@ base cyan
 digit cyan+:cyan
 match yellow:default /
 match cyan+:default -
-match cyan+:default +
-match green+:default [
-match green+:default ]
+match cyan+:default \+
+match green+:default \[
+match green+:default \]
 match green+:yellow (
 match green+:default )
-match white:default *
+match white:default \*
 match blue+:default UDP
 match blue+:default TCP
 match blue+:default TPI

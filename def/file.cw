@@ -6,6 +6,6 @@ match green+:default `
 match green+:default '
 match green+:white (
 match green+:default )
-match green+:white [
-match green+:default ]
+match green+:white \[
+match green+:default \]
 match green+:default -

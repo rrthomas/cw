@@ -1,9 +1,9 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base cyan
 digit cyan+:default
-match blue+:default .
-match blue+:default [
-match blue+:default ]
+match blue+:default \.
+match blue+:default \[
+match blue+:default \]
 match blue+:default <
 match blue+:default >
 match green+:default {
@@ -13,7 +13,7 @@ match grey:default )
 match cyan+:default -
 match yellow:default /
 match green+:default :
-match green+:default *
+match green+:default \*
 match yellow:none Active
 match green+:default ESTABLISHED
 match green+:default TIME_WAIT

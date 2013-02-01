@@ -6,10 +6,10 @@ match white:cyan :
 match white:default =
 match cyan+:default /
 match cyan+:default -
-match cyan+:default .
+match cyan+:default \.
 match cyan+:default `
 match cyan+:default '
-match white:default [
-match white:default ]
+match white:default \[
+match white:default \]
 match white:default <
 match white:default >

@@ -3,13 +3,13 @@ ifnarg --interactive
 base cyan
 digit cyan+:default
 match green+:default :
-match white:default .
+match white:default \.
 match white:default /
-match white:default [
-match white:default ]
+match white:default \[
+match white:default \]
 match white:default (
 match white:default )
-match yellow:default *
+match yellow:default \*
 match cyan+:default -
 match cyan+:default ,
 match cyan+:default nmap

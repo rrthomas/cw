@@ -6,8 +6,8 @@ match default:default M
 match default:default K
 token green+:default 0 9
 ifarg-else
-match green+:default [
-match green+:default ]
+match green+:default \[
+match green+:default \]
 match green+:default <
 match green+:default >
 match green+:default :

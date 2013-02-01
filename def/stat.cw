@@ -3,7 +3,7 @@ base cyan
 digit cyan+:default
 ucase cyan+:default
 match white:default :
-match white:default .
+match white:default \.
 match white:default (
 match white:default )
 match white:default -

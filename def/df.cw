@@ -16,13 +16,13 @@ match cyan+:default Mounted on
 ifarg <any>
 digit white:grey+
 match grey:grey+ /
-match grey:grey+ .
+match grey:grey+ \.
 match grey:grey+ :
 match grey:grey+ <
 match grey:grey+ >
 match grey:grey+ (
 match grey:grey+ )
-match grey:grey+ [
-match grey:grey+ ]
+match grey:grey+ \[
+match grey:grey+ \]
 match white:grey+ `
 match white:default '

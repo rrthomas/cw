@@ -4,11 +4,11 @@ digit cyan+:default
 ucase cyan+:default
 match green+:default -
 match grey:default :
-match grey:default .
+match grey:default \.
 match grey:default `
 match grey:default '
-match grey:default [
-match grey:default ]
+match grey:default \[
+match grey:default \]
 match grey:default (
 match grey:default )
 match green+:none target  

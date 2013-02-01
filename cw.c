@@ -107,13 +107,6 @@ struct{
   unsigned int tot;
  }m;
  struct{
-  char **data;
-  unsigned char *b;
-  unsigned char *a;
-  unsigned int cur;
-  unsigned int tot;
- }x;
- struct{
   unsigned char *slot;
   unsigned char *delim;
   unsigned char *b;
@@ -210,9 +203,9 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
- "'regex' definition used an invalid color. (defaulting)",
- "'regex' too many entries. (race condition?)",
- "'regex' syntax error. (not enough arguments?)",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "'ifos'/'ifnos' syntax error. (not enough arguments?)",
  "'ifos-else' used before any previous comparison.",
  "'ifarg-else' used before any previous comparison.",
@@ -497,40 +490,11 @@ static char *convert_string(const char *line){
  }
  /* start processing the 'match' definitions. */
  if(cfgtable.m.tot){
-  s=strlen(tbuf);
-  tmp=(char *)cwmalloc(s*(cfgtable.m.tot*16+1)+strlen(tbuf)+1);
-  for(k=i=0;i<s;i++){
-   for(j=0;j<cfgtable.m.tot;j++){
-    if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
-    &&!strwcmp(tbuf+i,cfgtable.m.data[j])){
-     if(cfgtable.m.b[j]!=17){
-      strcpy(tmp+k,pal2[cfgtable.m.b[j]==16?cfgtable.base:cfgtable.m.b[j]]);
-      k+=strlen(pal2[cfgtable.m.b[j]==16?cfgtable.base:cfgtable.m.b[j]]);
-     }
-     strncpy(tmp+k,tbuf+i,strlen(cfgtable.m.data[j]));
-     k+=strlen(cfgtable.m.data[j]);
-     i+=strlen(cfgtable.m.data[j]);
-     if(cfgtable.m.a[j]!=17){
-      strcpy(tmp+k,pal2[cfgtable.m.a[j]==16?cfgtable.base:cfgtable.m.a[j]]);
-      k+=strlen(pal2[cfgtable.m.a[j]==16?cfgtable.base:cfgtable.m.a[j]]);
-     }
-     j=-1;
-    }
-   }
-   tmp[k++]=tbuf[i];
-  }
-  free(tbuf);
-  tbuf=(char *)cwmalloc(strlen(tmp)+1);
-  strcpy(tbuf,tmp);
-  free(tmp);
- }
- /* start processing the 'regex' definitions. */
- if(cfgtable.x.tot){
-  for(j=i=0;i<cfgtable.x.tot;i++){
+  for(j=i=0;i<cfgtable.m.tot;i++){
    s=strlen(tbuf);
-   tmp=(char *)cwmalloc(s*(cfgtable.x.tot*16+1)+s+1);
+   tmp=(char *)cwmalloc(s*(cfgtable.m.tot*16+1)+s+1);
    on=j=l=k=0;
-   if(regcomp(&re,cfgtable.x.data[i],REG_EXTENDED))
+   if(regcomp(&re,cfgtable.m.data[i],REG_EXTENDED))
     free(tmp);
    else{
     while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
@@ -550,17 +514,17 @@ static char *convert_string(const char *line){
      k+=pm.rm_so;
      strncpy(tmpcmp,tbuf+k,l);
      if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))
-     &&cfgtable.x.b[i]!=17){
-      strcpy(tmp+j,pal2[cfgtable.x.b[i]==16?cfgtable.base:cfgtable.x.b[i]]);
-      j+=strlen(pal2[cfgtable.x.b[i]==16?cfgtable.base:cfgtable.x.b[i]]);
+     &&cfgtable.m.b[i]!=17){
+      strcpy(tmp+j,pal2[cfgtable.m.b[i]==16?cfgtable.base:cfgtable.m.b[i]]);
+      j+=strlen(pal2[cfgtable.m.b[i]==16?cfgtable.base:cfgtable.m.b[i]]);
      }
      strcpy(tmp+j,tmpcmp);
      j+=strlen(tmpcmp);
      free(tmpcmp);
      if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))
-     &&cfgtable.x.a[i]!=17){
-      strcpy(tmp+j,pal2[cfgtable.x.a[i]==16?cfgtable.base:cfgtable.x.a[i]]);
-      j+=strlen(pal2[cfgtable.x.a[i]==16?cfgtable.base:cfgtable.x.a[i]]);
+     &&cfgtable.m.a[i]!=17){
+      strcpy(tmp+j,pal2[cfgtable.m.a[i]==16?cfgtable.base:cfgtable.m.a[i]]);
+      j+=strlen(pal2[cfgtable.m.a[i]==16?cfgtable.base:cfgtable.m.a[i]]);
      }
      on=0;
      k-=pm.rm_so;
@@ -799,9 +763,7 @@ noreturn void execcw(signed int argc,char **argv){
 #ifdef SIGCHLD
  struct sigaction sa;
 #endif
- if(!(cfgtable.m.tot+
- cfgtable.x.tot+
- cfgtable.t.tot+cfgtable.n.on+cfgtable.u.on+cfgtable.l.on))
+ if(!(cfgtable.m.tot+cfgtable.t.tot+cfgtable.n.on+cfgtable.u.on+cfgtable.l.on))
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
@@ -1239,14 +1201,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
     tmp=strtok(tmp," ");
     tmp=strtok(0," ");
     tmp=strtok(0,"");
-    for(i=j=0;tmp[i];i++){
-     if(!strncmp(tmp+i,"{?}",3)){
-      tmp[j++]=-1;
-      i+=2;
-     }
-     else tmp[j++]=tmp[i];
-    }
-    tmp[j]=0;
     if(cfgtable.m.cur>cfgtable.m.tot)
      c_error(l,cfgmsg[3]);
     else{
@@ -1259,43 +1213,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
    else c_error(l,cfgmsg[4]);
   }
   else c_error(l,cfgmsg[4]);
- }
- else if(!strcmp(parameter(line," ",0),"regex")){
-  if(strcmp(parameter(line," ",1),"-1")){
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
-   if(color_atoi(parameter(tmp,":",0))>-1)
-    cfgtable.x.b[cfgtable.x.cur]=color_atoi(parameter(tmp,":",0));
-   else{
-    c_error(l,cfgmsg[27]);
-    cfgtable.x.b[cfgtable.x.cur]=16;
-   }
-   if(color_atoi(parameter(tmp,":",1))>-1)
-    cfgtable.x.a[cfgtable.x.cur]=color_atoi(parameter(tmp,":",1));
-   else{
-    c_error(l,cfgmsg[27]);
-    cfgtable.x.a[cfgtable.x.cur]=16;
-   }
-   free(tmp);
-   if(strcmp(parameter(line," ",2),"-1")){
-    tmp=(char *)cwmalloc(strlen(line)+1);
-    strcpy(tmp,line);
-     ptr=tmp;
-    tmp=strtok(tmp," ");
-    tmp=strtok(0," ");
-    tmp=strtok(0,"");
-    if(cfgtable.x.cur>cfgtable.x.tot)
-     c_error(l,cfgmsg[28]);
-    else{
-     cfgtable.x.data[cfgtable.x.cur]=(char *)cwmalloc(strlen(tmp)+1);
-     strcpy(cfgtable.x.data[cfgtable.x.cur],tmp);
-     cfgtable.x.cur++;
-    }
-    free(ptr);
-   }
-   else c_error(l,cfgmsg[29]);
-  }
-  else c_error(l,cfgmsg[29]);
  }
  else if(!strcmp(parameter(line," ",0),"token")){
   if(strcmp(parameter(line," ",1),"-1")){
@@ -1357,9 +1274,6 @@ void c_read(char *file,signed int argc){
    cfgtable.m.data=(char **)cwmalloc(cfgtable.m.tot*sizeof(char *)+1);
    cfgtable.m.b=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
    cfgtable.m.a=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
-   cfgtable.x.data=(char **)cwmalloc(cfgtable.x.tot*sizeof(char *)+1);
-   cfgtable.x.b=(unsigned char *)cwmalloc(cfgtable.x.tot+1);
-   cfgtable.x.a=(unsigned char *)cwmalloc(cfgtable.x.tot+1);
    cfgtable.t.slot=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
    cfgtable.t.delim=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
    cfgtable.t.b=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
@@ -1369,7 +1283,6 @@ void c_read(char *file,signed int argc){
    /* find the amount of definitions to store in memory. */
    if(!i){
     if(!strcmp(parameter(buf," ",0),"match"))cfgtable.m.tot++;
-    else if(!strcmp(pptr,"regex"))cfgtable.x.tot++;
     else if(!strcmp(pptr,"token"))cfgtable.t.tot++;
    }
    /* begin actual processing/handling of the config file. (c_handler) */
@@ -1387,7 +1300,6 @@ void c_read(char *file,signed int argc){
  fclose(fs);
  if(cfgtable.base<0)cfgtable.base=7;
  cfgtable.m.tot=cfgtable.m.cur;
- cfgtable.x.tot=cfgtable.x.cur;
  cfgtable.t.tot=cfgtable.t.cur;
  if(!cfgtable.path&&!cfgtable.cmd)c_error(0,cfgmsg[1]);
  else if(cfgtable.path&&cfgtable.cmd)c_error(0,cfgmsg[22]);

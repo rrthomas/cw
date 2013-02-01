@@ -3,7 +3,7 @@ base cyan
 digit cyan+:default
 match cyan+:default :
 match cyan+:default ,
-match cyan+:default .
+match cyan+:default \.
 match cyan+:default -
-match grey:default [
-match grey:default ]
+match grey:default \[
+match grey:default \]

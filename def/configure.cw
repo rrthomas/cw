@@ -5,22 +5,22 @@
 $NOCOLOR_NEXT=1
 path .
 base grey+
-regex green+:default yes$
-regex red+:default no$
-match cyan:default .
+match green+:default yes$
+match red+:default no$
+match cyan:default \.
 match grey:default -
 match grey:default /
-match cyan:default \
+match cyan:default \\
 match cyan+:default :
 match cyan+:default '
 match cyan+:default `
 match cyan+:default "
 match green+:default &
 match white:default =
-match white:default [
-match white:default ]
-match green+:default ***
-match white:default *
+match white:default \[
+match white:default \]
+match green+:default \*\*\*
+match white:default \*
 match white:default checking
 match yellow:default updating
 match cyan+:default creating

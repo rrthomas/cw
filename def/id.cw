@@ -5,8 +5,8 @@ base cyan
 match cyan+:default :
 match cyan+:default =
 match cyan+:default /
-match cyan+:cyan+ [
-match cyan+:default ]
+match cyan+:cyan+ \[
+match cyan+:default \]
 match cyan+:cyan+ (
 match cyan+:default )
 ifarg --help

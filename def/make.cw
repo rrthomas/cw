@@ -7,7 +7,7 @@ path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 # don't want to color kernel dialog compiling.
 ifnarg menuconfig
 base grey+
-match cyan:default .
+match cyan:default \.
 match grey:default -
 match grey:default /
 match cyan:default \
@@ -17,10 +17,10 @@ match cyan+:default `
 match cyan+:default "
 match green+:default &
 match white:default =
-match white:default [
-match white:default ]
-match green+:default ***
-match white:default *
+match white:default \[
+match white:default \]
+match green+:default \*\*\*
+match white:default \*
 match white:default checking
 match green+:default warning: 
 match red+:default error: 

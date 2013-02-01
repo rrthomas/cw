@@ -5,8 +5,8 @@ match grey:default -
 match purple+:default /
 match purple+:default <
 match purple+:default >
-match purple+:default [
-match purple+:default ]
-match red:red+ **
+match purple+:default \[
+match purple+:default \]
+match red:red+ \*\*
 match purple+:none Username
 match red+:default root

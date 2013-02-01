@@ -26,6 +26,7 @@ version 1.0.17:
 ! Removed noeol.
 ! Removed --cw-* command-line arguments; don't add help to other
   programs' output.
+! Removed regex instruction and make match always do regex matching.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

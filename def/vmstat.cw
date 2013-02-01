@@ -10,8 +10,8 @@ ifarg-else
 base cyan+
 digit cyan:default
 match white:default -
-match white:default [
-match white:default ]
+match white:default \[
+match white:default \]
 ifarg <any>
 match white:cyan+ (
 match white:default )

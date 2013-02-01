@@ -3,5 +3,5 @@ base purple
 digit purple+:default
 match purple+:default /
 match red+:default -
-match red+:red [
-match red+:default ]
+match red+:red \[
+match red+:default \]
