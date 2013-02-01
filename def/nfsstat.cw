@@ -1,6 +1,6 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base green
-digit green+:default
+match green+:default [[:digit:]]
 match white:default :
 match white:default %
 match white:default %

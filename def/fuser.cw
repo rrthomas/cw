@@ -1,7 +1,7 @@
 path /sbin:/usr/sbin:/bin:/usr/bin:<env>
 base grey+
 ifnarg <none>:-i:-ki
-digit cyan:default
+match cyan:default [[:digit:]]
 match white:none USER
 ifnarg -i:-ki
 match white:default -

@@ -1,6 +1,6 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base cyan
-digit cyan+:default
+match cyan+:default [[:digit:]]
 match cyan+:default -
 match cyan+:default \$
 match cyan+:default (

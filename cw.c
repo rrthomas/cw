@@ -115,21 +115,6 @@ struct{
   unsigned int tot;
  }t;
  struct{
-  unsigned char b;
-  unsigned char a;
-  unsigned char on;
- }n;
- struct{
-  unsigned char b;
-  unsigned char a;
-  unsigned char on;
- }u;
- struct{
-  unsigned char b;
-  unsigned char a;
-  unsigned char on;
- }l;
- struct{
   signed char l;
   signed char h;
   signed char c;
@@ -190,10 +175,10 @@ static const char *cfgmsg[]={
  "'base' definition used an invalid color.",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
- "'digit' definition used an invalid color. (defaulting)",
  "NO SUCH ERROR",
- "'ucase' definition used an invalid color. (defaulting)",
- "'lcase' definition used an invalid color. (defaulting)",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "'ifarg'/'ifnarg' syntax error. (not enough arguments?)",
  "NO SUCH ERROR",
  "'other' syntax error. (not enough arguments?)",
@@ -356,95 +341,6 @@ static char *convert_string(const char *line){
  s=strlen(line);
  tbuf=(char *)cwmalloc(s+1);
  strcpy(tbuf,line);
- /* start processing the 'digit' definition. */
- if(cfgtable.n.on){
-  tmp=(char *)cwmalloc(s*16+1);
-  for(k=j=i=0;s>i;i++){
-   if(isdigit((unsigned char)tbuf[i])){
-    if(!on){
-     if(cfgtable.n.b!=17){
-      strcpy(tmp+k,pal2[cfgtable.n.b==16?cfgtable.base:cfgtable.n.b]);
-      k+=strlen(pal2[cfgtable.n.b==16?cfgtable.base:cfgtable.n.b]);
-     }
-     on=1;
-    }
-   }
-   else if(on){
-    if(cfgtable.n.a!=17){
-     strcpy(tmp+k,pal2[cfgtable.n.a==16?cfgtable.base:cfgtable.n.a]);
-     k+=strlen(pal2[cfgtable.n.a==16?cfgtable.base:cfgtable.n.a]);
-    }
-    on=0;
-   }
-   tmp[k++]=tbuf[i];
-  }
-  free(tbuf);
-  s=strlen(tmp);
-  tbuf=(char *)cwmalloc(s+1);
-  strcpy(tbuf,tmp);
-  free(tmp);
-  on=0;
- }
- /* start processing the 'ucase' definition. */
- if(cfgtable.u.on){
-  tmp=(char *)cwmalloc(s*16+1);
-  for(k=j=i=0;s>i;i++){
-   if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
-   &&isupper((unsigned char)tbuf[i])){
-    if(!on){
-     if(cfgtable.u.b!=17){
-      strcpy(tmp+k,pal2[cfgtable.u.b==16?cfgtable.base:cfgtable.u.b]);
-      k+=strlen(pal2[cfgtable.u.b==16?cfgtable.base:cfgtable.u.b]);
-     }
-     on=1;
-    }
-   }
-   else if(on){
-    if(cfgtable.u.a!=17){
-     strcpy(tmp+k,pal2[cfgtable.u.a==16?cfgtable.base:cfgtable.u.a]);
-     k+=strlen(pal2[cfgtable.u.a==16?cfgtable.base:cfgtable.u.a]);
-    }
-    on=0;
-   }
-   tmp[k++]=tbuf[i];
-  }
-  free(tbuf);
-  s=strlen(tmp);
-  tbuf=(char *)cwmalloc(s+1);
-  strcpy(tbuf,tmp);
-  free(tmp);
-  on=0;
- }
- /* start processing the 'lcase' definition. */
- if(cfgtable.l.on){
-  tmp=(char *)cwmalloc(s*16+1);
-  for(k=j=i=0;s>i;i++){
-   if((!memchr(tmp+(k-(k<7?k:7)),'\x1b',(k<7?k:7)))
-   &&islower((unsigned char)tbuf[i])){
-    if(!on){
-     if(cfgtable.l.b!=17){
-      strcpy(tmp+k,pal2[cfgtable.l.b==16?cfgtable.base:cfgtable.l.b]);
-      k+=strlen(pal2[cfgtable.l.b==16?cfgtable.base:cfgtable.l.b]);
-     }
-     on=1;
-    }
-   }
-   else if(on){
-    if(cfgtable.l.a!=17){
-     strcpy(tmp+k,pal2[cfgtable.l.a==16?cfgtable.base:cfgtable.l.a]);
-     k+=strlen(pal2[cfgtable.l.a==16?cfgtable.base:cfgtable.l.a]);
-    }
-    on=0;
-   }
-   tmp[k++]=tbuf[i];
-  }
-  free(tbuf);
-  s=strlen(tmp);
-  tbuf=(char *)cwmalloc(s+1);
-  strcpy(tbuf,tmp);
-  free(tmp);
-  on=0;
- }
  /* start processing the 'token' definitions. */
  for(i=0;i<cfgtable.t.tot;i++){
   s=strlen(tbuf);
@@ -763,7 +659,7 @@ noreturn void execcw(signed int argc,char **argv){
 #ifdef SIGCHLD
  struct sigaction sa;
 #endif
- if(!(cfgtable.m.tot+cfgtable.t.tot+cfgtable.n.on+cfgtable.u.on+cfgtable.l.on))
+ if(!(cfgtable.m.tot+cfgtable.t.tot))
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
@@ -1113,69 +1009,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   if((cfgtable.base=color_atoi(parameter(line," ",1)))<0)
    c_error(l,cfgmsg[11]);
   if(cfgtable.base==16)cfgtable.base=7;
- }
- else if(!strcmp(parameter(line," ",0),"digit")){
-  if(strcmp(parameter(line," ",1),"-1")){
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
-   if(color_atoi(parameter(tmp,":",0))>-1)
-    cfgtable.n.b=color_atoi(parameter(tmp,":",0));
-   else{
-    c_error(l,cfgmsg[14]);
-    cfgtable.n.b=16;
-   }
-   if(color_atoi(parameter(tmp,":",1))>-1)
-    cfgtable.n.a=color_atoi(parameter(tmp,":",1));
-   else{
-    c_error(l,cfgmsg[14]);
-    cfgtable.n.a=16;
-   }
-   free(tmp);
-   cfgtable.n.on=1;
-  }
-  else c_error(l,cfgmsg[14]);
- }
- else if(!strcmp(parameter(line," ",0),"ucase")){
-  if(strcmp(parameter(line," ",1),"-1")){
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
-   if(color_atoi(parameter(tmp,":",0))>-1)
-    cfgtable.u.b=color_atoi(parameter(tmp,":",0));
-   else{
-    c_error(l,cfgmsg[16]);
-    cfgtable.u.b=16;
-   }
-   if(color_atoi(parameter(tmp,":",1))>-1)
-    cfgtable.u.a=color_atoi(parameter(tmp,":",1));
-   else{
-    c_error(l,cfgmsg[16]);
-    cfgtable.u.a=16;
-   }
-   free(tmp);
-   cfgtable.u.on=1;
-  }
-  else c_error(l,cfgmsg[16]);
- }
- else if(!strcmp(parameter(line," ",0),"lcase")){
-  if(strcmp(parameter(line," ",1),"-1")){
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
-   if(color_atoi(parameter(tmp,":",0))>-1)
-    cfgtable.l.b=color_atoi(parameter(tmp,":",0));
-   else{
-    c_error(l,cfgmsg[17]);
-    cfgtable.l.b=16;
-   }
-   if(color_atoi(parameter(tmp,":",1))>-1)
-    cfgtable.l.a=color_atoi(parameter(tmp,":",1));
-   else{
-    c_error(l,cfgmsg[17]);
-    cfgtable.l.a=16;
-   }
-   free(tmp);
-   cfgtable.l.on=1;
-  }
-  else c_error(l,cfgmsg[17]);
  }
  else if(!strcmp(parameter(line," ",0),"match")){
   if(strcmp(parameter(line," ",1),"-1")){

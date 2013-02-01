@@ -8,7 +8,7 @@ match white:none Num
 token cyan:none 1 32
 ifarg-else
 base cyan+
-digit cyan:default
+match cyan:default [[:digit:]]
 match white:default -
 match white:default \[
 match white:default \]

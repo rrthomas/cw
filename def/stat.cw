@@ -1,7 +1,7 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base cyan
-digit cyan+:default
-ucase cyan+:default
+match cyan+:default [[:digit:]]
+match cyan+:default [[:upper:]]
 match white:default :
 match white:default \.
 match white:default (

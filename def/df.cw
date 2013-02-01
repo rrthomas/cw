@@ -14,7 +14,7 @@ match default:none k-blocks
 match default:none -blocks
 match cyan+:default Mounted on
 ifarg <any>
-digit white:grey+
+match white:grey+ [[:digit:]]
 match grey:grey+ /
 match grey:grey+ \.
 match grey:grey+ :
