@@ -29,6 +29,8 @@ version 1.0.17:
 ! Removed regex instruction and make match always do regex matching.
 ! Removed digit, lcase and ucase instructions, and use regexes instead.
 ! Removed token instruction, and use regexes instead.
+* Color stdout and stderr separately, allowing e.g. stderr to be
+  redirected while stdout is still colored.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

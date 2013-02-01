@@ -92,6 +92,8 @@ struct{
  signed char fc;
  signed char invert;
  signed char nocolor;
+ signed char nocolor_stdout;
+ signed char nocolor_stderr;
  char *path;
  char *cmd;
  char *cmdargs;
@@ -264,18 +266,17 @@ signed int main(signed int argc,char **argv){
  if(getenv("CW_INVERT"))cfgtable.invert=1;
  c_read(scrname,argc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
- cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0);
+ cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0); /* FIXME: document this */
  if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
   cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
  if(getenv("NOCOLOR_NEXT")){
   setenv("NOCOLOR","1",1);
   unsetenv("NOCOLOR_NEXT");
  }
- /* from patch submitted by <komar@ukr.net>. (modified from original) */
- if(!isatty(STDOUT_FILENO)||!isatty(STDERR_FILENO))
-  cfgtable.nocolor=1;
  if(cfgtable.z.on)cfgtable.invert=0;
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
+ cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
+ cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
  execcw(argc,argv);
  cwexit(0,0);
 }
@@ -720,7 +721,10 @@ noreturn void execcw(signed int argc,char **argv){
        }
        else if(buf[i]=='\n'){
         tmp[j]=0;
-        fprintf((fd==fds[0]?stdout:stderr),"%s\n",convert_string(tmp));
+        if(fd==fds[0])
+          fprintf(stdout,"%s\n",cfgtable.nocolor_stdout?tmp:convert_string(tmp));
+        else
+          fprintf(stderr,"%s\n",cfgtable.nocolor_stderr?tmp:convert_string(tmp));
         fflush(fd==fds[0]?stdout:stderr);
         free(tmp);
         on=0;
