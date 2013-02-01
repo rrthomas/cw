@@ -661,7 +661,7 @@ signed char make_ptypair(unsigned char v){
  return(1);
 }
 #endif
-/* prints a formated line to stdout. */
+/* prints a formatted line to stdout. */
 unsigned char cwprintf(char *str){
  signed char x=0;
  unsigned int c=0;
@@ -676,7 +676,7 @@ unsigned char cwprintf(char *str){
    if(j>=(i+2)){
     if(strchr("\\enrtvxC",str[i+1])){
      if(str[i+1]=='\\')tmp[k++]='\\';
-     /* \e is not ANSI-C apparently. */
+     /* \e is not standard C. */
      else if(str[i+1]=='e')tmp[k++]=0x1b;
      else if(str[i+1]=='n')tmp[k++]='\n';
      else if(str[i+1]=='r')tmp[k++]='\r';
@@ -970,7 +970,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
  }
 }
 #ifdef INT_SETPROCTITLE
-/* pseudo-setproctitle startup. */
+/* initialize pseudo-setproctitle. */
 void initsetproctitle(signed int argc,char **argv,char **envp){
  int i=0;
  size_t envpsize=0;
@@ -997,7 +997,7 @@ void initsetproctitle(signed int argc,char **argv,char **envp){
    proct.largv=(envp[i]+strlen(envp[i]));
  }
 }
-/* pseudo-setproctitle set. */
+/* pseudo-setproctitle. */
 void setproctitle(const char *fmt,...){
  unsigned int i;
  char buf[BUFSIZE+1];
@@ -1387,7 +1387,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
  else if(!o)c_error(l,cfgmsg[0]);
 }
-/* reads (and allocates space) the config file to be passed to c_handler(). */
+/* reads (and allocates space for) the config file to be passed to c_handler(). */
 void c_read(char *file,signed int argc){
  unsigned char i=0;
  unsigned int j=0,k=0;
@@ -1439,7 +1439,7 @@ void c_read(char *file,signed int argc){
  else return;
  cwexit(1,cfgmsg[46]);
 }
-/* this get appended to "--help" displays/ */
+/* this gets appended to "--help" displays. */
 static void addhelp_display(void){
  fprintf(stdout,"\n%s\n","color wrapper (cw) options:");
  /* using spaces instead of \t to deal with terminal emulation issues. */
