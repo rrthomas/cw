@@ -4,4 +4,4 @@ match grey:default :
 match grey:cyan (
 match grey:default )
 match grey:cyan /
-token grey+:default 0 58
+match grey+:default [^:]+

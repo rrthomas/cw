@@ -1,8 +1,7 @@
 other tail -f /var/log/syslog
 base cyan
-match white:cyan+ (
+match white:cyan+ \(
 match white:default )
 match white:cyan+ \[
 match white:default \]
-token white:none 0 32
-token green+:default 3 32
+match white:green+ ^[[:alpha:]]+ +[[:digit:]]+ +[[:digit:]:]+

@@ -4,5 +4,4 @@ match cyan+:default /
 ifarg --h
 match cyan+:default -
 ifarg-else
-token cyan+:none 0 32
-token none:default 1 32
+match cyan+:default [^ ]+ [^ ]+

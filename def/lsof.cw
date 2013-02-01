@@ -27,4 +27,4 @@ match red:default VDEL
 ifos <any>
 match default:default COMMAND
 ifnarg -h:--help
-token green+:default 0 32
+match green+:default [^ ]+

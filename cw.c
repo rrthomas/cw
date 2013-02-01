@@ -107,14 +107,6 @@ struct{
   unsigned int tot;
  }m;
  struct{
-  unsigned char *slot;
-  unsigned char *delim;
-  unsigned char *b;
-  unsigned char *a;
-  unsigned int cur;
-  unsigned int tot;
- }t;
- struct{
   signed char l;
   signed char h;
   signed char c;
@@ -166,11 +158,11 @@ static const char *cfgmsg[]={
  "'match' definition used an invalid color. (defaulting)",
  "'match' too many entries. (race condition?)",
  "'match' syntax error. (not enough arguments?)",
- "'token' definition used an invalid color. (defaulting)",
- "'token' slot value out of range. (0-255)",
- "'token' delim value out of range. (1-255)",
- "'token' too many entries. (race condition?)",
- "'token' syntax error. (not enough arguments?)",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "'path' definition contained no existing/usable paths.",
  "'base' definition used an invalid color.",
  "NO SUCH ERROR",
@@ -270,7 +262,7 @@ signed int main(signed int argc,char **argv){
  cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=0;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
- cfgtable.ron=cfgtable.m.cur=cfgtable.t.cur=0;
+ cfgtable.ron=cfgtable.m.cur;
 #ifndef NO_PTY
  cfgtable.p.on=0;
 #endif
@@ -341,49 +333,6 @@ static char *convert_string(const char *line){
  s=strlen(line);
  tbuf=(char *)cwmalloc(s+1);
  strcpy(tbuf,line);
- /* start processing the 'token' definitions. */
- for(i=0;i<cfgtable.t.tot;i++){
-  s=strlen(tbuf);
-  tmp=(char *)cwmalloc(s+strlen(tbuf)+16+1);
-  if(!cfgtable.t.slot[i])on=3;
-  else on=0;
-  for(l=k=j=0;j<s;j++){
-   if(tbuf[j]==cfgtable.t.delim[i]){
-    if(!on){
-     k++;
-     if(k==cfgtable.t.slot[i])on=1;
-     else on=4;
-    }
-    else if(on==2){
-     if(cfgtable.t.a[i]!=17){
-      strcpy(tmp+l,pal2[cfgtable.t.a[i]==16?cfgtable.base:cfgtable.t.a[i]]);
-      l+=strlen(pal2[cfgtable.t.a[i]==16?cfgtable.base:cfgtable.t.a[i]]);
-     }
-     on=0;
-    }
-   }
-   else if(on==1||on==3){
-    if(cfgtable.t.b[i]!=17){
-     strcpy(tmp+l,pal2[cfgtable.t.b[i]==16?cfgtable.base:cfgtable.t.b[i]]);
-     l+=strlen(pal2[cfgtable.t.b[i]==16?cfgtable.base:cfgtable.t.b[i]]);
-    }
-    on=2;
-   }
-   else if(on==4)on=0;
-   tmp[l++]=tbuf[j];
-  }
-  if(on==2){
-   if(cfgtable.t.a[i]!=17){
-    strcpy(tmp+l,pal2[cfgtable.t.a[i]==16?cfgtable.base:cfgtable.t.a[i]]);
-    l+=strlen(pal2[cfgtable.t.a[i]==16?cfgtable.base:cfgtable.t.a[i]]);
-   }
-   on=0;
-  }
-  free(tbuf);
-  tbuf=(char *)cwmalloc(strlen(tmp)+1);
-  strcpy(tbuf,tmp);
-  free(tmp);
- }
  /* start processing the 'match' definitions. */
  if(cfgtable.m.tot){
   for(j=i=0;i<cfgtable.m.tot;i++){
@@ -394,6 +343,7 @@ static char *convert_string(const char *line){
     free(tmp);
    else{
     while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
+     fprintf(stderr, "matching pattern %d at %d\n", i, k);
      if(pm.rm_so){
       tmpcmp=(char *)cwmalloc(pm.rm_so+1);
       strncpy(tmpcmp,tbuf+k,pm.rm_so);
@@ -659,7 +609,7 @@ noreturn void execcw(signed int argc,char **argv){
 #ifdef SIGCHLD
  struct sigaction sa;
 #endif
- if(!(cfgtable.m.tot+cfgtable.t.tot))
+ if(!(cfgtable.m.tot))
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
@@ -1047,47 +997,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   }
   else c_error(l,cfgmsg[4]);
  }
- else if(!strcmp(parameter(line," ",0),"token")){
-  if(strcmp(parameter(line," ",1),"-1")){
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
-   if(color_atoi(parameter(tmp,":",0))>-1)
-    cfgtable.t.b[cfgtable.t.cur]=color_atoi(parameter(tmp,":",0));
-   else{
-    c_error(l,cfgmsg[5]);
-    cfgtable.t.b[cfgtable.t.cur]=16;
-   }
-   if(color_atoi(parameter(tmp,":",1))>-1)
-    cfgtable.t.a[cfgtable.t.cur]=color_atoi(parameter(tmp,":",1));
-   else{
-    c_error(l,cfgmsg[5]);
-    cfgtable.t.a[cfgtable.t.cur]=16;
-   }
-   free(tmp);
-   if(strcmp(parameter(line," ",2),"-1")){
-    if(atoi(pptr)<0||atoi(pptr)>255)
-     c_error(l,cfgmsg[6]);
-    else{
-     cfgtable.t.slot[cfgtable.t.cur]=atoi(pptr);
-     if(strcmp(parameter(line," ",3),"-1")){
-      if(atoi(pptr)<1||atoi(pptr)>255)
-       c_error(l,cfgmsg[7]);
-      else{
-       if(cfgtable.t.cur>cfgtable.t.tot)
-        c_error(l,cfgmsg[8]);
-       else{
-        cfgtable.t.delim[cfgtable.t.cur]=atoi(pptr);
-        cfgtable.t.cur++;
-       }
-      }
-     }
-     else c_error(l,cfgmsg[9]);
-    }
-   }
-   else c_error(l,cfgmsg[9]);
-  }
-  else c_error(l,cfgmsg[9]);
- }
  else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
  else if(!o)c_error(l,cfgmsg[0]);
@@ -1107,16 +1016,11 @@ void c_read(char *file,signed int argc){
    cfgtable.m.data=(char **)cwmalloc(cfgtable.m.tot*sizeof(char *)+1);
    cfgtable.m.b=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
    cfgtable.m.a=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
-   cfgtable.t.slot=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
-   cfgtable.t.delim=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
-   cfgtable.t.b=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
-   cfgtable.t.a=(unsigned char *)cwmalloc(cfgtable.t.tot+1);
   }
   for(memset(buf,0,BUFSIZE);fgets(buf,BUFSIZE,fs);memset(buf,0,BUFSIZE)){
    /* find the amount of definitions to store in memory. */
    if(!i){
     if(!strcmp(parameter(buf," ",0),"match"))cfgtable.m.tot++;
-    else if(!strcmp(pptr,"token"))cfgtable.t.tot++;
    }
    /* begin actual processing/handling of the config file. (c_handler) */
    else{
@@ -1133,7 +1037,6 @@ void c_read(char *file,signed int argc){
  fclose(fs);
  if(cfgtable.base<0)cfgtable.base=7;
  cfgtable.m.tot=cfgtable.m.cur;
- cfgtable.t.tot=cfgtable.t.cur;
  if(!cfgtable.path&&!cfgtable.cmd)c_error(0,cfgmsg[1]);
  else if(cfgtable.path&&cfgtable.cmd)c_error(0,cfgmsg[22]);
  else return;

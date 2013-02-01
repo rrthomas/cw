@@ -4,7 +4,7 @@ ifnarg --help
 match cyan+:default /
 match default:default M
 match default:default K
-token green+:default 0 9
+match green+:default [^\t]+
 ifarg-else
 match green+:default \[
 match green+:default \]

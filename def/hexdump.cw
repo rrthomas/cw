@@ -2,4 +2,4 @@ path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base cyan
 match yellow:default |
 ifnarg --help
-token white:default 0 32
+match white:default [^ ]+

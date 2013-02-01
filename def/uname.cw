@@ -7,4 +7,4 @@ match cyan+:default \.
 match cyan+:default -
 match cyan+:default #
 ifnarg --help:--version
-token cyan+:default 0 32
+match cyan+:default [^ ]+

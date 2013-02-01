@@ -10,4 +10,4 @@ match cyan+:default -
 match green+:default :
 match red+:default root
 ifnarg --help
-token cyan+:default 0 32
+match cyan+:default [^ ]+

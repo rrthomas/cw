@@ -10,4 +10,4 @@ match green+:default \]
 match green+:default (
 match green+:default )
 ifnarg --help
-token green+:default 0 32
+match green+:default [^ ]+

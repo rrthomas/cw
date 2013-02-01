@@ -5,7 +5,10 @@ match green:default _
 match green:default -
 match white:none Cache
 match white:none Num
-token cyan:none 1 32
+match white:none Total
+match white:none Size
+match white:none Pages
+match cyan:none  .*
 ifarg-else
 base cyan+
 match cyan:default [[:digit:]]

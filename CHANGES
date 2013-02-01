@@ -28,6 +28,7 @@ version 1.0.17:
   programs' output.
 ! Removed regex instruction and make match always do regex matching.
 ! Removed digit, lcase and ucase instructions, and use regexes instead.
+! Removed token instruction, and use regexes instead.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
