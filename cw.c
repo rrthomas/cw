@@ -24,7 +24,6 @@
 #include <stdarg.h>
 #include <signal.h>
 #include <string.h>
-#include <strings.h>
 #include <unistd.h>
 #ifdef HAVE_STROPTS_H
 #include <stropts.h>
@@ -63,7 +62,6 @@ void sighandler(signed int);
 char *strpname(char *);
 unsigned char strwcmp(char *,char *);
 unsigned char struncmp(char *);
-unsigned char regxcmp(char *,char *,unsigned char);
 signed char color_atoi(char *);
 signed char make_ptypair(unsigned char v);
 unsigned char cwprintf(char *);
@@ -103,7 +101,6 @@ struct{
  signed char ec;
  signed char eint;
  signed char fc;
- signed char ifregex;
  signed char ign;
  signed char invert;
  signed char nocolor;
@@ -639,34 +636,21 @@ _GL_ATTRIBUTE_PURE unsigned char strwcmp(char *line1,char *line2){
   if(line1[i]!=line2[i]&&!(line1[i]!='\x1b'&&line2[i]==-1))return(1);
  return(i==t?0:1);
 }
+/* checks for a regex match of a string. */
+static unsigned char regxcmp(char *str,char *pattern){
+ signed int r=0;
+ regex_t re;
+ if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
+  return(1);
+ r=regexec(&re,str,0,0,0);
+ regfree(&re);
+ return r==REG_NOMATCH;
+}
 /* scans for a system name match. */
 unsigned char struncmp(char *cmp){
  struct utsname un;
  if(uname(&un)<0||!strlen(un.sysname))return(1);
- if(!regxcmp(un.sysname,cmp,0))return(0);
- return(1);
-}
-/* checks for a regex match of a string, or strcmp-like if not supported. */
-unsigned char regxcmp(char *str,char *pattern,unsigned char type){
- signed int r=0;
- regex_t re;
- if(cfgtable.ifregex){
-  if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
-   return(1);
-  r=regexec(&re,str,0,0,0);
-  regfree(&re);
-  if(r)return(1);
-  return(0);
- }
- else{
-  if(!type){
-   if(!strcasecmp(str,pattern))return(0);
-  }
-  else{
-   if(strstr(str,pattern))return(0);
-  }
- }
- return(1);
+ return regxcmp(un.sysname,cmp);
 }
 /* converts the color string to a numerical storage value. (0-17) */
 _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
@@ -1128,7 +1112,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
    strcpy(tmp,pptr);
    for(j=i=0;!j&&strcmp(parameter(tmp,":",i),"-1");i++){
     if(!strcmp(pptr,"<any>")||(!strcmp(pptr,"<none>")&&argc<3))j=1;
-    else j=(regxcmp(cfgtable.cmdargs,pptr,1)?0:1);
+    else j=!regxcmp(cfgtable.cmdargs,pptr);
    }
    free(tmp);
    cfgtable.ifarg=j;
@@ -1438,7 +1422,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
 #else
  else if(!strcmp(parameter(line," ",0),"usepty"));
 #endif
- else if(!strcmp(parameter(line," ",0),"useifregex"))cfgtable.ifregex=1;
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
  else if(!strcmp(parameter(line," ",0),"nostrip"))cfgtable.nostrip=1;

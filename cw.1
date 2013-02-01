@@ -19,10 +19,10 @@ path list separated by colons to the program being wrapped.  \fB<env>\fR can be 
 \fBother\fR [\fIprogram\fR]
 uses specific program(s), in shell execution format, instead of using \fBpath\fR to find and execute the program.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments  (\fBpath\fR and \fBother\fR can not be used with each other)
 .TP 
-\fBifarg\fR [\fItext:text:...\fR]
-list separated by colons which will be compared against the arguments called to the program.  if the \fBtext\fR matches the arguments, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR definition instruction is used.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments)
+\fBifarg\fR [\fIregex:regex:...\fR]
+list separated by colons which will be compared against the arguments called to the program.  if the \fBregex\fR matches the arguments, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR definition instruction is used.  "\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments.
 .TP 
-\fBifnarg\fR [\fItext:text:...\fR]
+\fBifnarg\fR [\fIregex:regex:...\fR]
 reverse of \fBifarg\fR
 .TP 
 \fBifarg\-else\fR
@@ -37,10 +37,10 @@ reverse of \fBifexit\fR
 \fBifexit\-else\fR
 this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false
 .TP 
-\fBifos\fR [\fItext:text:...\fR]
-list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBtext\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  regex comparisons can be made instead of standard string comparisons by using the \fBuseifregex\fR definition instruction ("\fB<any>\fR" can be used as a constant value for any value, including no value.)
+\fBifos\fR [\fIregex:regex:...\fR]
+list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBregex\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
 .TP 
-\fBifnos\fR [\fItext:text:...\fR]
+\fBifnos\fR [\fIregex:regex:...\fR]
 reverse of \fBifos\fR
 .TP 
 \fBifos\-else\fR
@@ -79,9 +79,6 @@ number of extra \fBsecs\fR and \fBusecs\fR to wait for output after the real pro
 .TP 
 \fBusepty\fR
 allocates a pty to emulate a programs natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
-.TP 
-\fBuseifregex\fR
-enables use of regex comparisons instead of standard string comparisons for the \fBifarg\fR and \fBifos\fR definition instructions
 .TP 
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
