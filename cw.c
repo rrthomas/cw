@@ -343,7 +343,6 @@ static char *convert_string(const char *line){
     free(tmp);
    else{
     while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
-     fprintf(stderr, "matching pattern %d at %d\n", i, k);
      if(pm.rm_so){
       tmpcmp=(char *)cwmalloc(pm.rm_so+1);
       strncpy(tmpcmp,tbuf+k,pm.rm_so);
