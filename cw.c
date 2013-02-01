@@ -1445,7 +1445,7 @@ void c_read(char *file,signed int argc){
 /* this get appended to "--help" displays/ */
 static void addhelp_display(void){
  fprintf(stdout,"\n%s\n","color wrapper (cw) options:");
- /* using spaces instead of /t to deal with terminal emulation issues. */
+ /* using spaces instead of \t to deal with terminal emulation issues. */
  fprintf(stdout,"%s\n","  +co, --cw-colorize=color[:color]  sets colors to the provided argument(s"
  ").");
  fprintf(stdout,"%s\n","  +iv, --cw-invert                  invert the internal colormap.");
