@@ -91,7 +91,6 @@ struct{
  signed char ec;
  signed char eint;
  signed char fc;
- signed char ign;
  signed char invert;
  signed char nocolor;
  signed char noeol;
@@ -1389,8 +1388,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"nostrip"))cfgtable.nostrip=1;
  else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
- else if(!strcmp(parameter(line," ",0),"warnings"))cfgtable.ign=0;
- else if(!strcmp(parameter(line," ",0),"nowarnings"))cfgtable.ign=1;
  else if(!o)c_error(l,cfgmsg[0]);
 }
 /* reads (and allocates space) the config file to be passed to c_handler(). */
@@ -1457,8 +1454,7 @@ static void addhelp_display(void){
 }
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){
- if(!cfgtable.ign)
-  fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
+ fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
 }
 /* exit with or without a reason, resets color too. */
 noreturn void cwexit(signed char level,const char *reason){
