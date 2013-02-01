@@ -39,6 +39,8 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#include "progname.h"
+#include "dirname.h"
 
 #ifndef HAVE_OPENPTY
 #define NO_PTY
@@ -58,7 +60,7 @@ signed char make_ptypair(unsigned char v);
 unsigned char cwprintf(char *);
 void setcolorize(char *);
 signed char execot(char *,unsigned char,unsigned int);
-void execcw(signed int,char **,signed int,char **);
+void execcw(signed int,char **);
 #ifdef INT_SETPROCTITLE
 void initsetproctitle(signed int,char **,char **);
 void setproctitle(const char *,...);
@@ -78,7 +80,6 @@ struct{
 #endif
 /* configuration table. */
 struct{
- signed char addhelp;
  signed char ifarg;
  signed char ifarga;
  signed char ifexit;
@@ -165,7 +166,7 @@ struct{
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 unsigned char ext=0,rexit=0;
-char *pal2[18],*aptr,*fptr,*pptr,*progname,*scrname;
+char *pal2[18],*aptr,*fptr,*pptr,*scrname;
 pid_t pid_p,pid_c;
 extern char **environ;
 
@@ -236,56 +237,52 @@ static void *cwmalloc(size_t n) {
  return p;
 }
 
+static void usage(void){
+ fprintf(stdout,"Usage: not for direct use; use via definition files (see cw(1)):\n"
+         "  --version             display version information and exit\n"
+         "  --help                display this help and exit\n");
+ cwexit(0,0);
+}
+
 /* program start. */
 signed int main(signed int argc,char **argv){
- int i=0,j=0, margc=0;
- char *ptr,**margv;
+ int i=0,j=0;
+ char *ptr, *basename;
+ set_program_name(argv[0]);
+ basename=base_name(program_name);
  cfgtable.z.l=cfgtable.z.h=-1;
- margv=(char **)cwmalloc((sizeof(char *)*(argc+1)));
- margv[0]=argv[0];
- for(margc=i=1;i<argc;i++){
-  if(!strcmp("--cw-nocolor",argv[i]))
-   cfgtable.nocolor=1;
-  else if(!strcmp("--cw-invert",argv[i]))
-   cfgtable.invert=1;
-  else if(!strncmp("--cw-colorize=",argv[i],14)){
-   if(strlen(argv[i])>14)setcolorize(argv[i]+14);
-  }
-  else if(!strcmp("--help",argv[i])){
-   cfgtable.addhelp=1;
-  }
-  else if(!strcmp("--version",argv[i])){
-   cwexit(1,"cw (color wrapper) v"VERSION" (features="
+ if(!strcmp(basename,"cw")){
+  for(i=1;i<argc;i++){
+   if(!strcmp("--help",argv[i]))
+    usage();
+   else if(!strcmp("--version",argv[i])){
+    cwexit(1,"cw (color wrapper) v"VERSION" (features="
 #ifndef NO_PTY
-    "pty"
+           "pty"
 #endif
 #ifdef HAVE_SETPROCTITLE
-    "setproctitle"
+           "setproctitle"
 #endif
-    ")");
+           ")");
    }
-  else margv[margc++]=argv[i];
+  }
  }
- margv[margc]=0;
- progname=(char *)cwmalloc(strlen(margv[0])+1);
- strcpy(progname,margv[0]);
- for(i=2;margc>i;i++)j+=(strlen(margv[i])+1);
+ free(basename);
+ for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
  cfgtable.cmdargs=(char *)cwmalloc(j+1);
  j=0;
- for(i=2;margc>i;i++){
-  sprintf(cfgtable.cmdargs+j,"%s%c",margv[i],(margc-i==1?0:32));
-  j+=(strlen(margv[i])+1);
+ for(i=2;argc>i;i++){
+  sprintf(cfgtable.cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
+  j+=(strlen(argv[i])+1);
  }
- if(margc>1){
-  if(access(margv[1],F_OK))
+ if(argc>1){
+  if(access(argv[1],F_OK))
    cwexit(1,"non-existent path to definition file.");
-  scrname=(char *)cwmalloc(strlen(margv[1])+1);
-  strcpy(scrname,margv[1]);
+  scrname=(char *)cwmalloc(strlen(argv[1])+1);
+  strcpy(scrname,argv[1]);
  }
- else {
-  cfgtable.addhelp=1;
-  cwexit(0,0);
- }
+ else
+  usage();
  for(i=0;18>i;i++){
   pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
   strcpy(pal2[i],pal2_orig[i]);
@@ -302,7 +299,7 @@ signed int main(signed int argc,char **argv){
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=1;
- c_read(scrname,margc);
+ c_read(scrname,argc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0);
  if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
@@ -316,7 +313,7 @@ signed int main(signed int argc,char **argv){
   cfgtable.nocolor=1;
  if(cfgtable.z.on)cfgtable.invert=0;
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
- execcw(argc,argv,margc,margv);
+ execcw(argc,argv);
  cwexit(0,0);
 }
 /* all-purpose signal handler. */
@@ -792,7 +789,7 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
  return(r);
 }
 /* handles and executes the desired program. */
-noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
+noreturn void execcw(signed int argc,char **argv){
  unsigned char on=0,son=0;
  int i=0,j=0,k=0;
  signed char re=0;
@@ -878,7 +875,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    signal(SIGINT,sighandler);
 #ifdef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
-   initsetproctitle(oargc,oargv,environ);
+   initsetproctitle(argc,argv,environ);
 #endif
    setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
 #endif
@@ -1341,7 +1338,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   }
   else c_error(l,cfgmsg[9]);
  }
- else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
  else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
  else if(!o)c_error(l,cfgmsg[0]);
@@ -1398,14 +1394,6 @@ void c_read(char *file,signed int argc){
  else return;
  cwexit(1,cfgmsg[46]);
 }
-/* this gets appended to "--help" displays. */
-static void addhelp_display(void){
- fprintf(stdout,"\n%s\n","color wrapper (cw) options:");
- /* using spaces instead of \t to deal with terminal emulation issues. */
- fprintf(stdout,"%s\n","  --cw-colorize=color[:color]  sets colors to the provided argument(s).");
- fprintf(stdout,"%s\n","  --cw-invert                  invert the internal colormap.");
- fprintf(stdout,"%s\n","  --cw-nocolor                 disable color wrapping of this program.");
-}
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){
  fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
@@ -1413,8 +1401,6 @@ void c_error(unsigned int l,const char *text){
 /* exit with or without a reason, resets color too. */
 noreturn void cwexit(signed char level,const char *reason){
  if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
- else if(cfgtable.addhelp&&!cfgtable.nocolor&&!cfgtable.cmd)
-  addhelp_display();
  fflush(stdout);
  exit(level);
 }

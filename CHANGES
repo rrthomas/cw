@@ -24,6 +24,8 @@ version 1.0.17:
 ! Removed wait.
 ! Removed nostrip and limit.
 ! Removed noeol.
+! Removed --cw-* command-line arguments; don't add help to other
+  programs' output.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
