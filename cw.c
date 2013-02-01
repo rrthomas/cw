@@ -249,20 +249,17 @@ signed int main(signed int argc,char **argv){
  margv=(char **)cwmalloc((sizeof(char *)*(argc+1)));
  margv[0]=argv[0];
  for(margc=i=1;i<argc;i++){
-  if(!strcmp("+nc",argv[i])||!strcmp("--cw-nocolor",argv[i]))
+  if(!strcmp("--cw-nocolor",argv[i]))
    cfgtable.nocolor=1;
-  else if(!strcmp("+iv",argv[i])||!strcmp("--cw-invert",argv[i]))
+  else if(!strcmp("--cw-invert",argv[i]))
    cfgtable.invert=1;
-  else if(!strncmp("+co=",argv[i],4)){
-   if(strlen(argv[i])>4)setcolorize(argv[i]+4);
-  }
   else if(!strncmp("--cw-colorize=",argv[i],14)){
    if(strlen(argv[i])>14)setcolorize(argv[i]+14);
   }
   else if(!strcmp("--help",argv[i])){
    cfgtable.addhelp=1;
   }
-  else if(!strcmp("-v",argv[i])){
+  else if(!strcmp("--version",argv[i])){
    cwexit(1,"cw (color wrapper) v"VERSION" (features="
 #ifndef NO_PTY
     "pty"
@@ -1446,11 +1443,9 @@ void c_read(char *file,signed int argc){
 static void addhelp_display(void){
  fprintf(stdout,"\n%s\n","color wrapper (cw) options:");
  /* using spaces instead of \t to deal with terminal emulation issues. */
- fprintf(stdout,"%s\n","  +co, --cw-colorize=color[:color]  sets colors to the provided argument(s"
- ").");
- fprintf(stdout,"%s\n","  +iv, --cw-invert                  invert the internal colormap.");
- fprintf(stdout,"%s\n","  +nc, --cw-nocolor                 disable color wrapping of this"
- " program.");
+ fprintf(stdout,"%s\n","  --cw-colorize=color[:color]  sets colors to the provided argument(s).");
+ fprintf(stdout,"%s\n","  --cw-invert                  invert the internal colormap.");
+ fprintf(stdout,"%s\n","  --cw-nocolor                 disable color wrapping of this program.");
 }
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){
