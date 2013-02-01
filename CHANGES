@@ -31,6 +31,7 @@ version 1.0.17:
 ! Removed token instruction, and use regexes instead.
 * Color stdout and stderr separately, allowing e.g. stderr to be
   redirected while stdout is still colored.
+! Removed print instruction.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

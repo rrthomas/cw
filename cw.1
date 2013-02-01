@@ -52,9 +52,6 @@ color used if no other definitions state otherwise (if this is the only definiti
 \fBmatch\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
 changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  see regex(7) for the syntax of regular expressions.
 .TP 
-\fBprint\fR [\fIstring\fR]
-prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.
-.TP 
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
 .TP 

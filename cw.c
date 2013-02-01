@@ -57,7 +57,6 @@ unsigned char strwcmp(char *,char *);
 unsigned char struncmp(char *);
 signed char color_atoi(char *);
 signed char make_ptypair(unsigned char v);
-unsigned char cwprintf(char *);
 void setcolorize(char *);
 signed char execot(char *,unsigned char,unsigned int);
 void execcw(signed int,char **);
@@ -192,8 +191,8 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
- "'print' syntax error. (not enough arguments?)",
- "'print' write error.",
+ "NO SUCH ERROR",
+ "NO SUCH ERROR",
  "NO SUCH ERROR",
  "configuration contained critical errors."};
 
@@ -453,83 +452,6 @@ signed char make_ptypair(unsigned char v){
  return(1);
 }
 #endif
-/* prints a formatted line to stdout. */
-unsigned char cwprintf(char *str){
- signed char x=0;
- unsigned int c=0;
- unsigned int i=0,j=0,k=0;
- size_t p=0;
- char *tmp,*ctmp;
- j=strlen(str);
- k=(8*j);
- tmp=(char *)cwmalloc((j*k)+j+1);
- for(k=i=0;j>i;i++){
-  if(str[i]=='\\'){
-   if(j>=(i+2)){
-    if(strchr("\\enrtvxC",str[i+1])){
-     if(str[i+1]=='\\')tmp[k++]='\\';
-     /* \e is not standard C. */
-     else if(str[i+1]=='e')tmp[k++]=0x1b;
-     else if(str[i+1]=='n')tmp[k++]='\n';
-     else if(str[i+1]=='r')tmp[k++]='\r';
-     else if(str[i+1]=='t')tmp[k++]='\t';
-     else if(str[i+1]=='v')tmp[k++]='\v';
-     else if(str[i+1]=='x'){
-      if(j>(i+3)&&isxdigit((unsigned char)str[i+2])
-      &&isxdigit((unsigned char)str[i+3])){
-       if(sscanf(str+(i+2),"%2x",&c)>0){
-        tmp[k++]=c;
-        i+=2;
-       }
-       else{
-        tmp[k++]='\\';
-        i--;
-       }
-      }
-      else{
-       tmp[k++]='\\';
-       i--;
-      }
-     }
-     else if(j>=(i+4)&&str[i+1]=='C'&&str[i+2]=='['
-     &&(p=(size_t)strchr(str+i+4,']'))){
-      p-=((size_t)str+i+3);
-      if(p>1){
-       ctmp=(char *)cwmalloc(p+1);
-       strncpy(ctmp,str+i+3,p);
-       if((x=color_atoi(ctmp))>=0){
-        strcat(tmp,pal2[x]);
-        k+=strlen(pal2[x]);
-        i+=(p+2);
-       }
-       else{
-        tmp[k++]='\\';
-        i--;
-       }
-       free(ctmp);
-      }
-      else{
-       tmp[k++]='\\';
-       i--;
-      }
-     }
-     else{
-      tmp[k++]='\\';
-      i--;
-     }
-     i++;
-    }
-    else tmp[k++]='\\';
-   }
-   else tmp[k++]='\\';
-  }
-  else tmp[k++]=str[i];
- }
- /* using write() so null-bytes can be passed via \x. */
- i=write(STDOUT_FILENO,tmp,k);
- free(tmp);
- return(i==k?0:1);
-}
 /* sets colorize values. */
 void setcolorize(char *str){
  signed char r=0;
@@ -884,15 +806,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(line[0]=='!'||line[0]=='@'){
   if(strlen(line)>1)
    cfgtable.ec=execot(line+1,(line[0]=='!'?0:1),l);
- }
- else if(!strcmp(parameter(line," ",0),"print")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(ptr&&strlen(ptr)){
-   if(cwprintf(ptr))
-    c_error(l,cfgmsg[44]);
-  }
-  else c_error(l,cfgmsg[43]);
  }
  else if(!strcmp(parameter(line," ",0),"path")){
   ptr=strtok(line," ");
