@@ -92,7 +92,6 @@ struct{
  signed char fc;
  signed char invert;
  signed char nocolor;
- signed char ron;
  char *path;
  char *cmd;
  char *cmdargs;
@@ -262,7 +261,6 @@ signed int main(signed int argc,char **argv){
  cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=0;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
- cfgtable.ron=cfgtable.m.cur;
 #ifndef NO_PTY
  cfgtable.p.on=0;
 #endif
