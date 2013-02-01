@@ -29,11 +29,6 @@
 #include <stropts.h>
 #endif
 #include <fcntl.h>
-#ifdef HAVE_UTIL_H
-#include <util.h>
-#elif HAVE_LIBUTIL_H
-#include <libutil.h>
-#endif
 #ifdef HAVE_PTY_H
 #include <pty.h>
 #endif
@@ -45,9 +40,6 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
-#ifdef HAVE_UNIX_H
-#include <unix.h>
-#endif
 
 #ifndef HAVE_OPENPTY
 #define NO_PTY
