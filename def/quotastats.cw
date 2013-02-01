@@ -1,5 +1,4 @@
 path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-noaddhelp
 base white
 match grey:default :
 match grey:cyan (
