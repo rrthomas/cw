@@ -93,8 +93,6 @@ struct{
  signed char ifarga;
  signed char ifexit;
  signed char ifexita;
- signed char iflabel;
- signed char iflabelf;
  signed char ifos;
  signed char ifosa;
  signed char base;
@@ -111,7 +109,6 @@ struct{
  char *path;
  char *cmd;
  char *cmdargs;
- char *label;
 #ifdef HAVE_SETPROCTITLE
  char *title;
 #endif
@@ -320,7 +317,7 @@ signed int main(signed int argc,char **argv){
  cfgtable.base=-1;
  cfgtable.col=cfgtable.ifarg=cfgtable.ifarga=0;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
- cfgtable.ron=cfgtable.iflabel=cfgtable.m.cur=cfgtable.t.cur=0;
+ cfgtable.ron=cfgtable.m.cur=cfgtable.t.cur=0;
  cfgtable.w.it_interval.tv_sec=cfgtable.w.it_value.tv_sec=0;
  cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=0;
 #ifndef NO_PTY
@@ -1052,18 +1049,12 @@ void c_handler(char *line,unsigned int l,signed int argc){
  unsigned char o=0,on=0;
  unsigned int i=0,j=0,k=0,s=0;
  char *tmp,*tmppath,*ptr;
- if(cfgtable.label&&line[0]==':'){
-  o=1;
-  if(strlen(line)<2||strcmp(cfgtable.label,line+1))cfgtable.iflabel=1;
-  else cfgtable.iflabel=cfgtable.iflabelf=0;
- }
- else if(!cfgtable.iflabel&&(!strcmp(parameter(line," ",0),"ifos-else"))){
+ if(!strcmp(parameter(line," ",0),"ifos-else")){
   o=1;
   if(cfgtable.ifosa)cfgtable.ifos=(cfgtable.ifos?0:1);
   else c_error(l,cfgmsg[31]);
  }
- else if(!cfgtable.iflabel&&(!strcmp(parameter(line," ",0),"ifos")||
- !strcmp(pptr,"ifnos"))){
+ else if(!strcmp(parameter(line," ",0),"ifos")||!strcmp(pptr,"ifnos")){
   cfgtable.ifosa=o=1;
   if(!strcmp(parameter(line," ",1),"-1"))c_error(l,cfgmsg[30]);
   else{
@@ -1079,14 +1070,12 @@ void c_handler(char *line,unsigned int l,signed int argc){
     cfgtable.ifos=(cfgtable.ifos?0:1);
   }
  }
- else if(!cfgtable.ifos&&!cfgtable.iflabel
- &&(!strcmp(parameter(line," ",0),"ifexit-else"))){
+ else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit-else"))){
   o=1;
   if(cfgtable.ifexita)cfgtable.ifexit=(cfgtable.ifexit?0:1);
   else c_error(l,cfgmsg[38]);
  }
- else if(!cfgtable.ifos&&!cfgtable.iflabel
- &&(!strcmp(parameter(line," ",0),"ifexit")||!strcmp(pptr,"ifnexit"))){
+ else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit")||!strcmp(pptr,"ifnexit"))){
   cfgtable.ifexita=o=1;
   if(atoi(parameter(line," ",1))>127||atoi(pptr)<-127)
    c_error(l,cfgmsg[37]);
@@ -1096,14 +1085,12 @@ void c_handler(char *line,unsigned int l,signed int argc){
     cfgtable.ifexit=(cfgtable.ifexit?0:1);
   }
  }
- else if(!cfgtable.ifexit&&!cfgtable.ifos&&!cfgtable.iflabel
- &&(!strcmp(parameter(line," ",0),"ifarg-else"))){
+ else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg-else"))){
   o=1;
   if(cfgtable.ifarga)cfgtable.ifarg=(cfgtable.ifarg?0:1);
   else c_error(l,cfgmsg[32]);
  }
- else if(!cfgtable.ifexit&&!cfgtable.ifos&&!cfgtable.iflabel
- &&(!strcmp(parameter(line," ",0),"ifarg")||
+ else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
  !strcmp(pptr,"ifnarg"))){
   cfgtable.ifarga=o=1;
   if(!strcmp(parameter(line," ",1),"-1"))c_error(l,cfgmsg[18]);
@@ -1120,7 +1107,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
     cfgtable.ifarg=(cfgtable.ifarg?0:1);
   }
  }
- if(cfgtable.ifos||cfgtable.ifexit||cfgtable.ifarg||cfgtable.iflabel)
+ if(cfgtable.ifos||cfgtable.ifexit||cfgtable.ifarg)
   return;
  if(line[0]=='#')return;
  else if(line[0]=='$'){
@@ -1480,7 +1467,6 @@ void c_read(char *file,signed int argc){
  cfgtable.t.tot=cfgtable.t.cur;
  if(!cfgtable.path&&!cfgtable.cmd)c_error(0,cfgmsg[1]);
  else if(cfgtable.path&&cfgtable.cmd)c_error(0,cfgmsg[22]);
- else if(cfgtable.iflabelf)c_error(0,cfgmsg[26]);
  else return;
  cwexit(1,cfgmsg[46]);
 }
