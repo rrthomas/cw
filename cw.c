@@ -108,11 +108,6 @@ struct{
  struct{
   signed char l;
   signed char h;
-  signed char c;
- }r;
- struct{
-  signed char l;
-  signed char h;
   signed char on;
  }z;
  struct{
