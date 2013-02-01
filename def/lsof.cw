@@ -12,7 +12,7 @@ match white:default *
 match blue+:default UDP
 match blue+:default TCP
 match blue+:default TPI
-ifos linux:<pseudo>
+ifos linux
 match grey:default REG
 match grey+:default DIR
 match purple:default CHR
