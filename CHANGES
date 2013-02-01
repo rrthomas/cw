@@ -21,6 +21,7 @@ version 1.0.17:
 ! Removed useifregex instruction (always do regex matches).
 ! Removed usepty keyword: always use a pty if possible when coloring.
 ! Removed short command-line options.
+! Removed wait.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
@@ -291,7 +292,7 @@ version 1.0.3:
 
 version 1.0.2:
 * Added the "nostrip" definition instruction. (this will turn off
-  ANSI stripping)
+pp  ANSI stripping)
 ! Added ANSI stripping, which strips the real programs output of ANSI color
   codes. (px@zeroday.net's idea)
 ! Added text file color wrapping. (this will take effect when the cw

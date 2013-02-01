@@ -35,7 +35,6 @@
 #include <ctype.h>
 #include <regex.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
@@ -164,7 +163,6 @@ struct{
   signed char on;
  }p;
 #endif
- struct itimerval w;
 }cfgtable;
 
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
@@ -202,7 +200,7 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "'digit' definition used an invalid color. (defaulting)",
- "'wait' definition used an invalid time value.",
+ "NO SUCH ERROR",
  "'ucase' definition used an invalid color. (defaulting)",
  "'lcase' definition used an invalid color. (defaulting)",
  "'ifarg'/'ifnarg' syntax error. (not enough arguments?)",
@@ -301,8 +299,6 @@ signed int main(signed int argc,char **argv){
  cfgtable.col=cfgtable.ifarg=cfgtable.ifarga=0;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
  cfgtable.ron=cfgtable.m.cur=cfgtable.t.cur=0;
- cfgtable.w.it_interval.tv_sec=cfgtable.w.it_value.tv_sec=0;
- cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=0;
 #ifndef NO_PTY
  cfgtable.p.on=0;
 #endif
@@ -340,7 +336,6 @@ void sighandler(signed int sig){
  }
 #endif
  else if(sig==SIGUSR1)ext=1;
- else if(sig==SIGALRM)ext=2;
  else if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"%s",pal2[16]);
   fflush(stderr);
@@ -835,7 +830,6 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
  }
 #endif
  signal(SIGUSR1,sighandler);
- signal(SIGALRM,sighandler);
  signal(SIGPIPE,sighandler);
  switch(cfgtable.nocolor?0:(pid_c=fork())){
   case -1:
@@ -892,9 +886,6 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
 #endif
    buf=(char *)cwmalloc(BUFSIZE+1);
-   /* minimum catch-up time. */
-   if(!cfgtable.w.it_interval.tv_sec&&cfgtable.w.it_interval.tv_usec<100000)
-    cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=100000;
 #ifndef NO_PTY
    if(cfgtable.p.on){
     close(fds[0]);
@@ -904,19 +895,11 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    }
 #endif
    fdm=((fds[0]>fde[0]?fds[0]:fde[0])+1);
-   while(ext!=2){
-    if(ext==1){
-     signal(SIGALRM,sighandler);
-     setitimer(ITIMER_REAL,&cfgtable.w,0);
-    }
+   while(ext!=1){
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
     FD_SET(fde[0],&rfds);
     if(select(fdm,&rfds,0,0,0)>=0){
-     if(ext==1){
-      signal(SIGALRM,SIG_IGN);
-      setitimer(ITIMER_REAL,0,0);
-     }
      if(FD_ISSET(fds[0],&rfds))fd=fds[0];
      else fd=fde[0];
      memset(buf,0,BUFSIZE);
@@ -1368,17 +1351,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   }
   else if(atoi(pptr)>-1)cfgtable.col=atoi(pptr);
   else c_error(l,cfgmsg[19]);
- }
- else if(!strcmp(parameter(line," ",0),"wait")){
-  if(atoi(parameter(line," ",1))<0)
-   c_error(l,cfgmsg[15]);
-  else{
-   cfgtable.w.it_interval.tv_sec=cfgtable.w.it_value.tv_sec=atoi(pptr);
-  if(atoi(parameter(line," ",2))<0)
-    c_error(l,cfgmsg[15]);
-   else
-    cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=atoi(pptr);
-  }
  }
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;

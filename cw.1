@@ -53,7 +53,7 @@ color used if no other definitions state otherwise (if this is the only definiti
 changes the color before and after the \fBmatch text\fR, if the \fBmatch text\fR matched output from the program.  \fB{?}\fR is a single character wildcard that can be placed in \fBmatch text\fR.  the \fBregex\fR definition instruction is recommended for more complex matching
 .TP 
 \fBregex\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
-changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  it is recommended to use the \fBmatch\fR definition instruction if pattern matching is not necessary, this is  because (cpu) processing is much faster with the \fBmatch\fR definition instruction (see regex(7) for matching guidelines)
+changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  it is recommended to use the \fBmatch\fR definition instruction if pattern matching is not necessary, as it is much faster than regex matching. see regex(7) for the syntax of regular expressions.
 .TP 
 \fBtoken\fR [\fIbefore color:after color\fR] [\fIslot value\fR] [\fIdelim value\fR] 
 changes the color before and after the \fBslot value\fR based on the \fBdelim value\fR.  the \fBdelim value\fR is equal to a single ASCII character in the form of 1\-255 which is used as a start/stop point to assign each \fBslot value\fR
@@ -73,9 +73,6 @@ prints the \fBstring\fR to standard output as it is placed in the definition fil
 .TP 
 \fBlimit\fR [\fInumber\fR]
 only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the environment variable $COLUMNS instead of a static value)
-.TP 
-\fBwait\fR [\fIsecs\fR] [\fIusecs\fR]
-number of extra \fBsecs\fR and \fBusecs\fR to wait for output after the real program has exited.  this definition is rarely necessary
 .TP 
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
