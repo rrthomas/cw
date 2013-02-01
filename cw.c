@@ -876,7 +876,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
    exit(1);
    break;
   default:
-   /* parent process to read the programs output. (sends INT to child) */
+   /* parent process to read the program's output. (forwards SIGINT to child) */
    cfgtable.eint=1;
    signal(SIGINT,sighandler);
 #ifdef HAVE_SETPROCTITLE
