@@ -71,9 +71,6 @@ changes the color before and after any lowercase letter (a\-z)
 \fBprint\fR [\fIstring\fR]
 prints the \fBstring\fR to standard output as it is placed in the definition file.  a linefeed is not automatically placed on the end of the \fBstring\fR, it is expected for the user to handle this.  \fB\\\\, \\e, \\r, \\n, \\t, \\v, \\x\fR??\fB, \\C[\fRcolor\fB]\fR are supported conversions.
 .TP 
-\fBlimit\fR [\fInumber\fR]
-only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the environment variable $COLUMNS instead of a static value)
-.TP 
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
 .TP 
@@ -85,9 +82,6 @@ will not display cw help information when \fB\-\-help\fR is used in the program 
 .TP 
 \fBnoeol\fR
 disables the (reset color) value placed on the end of each line
-.TP 
-\fBnostrip\fR
-turns off ansi stripping of the programs output (rarely used; only to modify colors that already exist or have ANSI placement codes)
 .TP 
 \fB!\fR[\fIprogram\fR]
 executes the \fBprogram\fR string as it is placed in the definition file.  this is intended to either simply run a program before the wrapped program, or for special purposes relating to the \fBifexit\fR definition instructions.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments (the \fBprogram\fR string is in a shell execution format)

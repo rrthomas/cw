@@ -22,6 +22,7 @@ version 1.0.17:
 ! Removed usepty keyword: always use a pty if possible when coloring.
 ! Removed short command-line options.
 ! Removed wait.
+! Removed nostrip and limit.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

@@ -78,7 +78,6 @@ struct{
 #endif
 /* configuration table. */
 struct{
- unsigned char col;
  signed char addhelp;
  signed char ifarg;
  signed char ifarga;
@@ -93,7 +92,6 @@ struct{
  signed char invert;
  signed char nocolor;
  signed char noeol;
- signed char nostrip;
  signed char ron;
  char *path;
  char *cmd;
@@ -204,7 +202,7 @@ static const char *cfgmsg[]={
  "'ucase' definition used an invalid color. (defaulting)",
  "'lcase' definition used an invalid color. (defaulting)",
  "'ifarg'/'ifnarg' syntax error. (not enough arguments?)",
- "'limit' syntax error. (not enough arguments?)",
+ "NO SUCH ERROR",
  "'other' syntax error. (not enough arguments?)",
  "environment variable placement syntax error. (not enough arguments?)",
  "both 'path' and 'other' were defined. (one definition or the other)",
@@ -296,7 +294,7 @@ signed int main(signed int argc,char **argv){
  if(getenv("CW_CHK_SETCODE"))
   cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
  cfgtable.base=-1;
- cfgtable.col=cfgtable.ifarg=cfgtable.ifarga=0;
+ cfgtable.ifarg=cfgtable.ifarga=0;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
  cfgtable.ron=cfgtable.m.cur=cfgtable.t.cur=0;
 #ifndef NO_PTY
@@ -914,7 +912,7 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
         cwexit(1,"realloc() failed.");
       }
       for(i=0;s>i;i++){
-       if(!cfgtable.nostrip&&buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
+       if(buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
         son=0;
         for(k=i+2;!son&&s>k;k++){
          if(buf[k]=='m'){
@@ -926,7 +924,6 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
        }
        else if(buf[i]=='\n'){
         tmp[j]=0;
-        if(cfgtable.col&&cfgtable.col<strlen(tmp))tmp[cfgtable.col]=0;
         fprintf((fd==fds[0]?stdout:stderr),"%s\n",convert_string(tmp));
         fflush(fd==fds[0]?stdout:stderr);
         free(tmp);
@@ -1345,16 +1342,8 @@ void c_handler(char *line,unsigned int l,signed int argc){
   }
   else c_error(l,cfgmsg[9]);
  }
- else if(!strcmp(parameter(line," ",0),"limit")){
-  if(!strcmp(parameter(line," ",1),"columns")){
-   if(getenv("COLUMNS"))cfgtable.col=atoi(getenv("COLUMNS"));
-  }
-  else if(atoi(pptr)>-1)cfgtable.col=atoi(pptr);
-  else c_error(l,cfgmsg[19]);
- }
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
- else if(!strcmp(parameter(line," ",0),"nostrip"))cfgtable.nostrip=1;
  else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
  else if(!o)c_error(l,cfgmsg[0]);
