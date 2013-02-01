@@ -130,9 +130,9 @@ struct{
 
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
-unsigned char ext=0,rexit=0;
-char *pal2[18],*aptr,*fptr,*pptr,*scrname;
-pid_t pid_p,pid_c;
+static unsigned char ext=0,rexit=0;
+static char *pal2[18],*aptr,*fptr,*pptr,*scrname;
+static pid_t pid_p,pid_c;
 extern char **environ;
 
 #define BUFSIZE 1024
