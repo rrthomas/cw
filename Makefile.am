@@ -10,6 +10,6 @@ dist_man_MANS = cw.1
 EXTRA_DIST = $(srcdir)/def/*.cw m4/gnulib-cache.m4
 pkglibexec_SCRIPTS = $(basename $(wildcard def/*.cw))
 
-.cw:
+%: %.cw
 	printf "#!$(bindir)/cw\n" > $@
 	cat $< >> $@
