@@ -1,5 +1,4 @@
 path /bin:/usr/bin:/sbin:/usr/sbin:<env>
-usepty
 base cyan
 ifnarg --help
 match cyan+:default /

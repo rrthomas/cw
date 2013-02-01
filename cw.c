@@ -104,7 +104,6 @@ struct{
  signed char nocolor;
  signed char noeol;
  signed char nostrip;
- signed char pty;
  signed char ron;
  char *path;
  char *cmd;
@@ -263,10 +262,6 @@ signed int main(signed int argc,char **argv){
    cfgtable.nocolor=1;
   else if(!strcmp("+iv",argv[i])||!strcmp("--cw-invert",argv[i]))
    cfgtable.invert=1;
-#ifndef NO_PTY
-  else if(!strcmp("+py",argv[i])||!strcmp("--cw-usepty",argv[i]))
-   cfgtable.pty=1;
-#endif
   else if(!strncmp("+co=",argv[i],4)){
    if(strlen(argv[i])>4)setcolorize(argv[i]+4);
   }
@@ -277,12 +272,12 @@ signed int main(signed int argc,char **argv){
    cfgtable.addhelp=1;
   }
   else if(!strcmp("-v",argv[i])){
-   cwexit(1,"cw (color wrapper) v"VERSION" (support=+"
+   cwexit(1,"cw (color wrapper) v"VERSION" (features="
 #ifndef NO_PTY
-    "p"
+    "pty"
 #endif
 #ifdef HAVE_SETPROCTITLE
-    "s"
+    "setproctitle"
 #endif
     ")");
    }
@@ -322,7 +317,6 @@ signed int main(signed int argc,char **argv){
  cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=0;
 #ifndef NO_PTY
  cfgtable.p.on=0;
- if(getenv("CW_USEPTY"))cfgtable.pty=1;
 #endif
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
@@ -337,12 +331,8 @@ signed int main(signed int argc,char **argv){
   unsetenv("NOCOLOR_NEXT");
  }
  /* from patch submitted by <komar@ukr.net>. (modified from original) */
- if(!isatty(STDOUT_FILENO)||!isatty(STDERR_FILENO)){
+ if(!isatty(STDOUT_FILENO)||!isatty(STDERR_FILENO))
   cfgtable.nocolor=1;
-#ifndef NO_PTY
-  cfgtable.pty=0;
-#endif
- }
  if(cfgtable.z.on)cfgtable.invert=0;
  if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
  execcw(argc,argv,margc,margv);
@@ -838,10 +828,8 @@ noreturn void execcw(signed int oargc,char **oargv,signed int argc,char **argv){
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
-  if(cfgtable.pty){
-   if(!make_ptypair(0)||!make_ptypair(1))cfgtable.p.on=0;
-   else cfgtable.p.on=1;
-  }
+  if(!make_ptypair(0)||!make_ptypair(1))cfgtable.p.on=0;
+  else cfgtable.p.on=1;
 #endif
   if(pipe(fds)<0)cwexit(1,"pipe() failed.");
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
@@ -1404,11 +1392,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
     cfgtable.w.it_interval.tv_usec=cfgtable.w.it_value.tv_usec=atoi(pptr);
   }
  }
-#ifndef NO_PTY
- else if(!strcmp(parameter(line," ",0),"usepty"))cfgtable.pty=1;
-#else
- else if(!strcmp(parameter(line," ",0),"usepty"));
-#endif
  else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
  else if(!strcmp(parameter(line," ",0),"nostrip"))cfgtable.nostrip=1;
@@ -1479,9 +1462,6 @@ static void addhelp_display(void){
  fprintf(stdout,"%s\n","  +iv, --cw-invert                  invert the internal colormap.");
  fprintf(stdout,"%s\n","  +nc, --cw-nocolor                 disable color wrapping of this"
  " program.");
-#ifndef NO_PTY
- fprintf(stdout,"%s\n","  +py, --cw-usepty                  allocates a pseudo terminal.");
-#endif
 }
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){

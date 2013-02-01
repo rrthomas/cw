@@ -19,6 +19,7 @@ version 1.0.17:
 ! Removed clear instruction and CW_CLEAR environment variable.
 ! Removed nopipe instruction and NOCOLOR_PIPE environment variable.
 ! Removed useifregex instruction (always do regex matches).
+! Removed usepty keyword: always use a pty if possible when coloring.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

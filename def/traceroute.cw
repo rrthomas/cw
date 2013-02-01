@@ -1,5 +1,4 @@
 path /sbin:/usr/sbin:/bin:/usr/bin:<env>
-usepty
 base cyan
 digit cyan+:default
 match cyan+:default .

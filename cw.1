@@ -77,9 +77,6 @@ only displays \fBnumber\fR of characters per line. ("\fBcolumns\fR" to use the e
 \fBwait\fR [\fIsecs\fR] [\fIusecs\fR]
 number of extra \fBsecs\fR and \fBusecs\fR to wait for output after the real program has exited.  this definition is rarely necessary
 .TP 
-\fBusepty\fR
-allocates a pty to emulate a programs natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
-.TP 
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
 .TP 
@@ -132,9 +129,6 @@ inverts the internal color map
 .TP 
 \fB+nc, \-\-cw\-nocolor\fR
 disables color wrapping of the program
-.TP 
-\fB+py, \-\-cw\-usepty\fR
-allocates a pseudo terminal {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
 .SH "ENVIRONMENT"
 .PP 
 .TP 
@@ -149,9 +143,6 @@ disables color wrapping if the program/shell expression placed in the variable r
 .TP 
 \fBCW_CHK_SETCODE\fR
 sets the internal exit code to the exit code returned by the program/shell expression placed in the variable to be used with the \fBifexit\fR definition instructions, provided no \fB!\fR or \fB@\fR definition instructions are called before.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
-.TP 
-\fBCW_USEPTY\fR
-allocates a pty to emulate a program's natural environment.  this can be useful for programs that expect a terminal to be used, this may include programs that appear to hang and dump text either when the program exits or in large chunks while running. (any value placed in the variable will enable) {THIS MAY NOT BE INCLUDED UPON COMPILE, RUN \fBcw \-v\fR TO SEE IF "\fBp\fR" IS INCLUDED IN THE SUPPORT}
 .TP 
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
