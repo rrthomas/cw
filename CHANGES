@@ -23,6 +23,7 @@ version 1.0.17:
 ! Removed short command-line options.
 ! Removed wait.
 ! Removed nostrip and limit.
+! Removed noeol.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

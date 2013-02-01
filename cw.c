@@ -91,7 +91,6 @@ struct{
  signed char fc;
  signed char invert;
  signed char nocolor;
- signed char noeol;
  signed char ron;
  char *path;
  char *cmd;
@@ -581,10 +580,10 @@ static char *convert_string(const char *line){
   }
  }
  buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)
-                      +cfgtable.b.llen+cfgtable.b.rlen+(!cfgtable.noeol?4:0)+1);
+                      +cfgtable.b.llen+cfgtable.b.rlen+4+1);
  sprintf(buf,"%s%s%s%s%s",(cfgtable.b.llen?cfgtable.b.ldata:"")
  ,pal2[cfgtable.base],tbuf,(cfgtable.b.rlen?cfgtable.b.rdata:""),
- (!cfgtable.noeol?pal2[16]:""));
+ pal2[16]);
  free(tbuf);
  free(aptr);
  return(aptr=buf);
@@ -1342,7 +1341,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
   }
   else c_error(l,cfgmsg[9]);
  }
- else if(!strcmp(parameter(line," ",0),"noeol"))cfgtable.noeol=1;
  else if(!strcmp(parameter(line," ",0),"noaddhelp"))cfgtable.addhelp=0;
  else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
