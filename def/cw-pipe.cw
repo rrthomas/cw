@@ -1,6 +1,6 @@
 # generic/all-purpose pipe color definition file. (hack)
 # run this as "program_name | cw-pipe" in your shell. 
-other cat
+command cat
 base cyan
 match cyan+:default [[:digit:]]
 match grey:default \.

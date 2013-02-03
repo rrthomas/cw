@@ -782,7 +782,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
   if(strlen(line)>1)
    cfgtable.ec=execot(line+1,(line[0]=='!'?0:1),l);
  }
- else if(!strcmp(parameter(line," ",0),"other")){
+ else if(!strcmp(parameter(line," ",0),"command")){
   ptr=strtok(line," ");
   ptr=strtok(0,"");
   if((k=strlen(ptr))){
@@ -802,7 +802,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
    }
    cfgtable.cmd[j]=0;
   }
-  else c_error(l,"'other' instruction missing command.");
+  else c_error(l,"'command' instruction missing command.");
  }
  else if(!strcmp(parameter(line," ",0),"base")){
   if((cfgtable.base=color_atoi(parameter(line," ",1)))<0)

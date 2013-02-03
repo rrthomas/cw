@@ -10,7 +10,7 @@ cw \- color wrapper for common unix commands
 \fBcw\fR is a free color wrapper designed to be a color gateway between programs and the output they produce.  
 The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, except they are located in \fBNONE/libexec/cw/\fR.
 
-\fBother\fR [\fIprogram\fR]
+\fBcommand\fR [\fIprogram\fR]
 specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
 .TP 
 \fBifarg\fR [\fIregex:regex:...\fR]
@@ -75,7 +75,7 @@ Colors with a \fB+\fR designate a brighter color.
 disables color wrapping (any value placed in the variable will enable)
 .TP 
 \fBNOCOLOR_NEXT\fR
-disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is not like stripping, it is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
+disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
 .TP 
 \fBCW_CHK_NOCOLOR\fR
 disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments

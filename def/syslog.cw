@@ -1,4 +1,4 @@
-other tail -f /var/log/syslog
+command tail -f /var/log/syslog
 base cyan
 match white:cyan+ \(
 match white:default )
