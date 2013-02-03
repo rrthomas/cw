@@ -6,87 +6,87 @@ cw \- color wrapper for common unix commands
 .B cw
 [\fI\-\-version|\-\-help\fR]
 .SH "DESCRIPTION"
-.PP 
-\fBcw\fR colors the output of command-line programs. The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, except they are located in \fBNONE/libexec/cw/\fR.
+.PP
+\fBcw\fR colors the output of command-line programs. The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
 .SH "DEFINITION INSTRUCTIONS"
 the following instructions occur one per line in a definition file.
 .TP
 \fBcommand\fR [\fIprogram\fR]
 specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
-.TP 
+.TP
 \fBifarg\fR [\fIregex:regex:...\fR]
 list separated by colons which will be compared against the arguments called to the program.  if the \fBregex\fR matches the arguments, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR definition instruction is used.  "\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments.
-.TP 
+.TP
 \fBifnarg\fR [\fIregex:regex:...\fR]
 reverse of \fBifarg\fR
-.TP 
+.TP
 \fBifarg\-else\fR
 this will use the definitions to follow if the previous \fBifarg\fR or \fBifnarg\fR was false
-.TP 
+.TP
 \fBifexit\fR [\fIvalue\fR]
 compares the \fBvalue\fR to the last returned exit code from the \fB!\fR and \fB@\fR definition instructions.  if the \fBvalue\fR matches, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifexit\fR, \fBifnexit\fR or \fBifexit\-else\fR definition instruction is used.  this definition instruction is intended to create a gateway to the system to check for special scenarios in the form of user\-made scripts/programs.  \fBifexit\fR definition instructions are a higher priority than \fBifarg\fR.  \fBvalue\fR must be a numerical value between \-127 and 127, if nothing is placed in \fBvalue\fR it will default to \-1 ("\fB<any>\fR" can be used as a constant value for any value.)
-.TP 
+.TP
 \fBifnexit\fR [\fIvalue\fR]
 reverse of \fBifexit\fR
-.TP 
+.TP
 \fBifexit\-else\fR
 this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false
-.TP 
+.TP
 \fBifos\fR [\fIregex:regex:...\fR]
 list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBregex\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
-.TP 
+.TP
 \fBifnos\fR [\fIregex:regex:...\fR]
 reverse of \fBifos\fR
-.TP 
+.TP
 \fBifos\-else\fR
 this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\fR was false
-.TP 
+.TP
 \fBbase\fR [\fIcolor\fR]
 color used if no other definitions state otherwise (if this is the only definition used it will be ignored)
-.TP 
+.TP
 \fBmatch\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
 changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  see regex(7) for the syntax of regular expressions.
-.TP 
+.TP
 \fBforcecolor\fR
 forces color wrapping no matter what anti\-coloring measures are enabled
-.TP 
+.TP
 \fBnocolor\fR
 turns off all coloring (the only real purpose of this is for \fBif\fR\-related definition instructions)
-.TP 
+.TP
 \fB!\fR[\fIprogram\fR]
 executes the \fBprogram\fR string as it is placed in the definition file.  this is intended to either simply run a program before the wrapped program, or for special purposes relating to the \fBifexit\fR definition instructions.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments (the \fBprogram\fR string is in a shell execution format)
-.TP 
+.TP
 \fB@\fR[\fIprogram\fR]
 this is the same as \fB!\fR, except it does not display the output or allow input
-.TP 
+.TP
 \fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
 sets the environment variable \fBVAR\fR to \fBVALUE\fR
-.TP 
+.TP
 \fB#\fR[\fItext\fR]
 ignores the following \fBtext\fR for processing. (for comments)
-.TP 
+.TP
 The color values used are in the text form of:
 \fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default, none\fR
-.TP 
+.TP
 Colors with a \fB+\fR designate a brighter color.
 .SH "ENVIRONMENT"
-.PP 
-.TP 
+.PP
+.TP
 \fBNOCOLOR\fR
 disables color wrapping (any value placed in the variable will enable)
-.TP 
+.TP
 \fBNOCOLOR_NEXT\fR
 disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
-.TP 
+.TP
 \fBCW_CHK_NOCOLOR\fR
 disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
-.TP 
+.TP
 \fBCW_CHK_SETCODE\fR
 sets the internal exit code to the exit code returned by the program/shell expression placed in the variable to be used with the \fBifexit\fR definition instructions, provided no \fB!\fR or \fB@\fR definition instructions are called before.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
-.TP 
+.TP
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
-.TP 
+.TP
 \fBCW_COLORIZE\fR
 defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
 .SH "AUTHOR"
@@ -95,6 +95,6 @@ Written by v9/fakehalo. [v9@fakehalo.us]
 Report bugs to <v9@fakehalo.us>.
 .SH "COPYRIGHT"
 Copyright \(co 2004 v9/fakehalo.
-.br 
+.br
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

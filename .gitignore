@@ -12,6 +12,7 @@ Makefile
 /config.log
 /config.status
 /cw
+/cw.1
 /cw-*.tar.gz
 /depcomp
 /INSTALL
