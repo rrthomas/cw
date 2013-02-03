@@ -41,6 +41,8 @@
 #include <sys/wait.h>
 #include "progname.h"
 #include "dirname.h"
+#include "gl_xlist.h"
+#include "gl_linked_list.h"
 
 #ifndef HAVE_OPENPTY
 #define NO_PTY
@@ -98,13 +100,7 @@ struct{
 #ifdef HAVE_SETPROCTITLE
  char *title;
 #endif
- struct{
-  char **data;
-  unsigned char *b;
-  unsigned char *a;
-  unsigned int cur;
-  unsigned int tot;
- }m;
+ gl_list_t m;
  struct{
   signed char l;
   signed char h;
@@ -126,6 +122,13 @@ struct{
  }p;
 #endif
 }cfgtable;
+
+/* match instruction. */
+typedef struct{
+  char *data;
+  unsigned char b;
+  unsigned char a;
+}match;
 
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
@@ -208,6 +211,7 @@ signed int main(signed int argc,char **argv){
  set_program_name(argv[0]);
  basename=base_name(program_name);
  cfgtable.z.l=cfgtable.z.h=-1;
+ cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  if(!strcmp(basename,"cw")){
   for(i=1;i<argc;i++){
    if(!strcmp("--help",argv[i]))
@@ -298,63 +302,59 @@ void sighandler(signed int sig){
 /* converts the original string to a color string based on the config file. */
 static char *convert_string(const char *line){
  unsigned char on=0;
- unsigned int i=0,j=0,k=0,l=0;
- char *buf,*tbuf,*tmp,*tmpcmp;
+ gl_list_iterator_t i;
+ unsigned int j=0,k=0,l=0;
+ const match *m;
+ char *buf;
  regex_t re;
  regmatch_t pm;
- size_t s=strlen(line);
- tbuf=(char *)cwmalloc(s+1);
+ char *tbuf=(char *)cwmalloc(strlen(line)+1);
  strcpy(tbuf,line);
  /* start processing the 'match' definitions. */
- if(cfgtable.m.tot){
-  for(j=i=0;i<cfgtable.m.tot;i++){
-   s=strlen(tbuf);
-   tmp=(char *)cwmalloc(s*(cfgtable.m.tot*16+1)+s+1);
-   on=j=l=k=0;
-   if(regcomp(&re,cfgtable.m.data[i],REG_EXTENDED))
-    free(tmp);
-   else{
-    while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
-     if(pm.rm_so){
-      tmpcmp=(char *)cwmalloc(pm.rm_so+1);
-      strncpy(tmpcmp,tbuf+k,pm.rm_so);
-      strcpy(tmp+j,tmpcmp);
-      j+=strlen(tmpcmp);
-      free(tmpcmp);
-     }
-     if(!pm.rm_so&&!pm.rm_eo){
-      pm.rm_eo++;
-      on=1;
-     }
-     l=(pm.rm_eo-pm.rm_so);
-     tmpcmp=(char *)cwmalloc(l+1);
-     k+=pm.rm_so;
-     strncpy(tmpcmp,tbuf+k,l);
-     if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))
-     &&cfgtable.m.b[i]!=17){
-      strcpy(tmp+j,pal2[cfgtable.m.b[i]==16?cfgtable.base:cfgtable.m.b[i]]);
-      j+=strlen(pal2[cfgtable.m.b[i]==16?cfgtable.base:cfgtable.m.b[i]]);
-     }
+ for(j=0,i=gl_list_iterator(cfgtable.m);gl_list_iterator_next(&i,(const void **)&m,NULL);){
+  char *tmp,*tmpcmp;
+  size_t s=strlen(tbuf);
+  on=j=l=k=0;
+  if(!regcomp(&re,m->data,REG_EXTENDED)){
+   tmp=(char *)cwmalloc(s*(gl_list_size(cfgtable.m)*16+1)+s+1);
+   while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
+    if(pm.rm_so){
+     tmpcmp=(char *)cwmalloc(pm.rm_so+1);
+     strncpy(tmpcmp,tbuf+k,pm.rm_so);
      strcpy(tmp+j,tmpcmp);
      j+=strlen(tmpcmp);
      free(tmpcmp);
-     if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))
-     &&cfgtable.m.a[i]!=17){
-      strcpy(tmp+j,pal2[cfgtable.m.a[i]==16?cfgtable.base:cfgtable.m.a[i]]);
-      j+=strlen(pal2[cfgtable.m.a[i]==16?cfgtable.base:cfgtable.m.a[i]]);
-     }
-     on=0;
-     k-=pm.rm_so;
-     k+=pm.rm_eo;
     }
-    regfree(&re);
-    if(s>k)strcpy(tmp+j,tbuf+k);
-    free(tbuf);
-    tbuf=(char *)cwmalloc(strlen(tmp)+1);
-    strcpy(tbuf,tmp);
-    free(tmp);
+    if(!pm.rm_so&&!pm.rm_eo){
+     pm.rm_eo++;
+     on=1;
+    }
+    l=(pm.rm_eo-pm.rm_so);
+    tmpcmp=(char *)cwmalloc(l+1);
+    k+=pm.rm_so;
+    strncpy(tmpcmp,tbuf+k,l);
+    if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->b!=17){
+     strcpy(tmp+j,pal2[m->b==16?cfgtable.base:m->b]);
+     j+=strlen(pal2[m->b==16?cfgtable.base:m->b]);
+    }
+    strcpy(tmp+j,tmpcmp);
+    j+=strlen(tmpcmp);
+    free(tmpcmp);
+    if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->a!=17){
+     strcpy(tmp+j,pal2[m->a==16?cfgtable.base:m->a]);
+     j+=strlen(pal2[m->a==16?cfgtable.base:m->a]);
+    }
     on=0;
+    k-=pm.rm_so;
+    k+=pm.rm_eo;
    }
+   regfree(&re);
+   if(s>k)strcpy(tmp+j,tbuf+k);
+   free(tbuf);
+   tbuf=(char *)cwmalloc(strlen(tmp)+1);
+   strcpy(tbuf,tmp);
+   free(tmp);
+   on=0;
   }
  }
  buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)
@@ -503,7 +503,7 @@ noreturn void execcw(signed int argc,char **argv){
 #ifdef SIGCHLD
  struct sigaction sa;
 #endif
- if(!(cfgtable.m.tot))
+ if(!(cfgtable.m))
   cfgtable.nocolor=1;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
@@ -812,18 +812,19 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"match")){
   if(strcmp(parameter(line," ",1),"-1")){
    tmp=(char *)cwmalloc(strlen(pptr)+1);
+   match *m=(match *)cwmalloc(sizeof(match));
    strcpy(tmp,pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
-    cfgtable.m.b[cfgtable.m.cur]=color_atoi(parameter(tmp,":",0));
+    m->b=color_atoi(parameter(tmp,":",0));
    else{
     c_error(l,"invalid first color in 'match' definition. (defaulting)");
-    cfgtable.m.b[cfgtable.m.cur]=16;
+    m->b=16;
    }
    if(color_atoi(parameter(tmp,":",1))>-1)
-    cfgtable.m.a[cfgtable.m.cur]=color_atoi(parameter(tmp,":",1));
+    m->a=color_atoi(parameter(tmp,":",1));
    else{
     c_error(l,"invalid second color in 'match' definition. (defaulting)");
-    cfgtable.m.a[cfgtable.m.cur]=16;
+    m->a=16;
    }
    free(tmp);
    if(strcmp(parameter(line," ",2),"-1")){
@@ -833,13 +834,9 @@ void c_handler(char *line,unsigned int l,signed int argc){
     tmp=strtok(tmp," ");
     tmp=strtok(0," ");
     tmp=strtok(0,"");
-    if(cfgtable.m.cur>cfgtable.m.tot)
-     c_error(l,"'match' too many entries. (race condition?)");
-    else{
-     cfgtable.m.data[cfgtable.m.cur]=(char *)cwmalloc(strlen(tmp)+1);
-     strcpy(cfgtable.m.data[cfgtable.m.cur],tmp);
-     cfgtable.m.cur++;
-    }
+    m->data=(char *)cwmalloc(strlen(tmp)+1);
+    strcpy(m->data,tmp);
+    gl_list_add_last(cfgtable.m,m);
     free(ptr);
    }
    else c_error(l,"'match' syntax error: cannot find colors argument)");
@@ -850,42 +847,23 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
  else if(!o)c_error(l,"invalid definition instruction.");
 }
-/* reads (and allocates space for) the config file to be passed to c_handler(). */
+/* reads the config file, passing the lines to c_handler(). */
 void c_read(char *file,signed int argc){
- unsigned char i=0;
- unsigned int j=0,k=0;
+ size_t i=0,l=0;
  char buf[BUFSIZE+1];
  FILE *fs;
  if(!(fs=fopen(file,"r")))cwexit(1,"failed opening config file.");
- for(i=0;i<2;i++){
-  /* reset the reading location, it goes through the config file twice. */
-  rewind(fs);
-  if(i){
-   /* build array sizes. */
-   cfgtable.m.data=(char **)cwmalloc(cfgtable.m.tot*sizeof(char *)+1);
-   cfgtable.m.b=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
-   cfgtable.m.a=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
-  }
-  while(fgets(buf,BUFSIZE,fs)){
-   /* find the amount of definitions to store in memory. */
-   if(!i){
-    if(!strcmp(parameter(buf," ",0),"match"))cfgtable.m.tot++;
-   }
-   /* begin actual processing/handling of the config file. (c_handler) */
-   else{
-    j=strlen(buf);
-    if(j>2){
-     /* remove excess characters read, ex. \r\n. */
-     if(!isprint((unsigned char)buf[j-1]))buf[j-1]=0;
-     if(!isprint((unsigned char)buf[j-2]))buf[j-2]=0;
-     c_handler(buf,k++,argc);
-    }
-   }
+ while(fgets(buf,BUFSIZE,fs)){
+  i=strlen(buf);
+  if(i>2){
+   /* remove excess characters read, ex. \r\n. */
+   if(!isprint((unsigned char)buf[i-1]))buf[i-1]=0;
+   if(!isprint((unsigned char)buf[i-2]))buf[i-2]=0;
+   c_handler(buf,l++,argc);
   }
  }
  fclose(fs);
  if(cfgtable.base<0)cfgtable.base=7;
- cfgtable.m.tot=cfgtable.m.cur;
 }
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){
