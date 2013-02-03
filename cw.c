@@ -254,7 +254,7 @@ static void setcolorize(char *str){
 }
 
 /* handles and executes other programs. */
-static signed char execot(char *prog,unsigned char type,size_t l){
+static signed char execot(char *prog,bool no_io,size_t l){
  signed char r=0;
  bool on=false;
  int e=0;
@@ -278,10 +278,10 @@ static signed char execot(char *prog,unsigned char type,size_t l){
  str[j]=0;
  switch((p=fork())){
   case -1:
-   if(type<2)c_error(l,"'!'/'@' failed to execute background program.");
+   c_error(l,"'!'/'@' failed to execute background program.");
    break;
   case 0:
-   if(type==1){
+   if(no_io){
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
@@ -639,7 +639,7 @@ static void c_handler(char *line,size_t l,int argc){
  }
  else if(line[0]=='!'||line[0]=='@'){
   if(strlen(line)>1)
-   cfgtable.ec=execot(line+1,(line[0]=='!'?0:1),l);
+   cfgtable.ec=execot(line+1,line[0]=='@',l);
  }
  else if(!strcmp(parameter(line," ",0),"command")){
   ptr=strtok(line," ");
@@ -770,8 +770,6 @@ int main(int argc,char **argv){
   pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
   strcpy(pal2[i],pal2_orig[i]);
  }
- if(getenv("CW_CHK_SETCODE"))
-  cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
  cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=false;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=false;
@@ -788,8 +786,6 @@ int main(int argc,char **argv){
  c_read(scrname,argc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0); /* FIXME: document this */
- if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
-  cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
  if(getenv("NOCOLOR_NEXT")){
   setenv("NOCOLOR","1",1);
   unsetenv("NOCOLOR_NEXT");

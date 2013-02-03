@@ -78,12 +78,6 @@ disables color wrapping (any value placed in the variable will enable)
 \fBNOCOLOR_NEXT\fR
 disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
 .TP
-\fBCW_CHK_NOCOLOR\fR
-disables color wrapping if the program/shell expression placed in the variable returns a non\-zero exit code.  this is intended to help prevent unwanted coloring on a system\-specific basis.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
-.TP
-\fBCW_CHK_SETCODE\fR
-sets the internal exit code to the exit code returned by the program/shell expression placed in the variable to be used with the \fBifexit\fR definition instructions, provided no \fB!\fR or \fB@\fR definition instructions are called before.  "\fB{}\fR" can be used in the variable to insert the command\-line arguments
-.TP
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .TP
