@@ -14,3 +14,6 @@ pkglibexec_SCRIPTS = $(basename $(wildcard def/*.cw))
 %: %.cw
 	printf "#!$(bindir)/cw\n" > $@
 	cat $< >> $@
+
+clean-local:
+	rm -f $(pkglibexec_SCRIPTS)
