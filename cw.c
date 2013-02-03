@@ -866,7 +866,7 @@ void c_read(char *file,signed int argc){
    cfgtable.m.b=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
    cfgtable.m.a=(unsigned char *)cwmalloc(cfgtable.m.tot+1);
   }
-  for(memset(buf,0,BUFSIZE);fgets(buf,BUFSIZE,fs);memset(buf,0,BUFSIZE)){
+  while(fgets(buf,BUFSIZE,fs)){
    /* find the amount of definitions to store in memory. */
    if(!i){
     if(!strcmp(parameter(buf," ",0),"match"))cfgtable.m.tot++;
