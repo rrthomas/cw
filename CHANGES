@@ -33,6 +33,7 @@ version 1.0.17:
   redirected while stdout is still colored.
 ! Removed print instruction.
 ! Removed path instruction. Set $PATH if still needed.
+! Renamed other instruction to 'command'.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
