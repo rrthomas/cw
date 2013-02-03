@@ -1,5 +1,4 @@
 # this is a bit heavy on the regex, may be slow on old-old systems.
-path /sbin:/usr/sbin:/bin:/usr/bin:<env>
 base cyan
 ifarg --help:<none>
 match cyan+:default <.+>

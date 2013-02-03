@@ -1,7 +1,7 @@
 SUBDIRS = lib
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
-AM_CPPFLAGS = $(ISYSTEM)$(srcdir)/lib
+AM_CPPFLAGS = $(ISYSTEM)$(srcdir)/lib -DSCRIPTSDIR=\"$(pkglibexecdir)\"
 
 bin_PROGRAMS = cw
 cw_SOURCES = cw.c

@@ -1,4 +1,3 @@
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 base cyan
 ifos sunos
 match cyan+:blue+ ----

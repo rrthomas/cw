@@ -1,4 +1,3 @@
-path /usr/bin:/bin:/usr/sbin:/sbin:<env>
 base grey+
 ifarg --help
 match white:default \?

@@ -1,4 +1,3 @@
-path /bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:<env>
 ifnarg --interactive
 base cyan
 match cyan+:default [[:digit:]]

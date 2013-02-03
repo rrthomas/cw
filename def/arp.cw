@@ -1,4 +1,3 @@
-path /sbin:/usr/sbin:/bin:/usr/bin:<env>
 base cyan
 match white:default [a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}
 ifos sunos

@@ -1,4 +1,3 @@
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 ifnarg -G:-U
 base cyan
 match green+:default [[:digit:]]

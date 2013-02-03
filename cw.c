@@ -93,7 +93,6 @@ struct{
  signed char nocolor;
  signed char nocolor_stdout;
  signed char nocolor_stderr;
- char *path;
  char *cmd;
  char *cmdargs;
 #ifdef HAVE_SETPROCTITLE
@@ -149,7 +148,7 @@ static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
 static const char *cfgmsg[]={
  "invalid definition instruction.",
- "no valid 'path' or 'other' definition was defined.",
+ "NO SUCH ERROR",
  "'match' definition used an invalid color. (defaulting)",
  "'match' too many entries. (race condition?)",
  "'match' syntax error. (not enough arguments?)",
@@ -158,7 +157,7 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
- "'path' definition contained no existing/usable paths.",
+ "NO SUCH ERROR",
  "'base' definition used an invalid color.",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
@@ -170,7 +169,7 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "'other' syntax error. (not enough arguments?)",
  "environment variable placement syntax error. (not enough arguments?)",
- "both 'path' and 'other' were defined. (one definition or the other)",
+ "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
  "NO SUCH ERROR",
@@ -186,20 +185,53 @@ static const char *cfgmsg[]={
  "NO SUCH ERROR",
  "'!'/'@' failed to execute background program.",
  "'ifexit'/'ifnexit' invalid exit level. (-127..127)",
- "'ifexit-else' used before any previous comparison.",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "configuration contained critical errors."};
+ "'ifexit-else' used before any previous comparison."};
 
 static void *cwmalloc(size_t n) {
  void *p = calloc(1, n);
  if (!p) cwexit(1,"malloc() failed.");
  return p;
+}
+
+/* plucks a requested token out of a string. */
+static char *parameter(const char *string,const char *delim,size_t p){
+ size_t n=p;
+ char *arg;
+ free(fptr);
+ fptr=arg=(char *)cwmalloc(strlen(string)+1);
+ strcpy(arg,string);
+ arg=strtok(arg,delim);
+ while(n&&(arg=strtok(0,delim)))n--;
+ if(!arg){
+  free(fptr);
+  fptr=arg=(char *)cwmalloc(3);
+  strcpy(arg,"-1");
+ }
+ return(pptr=arg);
+}
+
+/* filter a directory out of a PATH-like colon-separated path list. */
+static char *remove_dir_from_path(const char *path, const char *dir){
+ if(path){
+  char *canon_dir=canonicalize_file_name(dir);
+  size_t s=strlen(path),i=0;
+  char *newpath=(char *)cwmalloc(s+1);
+  char *tmp=(char *)cwmalloc(s+1);
+  strcpy(tmp,path);
+  while(strcmp(parameter(tmp,":",i++),"-1")){
+   char *canon_pptr=canonicalize_file_name(pptr);
+   if(strcmp(canon_pptr,canon_dir)){
+    if(*newpath)
+     strcat(newpath,":");
+    strcat(newpath,pptr);
+   }
+   free(canon_pptr);
+  }
+  free(tmp);
+  free(canon_dir);
+  return newpath;
+ }
+ return 0;
 }
 
 static void usage(void){
@@ -212,7 +244,7 @@ static void usage(void){
 /* program start. */
 signed int main(signed int argc,char **argv){
  int i=0,j=0;
- char *ptr, *basename;
+ char *ptr,*basename,*newpath;
  set_program_name(argv[0]);
  basename=base_name(program_name);
  cfgtable.z.l=cfgtable.z.h=-1;
@@ -263,6 +295,10 @@ signed int main(signed int argc,char **argv){
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=1;
+ /* Set PATH for child processes; may be overridden by configuration file. */
+ newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
+ setenv("PATH",newpath,1);
+ free(newpath);
  c_read(scrname,argc);
  cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
  cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0); /* FIXME: document this */
@@ -299,31 +335,14 @@ void sighandler(signed int sig){
   cwexit(0,0);
  }
 }
-/* plucks a requested token out of a string. */
-static char *parameter(const char *string,const char *delim,unsigned int p){
- unsigned int n=p;
- char *arg;
- free(fptr);
- fptr=arg=(char *)cwmalloc(strlen(string)+1);
- strcpy(arg,string);
- arg=strtok(arg,delim);
- while(n&&(arg=strtok(0,delim)))n--;
- if(!arg){
-  free(fptr);
-  fptr=arg=(char *)cwmalloc(3);
-  strcpy(arg,"-1");
- }
- return(pptr=arg);
-}
 /* converts the original string to a color string based on the config file. */
 static char *convert_string(const char *line){
  unsigned char on=0;
- unsigned int i=0,j=0,k=0,l=0,s=0;
- char *buf,*tbuf,*tmp;
- char *tmpcmp;
+ unsigned int i=0,j=0,k=0,l=0;
+ char *buf,*tbuf,*tmp,*tmpcmp;
  regex_t re;
  regmatch_t pm;
- s=strlen(line);
+ size_t s=strlen(line);
  tbuf=(char *)cwmalloc(s+1);
  strcpy(tbuf,line);
  /* start processing the 'match' definitions. */
@@ -519,7 +538,7 @@ noreturn void execcw(signed int argc,char **argv){
  int i=0,j=0,k=0;
  signed char re=0;
  signed int fds[2],fde[2],fdm=0,fd=0,s=0,e=0;
- char **nargv,*buf,*tmp;
+ char *buf,*tmp;
  fd_set rfds;
 #ifdef SIGCHLD
  struct sigaction sa;
@@ -582,12 +601,8 @@ noreturn void execcw(signed int argc,char **argv){
    if(cfgtable.cmd)
     execle("/bin/sh",strpname(scrname),"-c",cfgtable.cmd,(char *)0,environ);
    else{
-    nargv=(char **)cwmalloc((sizeof(char *)*argc));
-    nargv[0]=strpname(scrname);
-    for(i=2;i<argc;i++)
-     nargv[i-1]=argv[i];
-    nargv[i-1]=0;
-    execve(cfgtable.path,nargv,environ);
+    argv[1]=strpname(scrname);
+    execvpe(base_name(scrname),&argv[1],environ);
    }
    /* shouldn't make it here. (no point to stay alive) */
    exit(1);
@@ -725,8 +740,8 @@ void setproctitle(const char *fmt,...){
 /* handles each config file line. (data sizes allocated in c_read()) */
 void c_handler(char *line,unsigned int l,signed int argc){
  unsigned char o=0,on=0;
- unsigned int i=0,j=0,k=0,s=0;
- char *tmp,*tmppath,*ptr;
+ unsigned int i=0,j=0,k=0;
+ char *tmp,*ptr;
  if(!strcmp(parameter(line," ",0),"ifos-else")){
   o=1;
   if(cfgtable.ifosa)cfgtable.ifos=(cfgtable.ifos?0:1);
@@ -806,41 +821,6 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(line[0]=='!'||line[0]=='@'){
   if(strlen(line)>1)
    cfgtable.ec=execot(line+1,(line[0]=='!'?0:1),l);
- }
- else if(!strcmp(parameter(line," ",0),"path")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if(ptr&&(k=strlen(ptr))){
-   s=(getenv("PATH")?strlen(getenv("PATH")):0);
-   tmp=(char *)cwmalloc(k+s+1);
-   for(on=i=j=0;k>i;i++){
-    if(!on&&s&&!strncmp(ptr+i,"<env>",5)){
-     strcpy(tmp+j,getenv("PATH"));
-     j+=s;
-     i+=4;
-     on=1;
-    }
-    else{
-     tmp[j]=ptr[i];
-     j++;
-    }
-   }
-   i=0;
-   while(strcmp(parameter(tmp,":",i++),"-1")){
-    tmppath=(char *)cwmalloc(strlen(pptr)+strlen(strpname(scrname))+2);
-    sprintf(tmppath,"%s/%s",pptr,strpname(scrname));
-    if(!access(tmppath,X_OK)){
-     if(cfgtable.path)free(cfgtable.path);
-     cfgtable.path=(char *)cwmalloc(strlen(tmppath)+1);
-     strcpy(cfgtable.path,tmppath);
-     free(tmppath);
-     break;
-    }
-    free(tmppath);
-   }
-   free(tmp);
-  }
-  if(!cfgtable.path)c_error(l,cfgmsg[10]);
  }
  else if(!strcmp(parameter(line," ",0),"other")){
   ptr=strtok(line," ");
@@ -946,10 +926,6 @@ void c_read(char *file,signed int argc){
  fclose(fs);
  if(cfgtable.base<0)cfgtable.base=7;
  cfgtable.m.tot=cfgtable.m.cur;
- if(!cfgtable.path&&!cfgtable.cmd)c_error(0,cfgmsg[1]);
- else if(cfgtable.path&&cfgtable.cmd)c_error(0,cfgmsg[22]);
- else return;
- cwexit(1,cfgmsg[46]);
 }
 /* configuration error message. */
 void c_error(unsigned int l,const char *text){

@@ -1,4 +1,3 @@
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 # don't color any potential interactive mode situations.
 ifnarg -:<none>
 base white

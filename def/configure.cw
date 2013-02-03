@@ -3,7 +3,7 @@
 # colors(ANSI) included.  this will simply turn the color off during the
 # next process.  same as make's, sometimes can be the same thing.
 $NOCOLOR_NEXT=1
-path .
+other ./configure
 base grey+
 match green+:default yes$
 match red+:default no$

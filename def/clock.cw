@@ -1,4 +1,3 @@
-path /sbin:/usr/sbin:/bin:/usr/bin:<env>
 base green+
 match cyan+:default [[:digit:]]
 match blue+:default :

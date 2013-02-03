@@ -1,4 +1,3 @@
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 # shell scripts use this a lot, will cause problems being colored.
 ifnarg -g:-G:-n:-r:-u:--group:--groups:--name:--real:--user
 base cyan

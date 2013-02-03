@@ -1,4 +1,3 @@
-path /bin:/usr/bin:/sbin:/usr/sbin:<env>
 # coloring the output stream of tar would create a broken archive.
 ifnarg -c:--create
 base cyan
