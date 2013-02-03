@@ -8,16 +8,10 @@ cw \- color wrapper for common unix commands
 .SH "DESCRIPTION"
 .PP 
 \fBcw\fR is a free color wrapper designed to be a color gateway between programs and the output they produce.  
-The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, except they are located in \fBNONE/libexec/cw/\fR.  The cw executable file in \fBNONE/libexec/cw/\fR will have a \fBpath\fR definition instruction in it to point it to the real program.
+The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, except they are located in \fBNONE/libexec/cw/\fR.
 
-The \fBpath\fR (or \fBother\fR) definition instruction is the only required definition in a cw executable file.
-
-.TP 
-\fBpath\fR [\fIpath:path:...\fR]
-path list separated by colons to the program being wrapped.  \fB<env>\fR can be inserted to use the \fBPATH\fR environment variable (traditional $PATH\-style format)
-.TP 
 \fBother\fR [\fIprogram\fR]
-uses specific program(s), in shell execution format, instead of using \fBpath\fR to find and execute the program.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments  (\fBpath\fR and \fBother\fR can not be used with each other)
+specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
 .TP 
 \fBifarg\fR [\fIregex:regex:...\fR]
 list separated by colons which will be compared against the arguments called to the program.  if the \fBregex\fR matches the arguments, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR definition instruction is used.  "\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments.
