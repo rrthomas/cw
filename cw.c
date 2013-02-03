@@ -173,7 +173,7 @@ static char *parameter(const char *string,const char *delim,size_t p){
  if(!arg){
   free(fptr);
   fptr=arg=(char *)cwmalloc(3);
-  strcpy(arg,"-1");
+  arg=NULL;
  }
  return(pptr=arg);
 }
@@ -186,7 +186,7 @@ static char *remove_dir_from_path(const char *path, const char *dir){
   char *newpath=(char *)cwmalloc(s+1);
   char *tmp=(char *)cwmalloc(s+1);
   strcpy(tmp,path);
-  while(strcmp(parameter(tmp,":",i++),"-1")){
+  while(parameter(tmp,":",i++)){
    char *canon_pptr=canonicalize_file_name(pptr);
    if(strcmp(canon_pptr,canon_dir)){
     if(*newpath)
@@ -568,11 +568,11 @@ static void c_handler(char *line,size_t l,int argc){
  }
  else if(!strcmp(parameter(line," ",0),"ifos")||!strcmp(pptr,"ifnos")){
   cfgtable.ifosa=o=true;
-  if(!strcmp(parameter(line," ",1),"-1"))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
+  if(!parameter(line," ",1))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
    tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
-   for(j=i=0;!j&&strcmp(parameter(tmp,":",i),"-1");i++){
+   for(j=i=0;!j&&!parameter(tmp,":",i);i++){
     if(!strcmp(pptr,"<any>"))j=1;
     else j=(struncmp(pptr)?0:1);
    }
@@ -605,11 +605,11 @@ static void c_handler(char *line,size_t l,int argc){
  else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
  !strcmp(pptr,"ifnarg"))){
   cfgtable.ifarga=o=true;
-  if(!strcmp(parameter(line," ",1),"-1"))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
+  if(!parameter(line," ",1))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
    tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
-   for(j=i=0;!j&&strcmp(parameter(tmp,":",i),"-1");i++){
+   for(j=i=0;!j&&!parameter(tmp,":",i);i++){
     if(!strcmp(pptr,"<any>")||(!strcmp(pptr,"<none>")&&argc<3))j=1;
     else j=!regxcmp(cfgtable.cmdargs,pptr);
    }
@@ -669,7 +669,7 @@ static void c_handler(char *line,size_t l,int argc){
   if(cfgtable.base==16)cfgtable.base=7;
  }
  else if(!strcmp(parameter(line," ",0),"match")){
-  if(strcmp(parameter(line," ",1),"-1")){
+  if(parameter(line," ",1)){
    tmp=(char *)cwmalloc(strlen(pptr)+1);
    match *m=(match *)cwmalloc(sizeof(match));
    strcpy(tmp,pptr);
@@ -686,7 +686,7 @@ static void c_handler(char *line,size_t l,int argc){
     m->a=16;
    }
    free(tmp);
-   if(strcmp(parameter(line," ",2),"-1")){
+   if(parameter(line," ",2)){
     tmp=(char *)cwmalloc(strlen(line)+1);
     strcpy(tmp,line);
     ptr=tmp;
