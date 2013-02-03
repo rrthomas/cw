@@ -6,7 +6,7 @@ FAQ-style readme:
 4. How do I turn cw off?
 5. Is there a more fine-grained way to turn coloring on and off?
 6. How can I make/modify the coloring of a specific program?
-7. Can curses programs be color wrapped?
+7. Can interactive programs be color wrapped?
 8. There are too many different colors!
 9. My terminal has a white background, why can't I see text?
 
@@ -65,7 +65,7 @@ creating the selected definition file (e.g. /usr/local/libexec/cw/df) in your
 favorite text editor and making the desired changes.
 
 
-7. Can curses programs be color wrapped?
+7. Can interactive programs be color wrapped?
 
 not really: cw is only designed for wrapping non-interactive programs.
 
