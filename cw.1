@@ -7,9 +7,10 @@ cw \- color wrapper for common unix commands
 [\fI\-\-version|\-\-help\fR]
 .SH "DESCRIPTION"
 .PP 
-\fBcw\fR is a free color wrapper designed to be a color gateway between programs and the output they produce.  
-The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, except they are located in \fBNONE/libexec/cw/\fR.
-
+\fBcw\fR colors the output of command-line programs. The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, except they are located in \fBNONE/libexec/cw/\fR.
+.SH "DEFINITION INSTRUCTIONS"
+the following instructions occur one per line in a definition file.
+.TP
 \fBcommand\fR [\fIprogram\fR]
 specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
 .TP 
