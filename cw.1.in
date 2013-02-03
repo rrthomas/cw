@@ -88,7 +88,7 @@ sets the internal exit code to the exit code returned by the program/shell expre
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .TP
 \fBCW_COLORIZE\fR
-defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR] ('[' and ']' are not included).  if a second color is provided you may use any colors desired for both fields, however if you place just one color in the variable it must be one of the following colors: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using offbeat combinations do to the method being used to colorize, it is recommended to use the single entry style)
+defines a static colorset to override the definition file (and \fBCW_INVERT\fR) colors.  this is intended to help make a uniform color scheme.  the format is \fBCW_COLORIZE=color\fR[\fB:color\fR].  if a second color is provided you may use any colors desired, however if you place just one color in the variable it must be one of the following: \fBblack, blue, green, cyan, red, purple, brown, grey, grey+\fR (using the dual color entry style can cause irregular coloring using unexpected combinations, so it is recommended to use the single entry style)
 .SH "AUTHOR"
 Written by v9/fakehalo. [v9@fakehalo.us]
 .SH "BUGS"
