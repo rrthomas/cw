@@ -91,12 +91,6 @@ struct{
   signed char h;
   signed char on;
  }z;
- struct{
-  char *ldata;
-  char *rdata;
-  unsigned int llen;
-  unsigned int rlen;
- }b;
 #ifndef NO_PTY
  struct{
   signed int mout;
@@ -369,11 +363,8 @@ static char *convert_string(const char *line){
    on=0;
   }
  }
- buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)
-                      +cfgtable.b.llen+cfgtable.b.rlen+4+1);
- sprintf(buf,"%s%s%s%s%s",(cfgtable.b.llen?cfgtable.b.ldata:"")
- ,pal2[cfgtable.base],tbuf,(cfgtable.b.rlen?cfgtable.b.rdata:""),
- pal2[16]);
+ buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)+4+1);
+ sprintf(buf,"%s%s%s",pal2[cfgtable.base],tbuf,pal2[16]);
  free(tbuf);
  free(aptr);
  return(aptr=buf);
