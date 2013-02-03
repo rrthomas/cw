@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdnoreturn.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdarg.h>
 #include <signal.h>
 #include <string.h>
@@ -52,7 +53,7 @@
 #define HAVE_SETPROCTITLE
 #endif
 #ifdef INT_SETPROCTITLE
-void initsetproctitle(signed int,char **,char **);
+void initsetproctitle(int,char **,char **);
 void setproctitle(const char *,...);
 #endif
 
@@ -66,22 +67,16 @@ struct{
 #endif
 /* configuration table. */
 struct{
- signed char ifarg;
- signed char ifarga;
- signed char ifexit;
- signed char ifexita;
- signed char ifos;
- signed char ifosa;
- signed char base;
- signed char ec;
- signed char eint;
- signed char fc;
- signed char invert;
- signed char nocolor;
- signed char nocolor_stdout;
- signed char nocolor_stderr;
- char *cmd;
- char *cmdargs;
+ bool ifarg, ifarga;
+ bool ifexit, ifexita;
+ bool ifos, ifosa;
+ bool base;
+ bool ec;
+ bool eint;
+ bool fc;
+ bool invert;
+ bool nocolor, nocolor_stdout, nocolor_stderr;
+ char *cmd, *cmdargs;
 #ifdef HAVE_SETPROCTITLE
  char *title;
 #endif
@@ -89,15 +84,15 @@ struct{
  struct{
   signed char l;
   signed char h;
-  signed char on;
+  bool on;
  }z;
 #ifndef NO_PTY
  struct{
-  signed int mout;
-  signed int sout;
-  signed int merr;
-  signed int serr;
-  signed char on;
+  int mout;
+  int sout;
+  int merr;
+  int serr;
+  bool on;
  }p;
 #endif
 }cfgtable;
@@ -111,7 +106,8 @@ typedef struct{
 
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
-static unsigned char ext=0,rexit=0;
+static bool ext=false;
+static unsigned char rexit=0;
 static char *pal2[18],*aptr,*fptr,*pptr,*scrname;
 static pid_t pid_p,pid_c;
 extern char **environ;
@@ -130,8 +126,8 @@ static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
 
 /* configuration error message. */
-void c_error(unsigned int l,const char *text){
- fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
+void c_error(size_t l,const char *text){
+ fprintf(stdout,"cw:definition_error:%zu: %s\n",l,text);
 }
 
 /* exit with or without a reason, resets color too. */
@@ -148,8 +144,8 @@ static void *cwmalloc(size_t n) {
 }
 
 /* checks for a regex match of a string. */
-static unsigned char regxcmp(char *str,char *pattern){
- signed int r=0;
+static bool regxcmp(char *str,char *pattern){
+ int r;
  regex_t re;
  if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
   return(1);
@@ -159,7 +155,7 @@ static unsigned char regxcmp(char *str,char *pattern){
 }
 
 /* scans for a system name match. */
-static unsigned char struncmp(char *cmp){
+static bool struncmp(char *cmp){
  struct utsname un;
  if(uname(&un)<0||!strlen(un.sysname))return(1);
  return regxcmp(un.sysname,cmp);
@@ -215,7 +211,7 @@ static void usage(void){
 
 /* converts the color string to a numerical storage value. (0-17) */
 static _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
- unsigned char i=0;
+ signed char i=0;
  const char **palptr;
  if(cfgtable.invert)palptr=pal1_invert;
  else palptr=pal1;
@@ -239,10 +235,10 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
 /* sets colorize values. */
 static void setcolorize(char *str){
  signed char r=0;
- cfgtable.invert=cfgtable.z.on=0;
+ cfgtable.invert=cfgtable.z.on=false;
  cfgtable.z.l=color_atoi(parameter(str,":",0));
  cfgtable.z.h=color_atoi(parameter(str,":",1));
- if(cfgtable.z.l>=0&&cfgtable.z.h>=0)cfgtable.z.on=1;
+ if(cfgtable.z.l>=0&&cfgtable.z.h>=0)cfgtable.z.on=true;
  else{
   r=color_atoi(str);
   if(r>=0&&r<8){
@@ -253,25 +249,26 @@ static void setcolorize(char *str){
    cfgtable.z.l=8;
    cfgtable.z.h=7;
   }
-  if(r>=0&&r<9)cfgtable.z.on=1;
+  if(r>=0&&r<9)cfgtable.z.on=true;
  }
 }
 
 /* handles and executes other programs. */
-static signed char execot(char *prog,unsigned char type,unsigned int l){
- signed char r=0,on=0;
- signed int e=0;
- unsigned int i=0,j=0,k=0;
+static signed char execot(char *prog,unsigned char type,size_t l){
+ signed char r=0;
+ bool on=false;
+ int e=0;
+ size_t i=0,j=0,k=0;
  char *str;
  pid_t p=0;
  k=strlen(prog);
  str=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
- for(on=j=i=0;k>i;i++){
+ for(j=i=0;k>i;i++){
   if(!on&&!strncmp(prog+i,"{}",2)){
    strcpy(str+j,cfgtable.cmdargs);
    j+=strlen(cfgtable.cmdargs);
    i++;
-   on=1;
+   on=true;
   }
   else{
    str[j]=prog[i];
@@ -307,9 +304,8 @@ static _GL_ATTRIBUTE_PURE char *strpname(char *file){
 
 /* converts the original string to a color string based on the config file. */
 static char *convert_string(const char *line){
- unsigned char on=0;
  gl_list_iterator_t i;
- unsigned int j=0,k=0,l=0;
+ size_t j=0,k=0,l=0;
  const match *m;
  char *buf;
  regex_t re;
@@ -320,7 +316,8 @@ static char *convert_string(const char *line){
  for(j=0,i=gl_list_iterator(cfgtable.m);gl_list_iterator_next(&i,(const void **)&m,NULL);){
   char *tmp,*tmpcmp;
   size_t s=strlen(tbuf);
-  on=j=l=k=0;
+  bool on=false;
+  j=l=k=0;
   if(!regcomp(&re,m->data,REG_EXTENDED)){
    tmp=(char *)cwmalloc(s*(gl_list_size(cfgtable.m)*16+1)+s+1);
    while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
@@ -333,7 +330,7 @@ static char *convert_string(const char *line){
     }
     if(!pm.rm_so&&!pm.rm_eo){
      pm.rm_eo++;
-     on=1;
+     on=true;
     }
     l=(pm.rm_eo-pm.rm_so);
     tmpcmp=(char *)cwmalloc(l+1);
@@ -350,7 +347,7 @@ static char *convert_string(const char *line){
      strcpy(tmp+j,pal2[m->a==16?cfgtable.base:m->a]);
      j+=strlen(pal2[m->a==16?cfgtable.base:m->a]);
     }
-    on=0;
+    on=false;
     k-=pm.rm_so;
     k+=pm.rm_eo;
    }
@@ -360,7 +357,7 @@ static char *convert_string(const char *line){
    tbuf=(char *)cwmalloc(strlen(tmp)+1);
    strcpy(tbuf,tmp);
    free(tmp);
-   on=0;
+   on=false;
   }
  }
  buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)+4+1);
@@ -384,11 +381,11 @@ static signed char make_ptypair(unsigned char v){
 #endif
 
 /* all-purpose signal handler. */
-static void sighandler(signed int sig){
+static void sighandler(int sig){
  if(sig==SIGINT&&cfgtable.eint){
   if(pid_c){
    kill(pid_c,SIGINT);
-   cfgtable.eint=0;
+   cfgtable.eint=false;
   }
  }
 #ifdef SIGCHLD
@@ -396,7 +393,7 @@ static void sighandler(signed int sig){
   if(pid_p)kill(pid_p,SIGUSR1);
  }
 #endif
- else if(sig==SIGUSR1)ext=1;
+ else if(sig==SIGUSR1)ext=true;
  else if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"%s",pal2[16]);
   fflush(stderr);
@@ -405,22 +402,22 @@ static void sighandler(signed int sig){
 }
 
 /* handles and executes the desired program. */
-noreturn void execcw(signed int argc,char **argv){
- unsigned char on=0,son=0;
- int i=0,j=0,k=0;
+noreturn void execcw(int argc,char **argv){
+ bool on=false,son=false;
+ ssize_t i=0,j=0,k=0,s=0;
  signed char re=0;
- signed int fds[2],fde[2],fdm=0,fd=0,s=0,e=0;
+ int fds[2],fde[2],fdm=0,fd=0,e=0;
  char *buf,*tmp;
  fd_set rfds;
 #ifdef SIGCHLD
  struct sigaction sa;
 #endif
  if(!(cfgtable.m))
-  cfgtable.nocolor=1;
+  cfgtable.nocolor=true;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
-  if(!make_ptypair(0)||!make_ptypair(1))cfgtable.p.on=0;
-  else cfgtable.p.on=1;
+  if(!make_ptypair(0)||!make_ptypair(1))cfgtable.p.on=false;
+  else cfgtable.p.on=true;
 #endif
   if(pipe(fds)<0)cwexit(1,"pipe() failed.");
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
@@ -481,7 +478,7 @@ noreturn void execcw(signed int argc,char **argv){
    break;
   default:
    /* parent process to read the program's output. (forwards SIGINT to child) */
-   cfgtable.eint=1;
+   cfgtable.eint=true;
    signal(SIGINT,sighandler);
 #ifdef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
@@ -499,7 +496,7 @@ noreturn void execcw(signed int argc,char **argv){
    }
 #endif
    fdm=((fds[0]>fde[0]?fds[0]:fde[0])+1);
-   while(ext!=1){
+   while(!ext){
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
     FD_SET(fde[0],&rfds);
@@ -511,7 +508,7 @@ noreturn void execcw(signed int argc,char **argv){
       if(!on){
        j=0;
        tmp=(char *)cwmalloc(s+1);
-       on=1;
+       on=true;
       }
       else{
        if(!(tmp=(char *)realloc(tmp,s+j+1)))
@@ -519,13 +516,13 @@ noreturn void execcw(signed int argc,char **argv){
       }
       for(i=0;s>i;i++){
        if(buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
-        son=0;
+        son=false;
         for(k=i+2;!son&&s>k;k++){
          if(buf[k]=='m'){
           if(k-i>2)i+=k-i;
-          son=1;
+          son=true;
          }
-         else if(buf[k]!=';'&&!isdigit((unsigned char)buf[k]))son=1;
+         else if(buf[k]!=';'&&!isdigit((unsigned char)buf[k]))son=true;
         }
        }
        else if(buf[i]=='\n'){
@@ -536,10 +533,10 @@ noreturn void execcw(signed int argc,char **argv){
           fprintf(stderr,"%s\n",cfgtable.nocolor_stderr?tmp:convert_string(tmp));
         fflush(fd==fds[0]?stdout:stderr);
         free(tmp);
-        on=0;
+        on=false;
         if(s>i){
          tmp=(char *)cwmalloc(s-i+1);
-         on=1;
+         on=true;
         }
         j=0;
        }
@@ -560,17 +557,17 @@ noreturn void execcw(signed int argc,char **argv){
 }
 
 /* handles each config file line. */
-static void c_handler(char *line,unsigned int l,signed int argc){
- unsigned char o=0,on=0;
- unsigned int i=0,j=0,k=0;
+static void c_handler(char *line,size_t l,int argc){
+ bool o=false,on=false;
+ size_t i=0,j=0,k=0;
  char *tmp,*ptr;
  if(!strcmp(parameter(line," ",0),"ifos-else")){
-  o=1;
+  o=true;
   if(cfgtable.ifosa)cfgtable.ifos=(cfgtable.ifos?0:1);
   else c_error(l,"'ifos-else' used before any previous comparison.");
  }
  else if(!strcmp(parameter(line," ",0),"ifos")||!strcmp(pptr,"ifnos")){
-  cfgtable.ifosa=o=1;
+  cfgtable.ifosa=o=true;
   if(!strcmp(parameter(line," ",1),"-1"))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
    tmp=(char *)cwmalloc(strlen(pptr)+1);
@@ -586,28 +583,28 @@ static void c_handler(char *line,unsigned int l,signed int argc){
   }
  }
  else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit-else"))){
-  o=1;
+  o=true;
   if(cfgtable.ifexita)cfgtable.ifexit=(cfgtable.ifexit?0:1);
   else c_error(l,"'ifexit-else' used before any previous comparison.");
  }
  else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit")||!strcmp(pptr,"ifnexit"))){
-  cfgtable.ifexita=o=1;
+  cfgtable.ifexita=o=true;
   if(atoi(parameter(line," ",1))>127||atoi(pptr)<-127)
    c_error(l,"'ifexit'/'ifnexit' invalid exit level. (-127..127)");
   else{
-   if(!strcmp(pptr,"<any>")||atoi(pptr)==cfgtable.ec)cfgtable.ifexit=1;
+   if(!strcmp(pptr,"<any>")||atoi(pptr)==cfgtable.ec)cfgtable.ifexit=true;
    if(!strcmp(parameter(line," ",0),"ifexit"))
     cfgtable.ifexit=(cfgtable.ifexit?0:1);
   }
  }
  else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg-else"))){
-  o=1;
+  o=true;
   if(cfgtable.ifarga)cfgtable.ifarg=(cfgtable.ifarg?0:1);
   else c_error(l,"'ifarg-else' used before any previous comparison.");
  }
  else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
  !strcmp(pptr,"ifnarg"))){
-  cfgtable.ifarga=o=1;
+  cfgtable.ifarga=o=true;
   if(!strcmp(parameter(line," ",1),"-1"))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
    tmp=(char *)cwmalloc(strlen(pptr)+1);
@@ -650,12 +647,12 @@ static void c_handler(char *line,unsigned int l,signed int argc){
   if((k=strlen(ptr))){
    if(cfgtable.cmd)free(cfgtable.cmd);
    cfgtable.cmd=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
-   for(on=j=i=0;k>i;i++){
+   for(on=false,j=i=0;k>i;i++){
     if(!on&&!strncmp(ptr+i,"{}",2)){
      strcpy(cfgtable.cmd+j,cfgtable.cmdargs);
      j+=strlen(cfgtable.cmdargs);
      i++;
-     on=1;
+     on=true;
     }
     else{
      cfgtable.cmd[j]=ptr[i];
@@ -705,13 +702,13 @@ static void c_handler(char *line,unsigned int l,signed int argc){
   }
   else c_error(l,"'match' syntax error: cannot find regex argument");
  }
- else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
- else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
+ else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=true;
+ else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=true;
  else if(!o)c_error(l,"invalid definition instruction.");
 }
 
 /* reads the config file, passing the lines to c_handler(). */
-void c_read(char *file,signed int argc){
+void c_read(char *file,int argc){
  size_t i=0,l=0;
  char buf[BUFSIZE+1];
  FILE *fs;
@@ -730,7 +727,7 @@ void c_read(char *file,signed int argc){
 }
 
 /* program start. */
-signed int main(signed int argc,char **argv){
+int main(int argc,char **argv){
  int i=0,j=0;
  char *ptr,*basename,*newpath;
  set_program_name(argv[0]);
@@ -776,14 +773,14 @@ signed int main(signed int argc,char **argv){
  if(getenv("CW_CHK_SETCODE"))
   cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
  cfgtable.base=-1;
- cfgtable.ifarg=cfgtable.ifarga=0;
- cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
+ cfgtable.ifarg=cfgtable.ifarga=false;
+ cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=false;
 #ifndef NO_PTY
- cfgtable.p.on=0;
+ cfgtable.p.on=false;
 #endif
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
- if(getenv("CW_INVERT"))cfgtable.invert=1;
+ if(getenv("CW_INVERT"))cfgtable.invert=true;
  /* Set PATH for child processes; may be overridden by configuration file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
@@ -797,8 +794,8 @@ signed int main(signed int argc,char **argv){
   setenv("NOCOLOR","1",1);
   unsetenv("NOCOLOR_NEXT");
  }
- if(cfgtable.z.on)cfgtable.invert=0;
- if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
+ if(cfgtable.z.on)cfgtable.invert=false;
+ if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=false;
  cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
  cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
  execcw(argc,argv);
@@ -806,7 +803,7 @@ signed int main(signed int argc,char **argv){
 }
 #ifdef INT_SETPROCTITLE
 /* initialize pseudo-setproctitle. */
-void initsetproctitle(signed int argc,char **argv,char **envp){
+void initsetproctitle(int argc,char **argv,char **envp){
  int i=0;
  size_t envpsize=0;
  char *s;
@@ -834,7 +831,7 @@ void initsetproctitle(signed int argc,char **argv,char **envp){
 }
 /* pseudo-setproctitle. */
 void setproctitle(const char *fmt,...){
- unsigned int i;
+ size_t i;
  char buf[BUFSIZE+1];
  char buf2[BUFSIZE+4+1];
  char *p;
@@ -845,7 +842,7 @@ void setproctitle(const char *fmt,...){
  sprintf(buf2,"cw: %s",buf);
  memset(buf,0,sizeof(buf));
  strncpy(buf,buf2,(sizeof(buf)-1));
- if((i=strlen(buf))>proct.largv-proct.argv[0]-2){
+ if((i=strlen(buf))>(size_t)(proct.largv-proct.argv[0]-2)){
   i=proct.largv-proct.argv[0]-2;
   buf[i]=0;
  }
