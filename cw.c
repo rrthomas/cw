@@ -51,25 +51,10 @@
 #define INT_SETPROCTITLE
 #define HAVE_SETPROCTITLE
 #endif
-
-/* prototypes. */
-void sighandler(signed int);
-char *strpname(char *);
-unsigned char strwcmp(char *,char *);
-unsigned char struncmp(char *);
-signed char color_atoi(char *);
-signed char make_ptypair(unsigned char v);
-void setcolorize(char *);
-signed char execot(char *,unsigned char,unsigned int);
-void execcw(signed int,char **);
 #ifdef INT_SETPROCTITLE
 void initsetproctitle(signed int,char **,char **);
 void setproctitle(const char *,...);
 #endif
-void c_handler(char *,unsigned int,signed int);
-void c_read(char *,signed int);
-void c_error(unsigned int,const char *);
-void cwexit(signed char,const char *);
 
 /* pseudo-setproctitle table. */
 #ifdef INT_SETPROCTITLE
@@ -150,10 +135,40 @@ static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
 
+/* configuration error message. */
+void c_error(unsigned int l,const char *text){
+ fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
+}
+
+/* exit with or without a reason, resets color too. */
+noreturn void cwexit(signed char level,const char *reason){
+ if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
+ fflush(stdout);
+ exit(level);
+}
+
 static void *cwmalloc(size_t n) {
  void *p = calloc(1, n);
  if (!p) cwexit(1,"malloc() failed.");
  return p;
+}
+
+/* checks for a regex match of a string. */
+static unsigned char regxcmp(char *str,char *pattern){
+ signed int r=0;
+ regex_t re;
+ if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
+  return(1);
+ r=regexec(&re,str,0,0,0);
+ regfree(&re);
+ return r==REG_NOMATCH;
+}
+
+/* scans for a system name match. */
+static unsigned char struncmp(char *cmp){
+ struct utsname un;
+ if(uname(&un)<0||!strlen(un.sysname))return(1);
+ return regxcmp(un.sysname,cmp);
 }
 
 /* plucks a requested token out of a string. */
@@ -204,101 +219,98 @@ static void usage(void){
  cwexit(0,0);
 }
 
-/* program start. */
-signed int main(signed int argc,char **argv){
- int i=0,j=0;
- char *ptr,*basename,*newpath;
- set_program_name(argv[0]);
- basename=base_name(program_name);
- cfgtable.z.l=cfgtable.z.h=-1;
- cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
- if(!strcmp(basename,"cw")){
-  for(i=1;i<argc;i++){
-   if(!strcmp("--help",argv[i]))
-    usage();
-   else if(!strcmp("--version",argv[i])){
-    cwexit(1,"cw (color wrapper) v"VERSION" (features="
-#ifndef NO_PTY
-           "pty"
-#endif
-#ifdef HAVE_SETPROCTITLE
-           "setproctitle"
-#endif
-           ")");
+/* converts the color string to a numerical storage value. (0-17) */
+static _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
+ unsigned char i=0;
+ const char **palptr;
+ if(cfgtable.invert)palptr=pal1_invert;
+ else palptr=pal1;
+ if(cfgtable.z.on){
+  if(!strcmp(color,"default")){
+   if(cfgtable.base<9)i=cfgtable.z.l;
+   else i=cfgtable.z.h;
+  }
+  else if(!strcmp(color,"none"))i=17;
+  else{
+   if(!strchr(color,'+'))i=cfgtable.z.l;
+   else i=cfgtable.z.h;
+  }
+ }
+ else{
+  while(strcmp(palptr[i],color)&&i<18)i++;
+ }
+ return(i<18?i:-1);
+}
+
+/* sets colorize values. */
+static void setcolorize(char *str){
+ signed char r=0;
+ cfgtable.invert=cfgtable.z.on=0;
+ cfgtable.z.l=color_atoi(parameter(str,":",0));
+ cfgtable.z.h=color_atoi(parameter(str,":",1));
+ if(cfgtable.z.l>=0&&cfgtable.z.h>=0)cfgtable.z.on=1;
+ else{
+  r=color_atoi(str);
+  if(r>=0&&r<8){
+   cfgtable.z.l=r;
+   cfgtable.z.h=(r+8);
+  }
+  else if(r==8){
+   cfgtable.z.l=8;
+   cfgtable.z.h=7;
+  }
+  if(r>=0&&r<9)cfgtable.z.on=1;
+ }
+}
+
+/* handles and executes other programs. */
+static signed char execot(char *prog,unsigned char type,unsigned int l){
+ signed char r=0,on=0;
+ signed int e=0;
+ unsigned int i=0,j=0,k=0;
+ char *str;
+ pid_t p=0;
+ k=strlen(prog);
+ str=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
+ for(on=j=i=0;k>i;i++){
+  if(!on&&!strncmp(prog+i,"{}",2)){
+   strcpy(str+j,cfgtable.cmdargs);
+   j+=strlen(cfgtable.cmdargs);
+   i++;
+   on=1;
+  }
+  else{
+   str[j]=prog[i];
+   j++;
+  }
+ }
+ str[j]=0;
+ switch((p=fork())){
+  case -1:
+   if(type<2)c_error(l,"'!'/'@' failed to execute background program.");
+   break;
+  case 0:
+   if(type==1){
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
    }
-  }
+   execle("/bin/sh","sh","-c",str,(char *)0,environ);
+  default:
+    if(waitpid(p,&e,0)>=0&&WIFEXITED(e))
+     r=WEXITSTATUS(e);
+    else r=0;
  }
- free(basename);
- for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
- cfgtable.cmdargs=(char *)cwmalloc(j+1);
- j=0;
- for(i=2;argc>i;i++){
-  sprintf(cfgtable.cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
-  j+=(strlen(argv[i])+1);
- }
- if(argc>1){
-  if(access(argv[1],F_OK))
-   cwexit(1,"non-existent path to definition file.");
-  scrname=(char *)cwmalloc(strlen(argv[1])+1);
-  strcpy(scrname,argv[1]);
- }
- else
-  usage();
- for(i=0;18>i;i++){
-  pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
-  strcpy(pal2[i],pal2_orig[i]);
- }
- if(getenv("CW_CHK_SETCODE"))
-  cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
- cfgtable.base=-1;
- cfgtable.ifarg=cfgtable.ifarga=0;
- cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
-#ifndef NO_PTY
- cfgtable.p.on=0;
-#endif
- if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
-  setcolorize(ptr);
- if(getenv("CW_INVERT"))cfgtable.invert=1;
- /* Set PATH for child processes; may be overridden by configuration file. */
- newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
- setenv("PATH",newpath,1);
- free(newpath);
- c_read(scrname,argc);
- cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
- cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0); /* FIXME: document this */
- if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
-  cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
- if(getenv("NOCOLOR_NEXT")){
-  setenv("NOCOLOR","1",1);
-  unsetenv("NOCOLOR_NEXT");
- }
- if(cfgtable.z.on)cfgtable.invert=0;
- if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
- cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
- cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
- execcw(argc,argv);
- cwexit(0,0);
+ free(str);
+ return(r);
 }
-/* all-purpose signal handler. */
-void sighandler(signed int sig){
- if(sig==SIGINT&&cfgtable.eint){
-  if(pid_c){
-   kill(pid_c,SIGINT);
-   cfgtable.eint=0;
-  }
- }
-#ifdef SIGCHLD
- else if(sig==SIGCHLD){
-  if(pid_p)kill(pid_p,SIGUSR1);
- }
-#endif
- else if(sig==SIGUSR1)ext=1;
- else if(sig==SIGPIPE||sig==SIGINT){
-  fprintf(stderr,"%s",pal2[16]);
-  fflush(stderr);
-  cwexit(0,0);
- }
+
+/* just like basename(), except no conflicts on different systems. */
+static _GL_ATTRIBUTE_PURE char *strpname(char *file){
+ char *ptr=strrchr(file,'/');
+ return(ptr?ptr+1:file);
 }
+
 /* converts the original string to a color string based on the config file. */
 static char *convert_string(const char *line){
  unsigned char on=0;
@@ -366,62 +378,10 @@ static char *convert_string(const char *line){
  free(aptr);
  return(aptr=buf);
 }
-/* just like basename(), except no conflicts on different systems. */
-_GL_ATTRIBUTE_PURE char *strpname(char *file){
- char *ptr=strrchr(file,'/');
- return(ptr?ptr+1:file);
-}
-/* scans for the match/wildcard in a string. */
-_GL_ATTRIBUTE_PURE unsigned char strwcmp(char *line1,char *line2){
- unsigned int i=0,s=0,t=0;
- s=strlen(line1);
- t=strlen(line2);
- for(i=0;i<s&&i<t;i++)
-  /* don't count wildcard matches of 0x1b. */
-  if(line1[i]!=line2[i]&&!(line1[i]!='\x1b'&&line2[i]==-1))return(1);
- return(i==t?0:1);
-}
-/* checks for a regex match of a string. */
-static unsigned char regxcmp(char *str,char *pattern){
- signed int r=0;
- regex_t re;
- if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
-  return(1);
- r=regexec(&re,str,0,0,0);
- regfree(&re);
- return r==REG_NOMATCH;
-}
-/* scans for a system name match. */
-unsigned char struncmp(char *cmp){
- struct utsname un;
- if(uname(&un)<0||!strlen(un.sysname))return(1);
- return regxcmp(un.sysname,cmp);
-}
-/* converts the color string to a numerical storage value. (0-17) */
-_GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
- unsigned char i=0;
- const char **palptr;
- if(cfgtable.invert)palptr=pal1_invert;
- else palptr=pal1;
- if(cfgtable.z.on){
-  if(!strcmp(color,"default")){
-   if(cfgtable.base<9)i=cfgtable.z.l;
-   else i=cfgtable.z.h;
-  }
-  else if(!strcmp(color,"none"))i=17;
-  else{
-   if(!strchr(color,'+'))i=cfgtable.z.l;
-   else i=cfgtable.z.h;
-  }
- }
- else{
-  while(strcmp(palptr[i],color)&&i<18)i++;
- }
- return(i<18?i:-1);
-}
+
 #ifndef NO_PTY
 /* creates a pty pair. (master/slave) */
-signed char make_ptypair(unsigned char v){
+static signed char make_ptypair(unsigned char v){
  if(v){
   if(openpty(&cfgtable.p.merr,&cfgtable.p.serr,0,0,0))return(0);
  }
@@ -431,67 +391,28 @@ signed char make_ptypair(unsigned char v){
  return(1);
 }
 #endif
-/* sets colorize values. */
-void setcolorize(char *str){
- signed char r=0;
- cfgtable.invert=cfgtable.z.on=0;
- cfgtable.z.l=color_atoi(parameter(str,":",0));
- cfgtable.z.h=color_atoi(parameter(str,":",1));
- if(cfgtable.z.l>=0&&cfgtable.z.h>=0)cfgtable.z.on=1;
- else{
-  r=color_atoi(str);
-  if(r>=0&&r<8){
-   cfgtable.z.l=r;
-   cfgtable.z.h=(r+8);
+
+/* all-purpose signal handler. */
+static void sighandler(signed int sig){
+ if(sig==SIGINT&&cfgtable.eint){
+  if(pid_c){
+   kill(pid_c,SIGINT);
+   cfgtable.eint=0;
   }
-  else if(r==8){
-   cfgtable.z.l=8;
-   cfgtable.z.h=7;
-  }
-  if(r>=0&&r<9)cfgtable.z.on=1;
+ }
+#ifdef SIGCHLD
+ else if(sig==SIGCHLD){
+  if(pid_p)kill(pid_p,SIGUSR1);
+ }
+#endif
+ else if(sig==SIGUSR1)ext=1;
+ else if(sig==SIGPIPE||sig==SIGINT){
+  fprintf(stderr,"%s",pal2[16]);
+  fflush(stderr);
+  cwexit(0,0);
  }
 }
-/* handles and executes other programs. */
-signed char execot(char *prog,unsigned char type,unsigned int l){
- signed char r=0,on=0;
- signed int e=0;
- unsigned int i=0,j=0,k=0;
- char *str;
- pid_t p=0;
- k=strlen(prog);
- str=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
- for(on=j=i=0;k>i;i++){
-  if(!on&&!strncmp(prog+i,"{}",2)){
-   strcpy(str+j,cfgtable.cmdargs);
-   j+=strlen(cfgtable.cmdargs);
-   i++;
-   on=1;
-  }
-  else{
-   str[j]=prog[i];
-   j++;
-  }
- }
- str[j]=0;
- switch((p=fork())){
-  case -1:
-   if(type<2)c_error(l,"'!'/'@' failed to execute background program.");
-   break;
-  case 0:
-   if(type==1){
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-   }
-   execle("/bin/sh","sh","-c",str,(char *)0,environ);
-  default:
-    if(waitpid(p,&e,0)>=0&&WIFEXITED(e))
-     r=WEXITSTATUS(e);
-    else r=0;
- }
- free(str);
- return(r);
-}
+
 /* handles and executes the desired program. */
 noreturn void execcw(signed int argc,char **argv){
  unsigned char on=0,son=0;
@@ -646,59 +567,9 @@ noreturn void execcw(signed int argc,char **argv){
    break;
  }
 }
-#ifdef INT_SETPROCTITLE
-/* initialize pseudo-setproctitle. */
-void initsetproctitle(signed int argc,char **argv,char **envp){
- int i=0;
- size_t envpsize=0;
- char *s;
- for(i=0;envp[i]!=0;i++)
-  envpsize+=(strlen(envp[i])+1);
- environ=(char **)cwmalloc((sizeof(char *)*(i+1))+envpsize+1);
- s=((char *)environ)+((sizeof(char *)*(i+1)));
- for(i=0;envp[i]!=0;i++){
-  strcpy(s,envp[i]);
-  environ[i]=s;
-  s+=(strlen(s)+1);
- }
- environ[i]=0;
- proct.name=(char *)cwmalloc(strlen(argv[0])+1);
- strcpy(proct.name,argv[0]);
- proct.argv=argv;
- for(i=0;i<argc;i++){
-  if(i==0||proct.largv+1==argv[i])
-   proct.largv=(argv[i]+strlen(argv[i]));
- }
- for(i=0;envp[i]!=0;i++){
-  if(proct.largv+1==envp[i])
-   proct.largv=(envp[i]+strlen(envp[i]));
- }
-}
-/* pseudo-setproctitle. */
-void setproctitle(const char *fmt,...){
- unsigned int i;
- char buf[BUFSIZE+1];
- char buf2[BUFSIZE+4+1];
- char *p;
- va_list param;
- va_start(param,fmt);
- vsnprintf(buf,sizeof(buf),fmt,param);
- va_end(param);
- sprintf(buf2,"cw: %s",buf);
- memset(buf,0,sizeof(buf));
- strncpy(buf,buf2,(sizeof(buf)-1));
- if((i=strlen(buf))>proct.largv-proct.argv[0]-2){
-  i=proct.largv-proct.argv[0]-2;
-  buf[i]=0;
- }
- strcpy(proct.argv[0],buf);
- p=&proct.argv[0][i];
- while(p<proct.largv)*p++=0;
- proct.argv[1]=0;
-}
-#endif
-/* handles each config file line. (data sizes allocated in c_read()) */
-void c_handler(char *line,unsigned int l,signed int argc){
+
+/* handles each config file line. */
+static void c_handler(char *line,unsigned int l,signed int argc){
  unsigned char o=0,on=0;
  unsigned int i=0,j=0,k=0;
  char *tmp,*ptr;
@@ -847,6 +718,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
  else if(!o)c_error(l,"invalid definition instruction.");
 }
+
 /* reads the config file, passing the lines to c_handler(). */
 void c_read(char *file,signed int argc){
  size_t i=0,l=0;
@@ -865,13 +737,130 @@ void c_read(char *file,signed int argc){
  fclose(fs);
  if(cfgtable.base<0)cfgtable.base=7;
 }
-/* configuration error message. */
-void c_error(unsigned int l,const char *text){
- fprintf(stdout,"cw:definition_error:%u: %s\n",l,text);
+
+/* program start. */
+signed int main(signed int argc,char **argv){
+ int i=0,j=0;
+ char *ptr,*basename,*newpath;
+ set_program_name(argv[0]);
+ basename=base_name(program_name);
+ cfgtable.z.l=cfgtable.z.h=-1;
+ cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
+ if(!strcmp(basename,"cw")){
+  for(i=1;i<argc;i++){
+   if(!strcmp("--help",argv[i]))
+    usage();
+   else if(!strcmp("--version",argv[i])){
+    cwexit(1,"cw (color wrapper) v"VERSION" (features="
+#ifndef NO_PTY
+           "pty"
+#endif
+#ifdef HAVE_SETPROCTITLE
+           "setproctitle"
+#endif
+           ")");
+   }
+  }
+ }
+ free(basename);
+ for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
+ cfgtable.cmdargs=(char *)cwmalloc(j+1);
+ j=0;
+ for(i=2;argc>i;i++){
+  sprintf(cfgtable.cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
+  j+=(strlen(argv[i])+1);
+ }
+ if(argc>1){
+  if(access(argv[1],F_OK))
+   cwexit(1,"non-existent path to definition file.");
+  scrname=(char *)cwmalloc(strlen(argv[1])+1);
+  strcpy(scrname,argv[1]);
+ }
+ else
+  usage();
+ for(i=0;18>i;i++){
+  pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
+  strcpy(pal2[i],pal2_orig[i]);
+ }
+ if(getenv("CW_CHK_SETCODE"))
+  cfgtable.ec=execot(getenv("CW_CHK_SETCODE"),2,0);
+ cfgtable.base=-1;
+ cfgtable.ifarg=cfgtable.ifarga=0;
+ cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=0;
+#ifndef NO_PTY
+ cfgtable.p.on=0;
+#endif
+ if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
+  setcolorize(ptr);
+ if(getenv("CW_INVERT"))cfgtable.invert=1;
+ /* Set PATH for child processes; may be overridden by configuration file. */
+ newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
+ setenv("PATH",newpath,1);
+ free(newpath);
+ c_read(scrname,argc);
+ cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
+ cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0); /* FIXME: document this */
+ if(!cfgtable.nocolor&&getenv("CW_CHK_NOCOLOR"))
+  cfgtable.nocolor=(execot(getenv("CW_CHK_NOCOLOR"),2,0)?1:0);
+ if(getenv("NOCOLOR_NEXT")){
+  setenv("NOCOLOR","1",1);
+  unsetenv("NOCOLOR_NEXT");
+ }
+ if(cfgtable.z.on)cfgtable.invert=0;
+ if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=0;
+ cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
+ cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
+ execcw(argc,argv);
+ cwexit(0,0);
 }
-/* exit with or without a reason, resets color too. */
-noreturn void cwexit(signed char level,const char *reason){
- if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
- fflush(stdout);
- exit(level);
+#ifdef INT_SETPROCTITLE
+/* initialize pseudo-setproctitle. */
+void initsetproctitle(signed int argc,char **argv,char **envp){
+ int i=0;
+ size_t envpsize=0;
+ char *s;
+ for(i=0;envp[i]!=0;i++)
+  envpsize+=(strlen(envp[i])+1);
+ environ=(char **)cwmalloc((sizeof(char *)*(i+1))+envpsize+1);
+ s=((char *)environ)+((sizeof(char *)*(i+1)));
+ for(i=0;envp[i]!=0;i++){
+  strcpy(s,envp[i]);
+  environ[i]=s;
+  s+=(strlen(s)+1);
+ }
+ environ[i]=0;
+ proct.name=(char *)cwmalloc(strlen(argv[0])+1);
+ strcpy(proct.name,argv[0]);
+ proct.argv=argv;
+ for(i=0;i<argc;i++){
+  if(i==0||proct.largv+1==argv[i])
+   proct.largv=(argv[i]+strlen(argv[i]));
+ }
+ for(i=0;envp[i]!=0;i++){
+  if(proct.largv+1==envp[i])
+   proct.largv=(envp[i]+strlen(envp[i]));
+ }
 }
+/* pseudo-setproctitle. */
+void setproctitle(const char *fmt,...){
+ unsigned int i;
+ char buf[BUFSIZE+1];
+ char buf2[BUFSIZE+4+1];
+ char *p;
+ va_list param;
+ va_start(param,fmt);
+ vsnprintf(buf,sizeof(buf),fmt,param);
+ va_end(param);
+ sprintf(buf2,"cw: %s",buf);
+ memset(buf,0,sizeof(buf));
+ strncpy(buf,buf2,(sizeof(buf)-1));
+ if((i=strlen(buf))>proct.largv-proct.argv[0]-2){
+  i=proct.largv-proct.argv[0]-2;
+  buf[i]=0;
+ }
+ strcpy(proct.argv[0],buf);
+ p=&proct.argv[0][i];
+ while(p<proct.largv)*p++=0;
+ proct.argv[1]=0;
+}
+#endif
