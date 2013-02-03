@@ -146,46 +146,6 @@ static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
-static const char *cfgmsg[]={
- "invalid definition instruction.",
- "NO SUCH ERROR",
- "'match' definition used an invalid color. (defaulting)",
- "'match' too many entries. (race condition?)",
- "'match' syntax error. (not enough arguments?)",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "'base' definition used an invalid color.",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "'ifarg'/'ifnarg' syntax error. (not enough arguments?)",
- "NO SUCH ERROR",
- "'other' syntax error. (not enough arguments?)",
- "environment variable placement syntax error. (not enough arguments?)",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "'ifos'/'ifnos' syntax error. (not enough arguments?)",
- "'ifos-else' used before any previous comparison.",
- "'ifarg-else' used before any previous comparison.",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "NO SUCH ERROR",
- "'!'/'@' failed to execute background program.",
- "'ifexit'/'ifnexit' invalid exit level. (-127..127)",
- "'ifexit-else' used before any previous comparison."};
 
 static void *cwmalloc(size_t n) {
  void *p = calloc(1, n);
@@ -515,7 +475,7 @@ signed char execot(char *prog,unsigned char type,unsigned int l){
  str[j]=0;
  switch((p=fork())){
   case -1:
-   if(type<2)c_error(l,cfgmsg[36]);
+   if(type<2)c_error(l,"'!'/'@' failed to execute background program.");
    break;
   case 0:
    if(type==1){
@@ -745,11 +705,11 @@ void c_handler(char *line,unsigned int l,signed int argc){
  if(!strcmp(parameter(line," ",0),"ifos-else")){
   o=1;
   if(cfgtable.ifosa)cfgtable.ifos=(cfgtable.ifos?0:1);
-  else c_error(l,cfgmsg[31]);
+  else c_error(l,"'ifos-else' used before any previous comparison.");
  }
  else if(!strcmp(parameter(line," ",0),"ifos")||!strcmp(pptr,"ifnos")){
   cfgtable.ifosa=o=1;
-  if(!strcmp(parameter(line," ",1),"-1"))c_error(l,cfgmsg[30]);
+  if(!strcmp(parameter(line," ",1),"-1"))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
    tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
@@ -766,12 +726,12 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit-else"))){
   o=1;
   if(cfgtable.ifexita)cfgtable.ifexit=(cfgtable.ifexit?0:1);
-  else c_error(l,cfgmsg[38]);
+  else c_error(l,"'ifexit-else' used before any previous comparison.");
  }
  else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit")||!strcmp(pptr,"ifnexit"))){
   cfgtable.ifexita=o=1;
   if(atoi(parameter(line," ",1))>127||atoi(pptr)<-127)
-   c_error(l,cfgmsg[37]);
+   c_error(l,"'ifexit'/'ifnexit' invalid exit level. (-127..127)");
   else{
    if(!strcmp(pptr,"<any>")||atoi(pptr)==cfgtable.ec)cfgtable.ifexit=1;
    if(!strcmp(parameter(line," ",0),"ifexit"))
@@ -781,12 +741,12 @@ void c_handler(char *line,unsigned int l,signed int argc){
  else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg-else"))){
   o=1;
   if(cfgtable.ifarga)cfgtable.ifarg=(cfgtable.ifarg?0:1);
-  else c_error(l,cfgmsg[32]);
+  else c_error(l,"'ifarg-else' used before any previous comparison.");
  }
  else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
  !strcmp(pptr,"ifnarg"))){
   cfgtable.ifarga=o=1;
-  if(!strcmp(parameter(line," ",1),"-1"))c_error(l,cfgmsg[18]);
+  if(!strcmp(parameter(line," ",1),"-1"))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
    tmp=(char *)cwmalloc(strlen(pptr)+1);
    strcpy(tmp,pptr);
@@ -813,10 +773,10 @@ void c_handler(char *line,unsigned int l,signed int argc){
    line=strtok(0,"");
    if(line&&strlen(line))
     setenv(tmp,line,1);
-   else c_error(l,cfgmsg[21]);
+   else c_error(l,"environment variable value missing.");
    free(tmp);
   }
-  else c_error(l,cfgmsg[21]);
+  else c_error(l,"environment variable name missing.");
  }
  else if(line[0]=='!'||line[0]=='@'){
   if(strlen(line)>1)
@@ -842,11 +802,11 @@ void c_handler(char *line,unsigned int l,signed int argc){
    }
    cfgtable.cmd[j]=0;
   }
-  else c_error(l,cfgmsg[20]);
+  else c_error(l,"'other' instruction missing command.");
  }
  else if(!strcmp(parameter(line," ",0),"base")){
   if((cfgtable.base=color_atoi(parameter(line," ",1)))<0)
-   c_error(l,cfgmsg[11]);
+   c_error(l,"'base' definition used an invalid color.");
   if(cfgtable.base==16)cfgtable.base=7;
  }
  else if(!strcmp(parameter(line," ",0),"match")){
@@ -856,13 +816,13 @@ void c_handler(char *line,unsigned int l,signed int argc){
    if(color_atoi(parameter(tmp,":",0))>-1)
     cfgtable.m.b[cfgtable.m.cur]=color_atoi(parameter(tmp,":",0));
    else{
-    c_error(l,cfgmsg[2]);
+    c_error(l,"invalid first color in 'match' definition. (defaulting)");
     cfgtable.m.b[cfgtable.m.cur]=16;
    }
    if(color_atoi(parameter(tmp,":",1))>-1)
     cfgtable.m.a[cfgtable.m.cur]=color_atoi(parameter(tmp,":",1));
    else{
-    c_error(l,cfgmsg[2]);
+    c_error(l,"invalid second color in 'match' definition. (defaulting)");
     cfgtable.m.a[cfgtable.m.cur]=16;
    }
    free(tmp);
@@ -874,7 +834,7 @@ void c_handler(char *line,unsigned int l,signed int argc){
     tmp=strtok(0," ");
     tmp=strtok(0,"");
     if(cfgtable.m.cur>cfgtable.m.tot)
-     c_error(l,cfgmsg[3]);
+     c_error(l,"'match' too many entries. (race condition?)");
     else{
      cfgtable.m.data[cfgtable.m.cur]=(char *)cwmalloc(strlen(tmp)+1);
      strcpy(cfgtable.m.data[cfgtable.m.cur],tmp);
@@ -882,13 +842,13 @@ void c_handler(char *line,unsigned int l,signed int argc){
     }
     free(ptr);
    }
-   else c_error(l,cfgmsg[4]);
+   else c_error(l,"'match' syntax error: cannot find colors argument)");
   }
-  else c_error(l,cfgmsg[4]);
+  else c_error(l,"'match' syntax error: cannot find regex argument");
  }
  else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=1;
  else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=1;
- else if(!o)c_error(l,cfgmsg[0]);
+ else if(!o)c_error(l,"invalid definition instruction.");
 }
 /* reads (and allocates space for) the config file to be passed to c_handler(). */
 void c_read(char *file,signed int argc){
