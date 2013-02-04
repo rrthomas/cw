@@ -46,6 +46,8 @@
 #include "gl_linked_list.h"
 #include "xalloc.h"
 
+#define BUFSIZE 1024
+
 #ifndef HAVE_OPENPTY
 #define NO_PTY
 #endif
@@ -54,18 +56,57 @@
 #define HAVE_SETPROCTITLE
 #endif
 #ifdef INT_SETPROCTITLE
-void initsetproctitle(int,char **,char **);
-void setproctitle(const char *,...);
-#endif
-
-/* pseudo-setproctitle table. */
-#ifdef INT_SETPROCTITLE
 struct{
  char **argv;
  char *largv;
  char *name;
 }proct;
+/* initialize pseudo-setproctitle. */
+static void initsetproctitle(int argc,char **argv,char **envp){
+ int i=0;
+ size_t envpsize=0;
+ char *s;
+ for(i=0;envp[i]!=0;i++)
+  envpsize+=(strlen(envp[i])+1);
+ environ=(char **)xzalloc((sizeof(char *)*(i+1))+envpsize+1);
+ s=((char *)environ)+((sizeof(char *)*(i+1)));
+ for(i=0;envp[i]!=0;i++){
+  strcpy(s,envp[i]);
+  environ[i]=s;
+  s+=(strlen(s)+1);
+ }
+ environ[i]=0;
+ proct.name=xstrdup(argv[0]);
+ proct.argv=argv;
+ for(i=0;i<argc;i++){
+  if(i==0||proct.largv+1==argv[i])
+   proct.largv=(argv[i]+strlen(argv[i]));
+ }
+ for(i=0;envp[i]!=0;i++){
+  if(proct.largv+1==envp[i])
+   proct.largv=(envp[i]+strlen(envp[i]));
+ }
+}
+/* pseudo-setproctitle. */
+static void setproctitle(const char *fmt,...){
+ size_t i;
+ char buf[BUFSIZE+1];
+ char *p;
+ va_list param;
+ va_start(param,fmt);
+ vsnprintf(buf,sizeof(buf),fmt,param);
+ va_end(param);
+ if((i=strlen(buf))>(size_t)(proct.largv-proct.argv[0]-2)){
+  i=proct.largv-proct.argv[0]-2;
+  buf[i]='\0';
+ }
+ strcpy(proct.argv[0],buf);
+ p=&proct.argv[0][i];
+ while(p<proct.largv)*p++=0;
+ proct.argv[1]=0;
+}
 #endif
+
 /* configuration table. */
 struct{
  bool ifarg, ifarga;
@@ -111,8 +152,6 @@ static unsigned char rexit=0;
 static char *pal2[18],*aptr,*fptr,*pptr,*scrname;
 static pid_t pid_p,pid_c;
 extern char **environ;
-
-#define BUFSIZE 1024
 
 static const char *pal1[]={"black","blue","green","cyan","red","purple","brown",
  "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",
@@ -715,49 +754,3 @@ int main(int argc,char **argv){
  execcw(argc,argv);
  cwexit(0,0);
 }
-#ifdef INT_SETPROCTITLE
-/* initialize pseudo-setproctitle. */
-void initsetproctitle(int argc,char **argv,char **envp){
- int i=0;
- size_t envpsize=0;
- char *s;
- for(i=0;envp[i]!=0;i++)
-  envpsize+=(strlen(envp[i])+1);
- environ=(char **)xzalloc((sizeof(char *)*(i+1))+envpsize+1);
- s=((char *)environ)+((sizeof(char *)*(i+1)));
- for(i=0;envp[i]!=0;i++){
-  strcpy(s,envp[i]);
-  environ[i]=s;
-  s+=(strlen(s)+1);
- }
- environ[i]=0;
- proct.name=xstrdup(argv[0]);
- proct.argv=argv;
- for(i=0;i<argc;i++){
-  if(i==0||proct.largv+1==argv[i])
-   proct.largv=(argv[i]+strlen(argv[i]));
- }
- for(i=0;envp[i]!=0;i++){
-  if(proct.largv+1==envp[i])
-   proct.largv=(envp[i]+strlen(envp[i]));
- }
-}
-/* pseudo-setproctitle. */
-void setproctitle(const char *fmt,...){
- size_t i;
- char buf[BUFSIZE+1];
- char *p;
- va_list param;
- va_start(param,fmt);
- vsnprintf(buf,sizeof(buf),fmt,param);
- va_end(param);
- if((i=strlen(buf))>(size_t)(proct.largv-proct.argv[0]-2)){
-  i=proct.largv-proct.argv[0]-2;
-  buf[i]='\0';
- }
- strcpy(proct.argv[0],buf);
- p=&proct.argv[0][i];
- while(p<proct.largv)*p++=0;
- proct.argv[1]=0;
-}
-#endif
