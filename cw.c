@@ -715,13 +715,11 @@ int main(int argc,char **argv){
   sprintf(cfgtable.cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
   j+=(strlen(argv[i])+1);
  }
- if(argc>1){
-  if(access(argv[1],F_OK))
-   cwexit(1,"non-existent path to definition file.");
-  scrname=xstrdup(argv[1]);
- }
- else
+ if(argc<=1)
   usage();
+ if(access(argv[1],F_OK))
+  cwexit(1,"cannot find definition file.");
+ scrname=xstrdup(argv[1]);
  for(i=0;18>i;i++)
   pal2[i]=xstrdup(pal2_orig[i]);
  cfgtable.base=-1;
@@ -730,7 +728,7 @@ int main(int argc,char **argv){
 #ifndef NO_PTY
  cfgtable.p.on=false;
 #endif
- if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
+ if(!cfgtable.z.on&&(ptr=getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=true;
  /* Set PATH for child processes; may be overridden by definition file. */
