@@ -114,7 +114,6 @@ struct{
  bool base;
  bool ec;
  bool eint;
- bool fc;
  bool invert;
  bool nocolor, nocolor_stdout, nocolor_stderr;
  char *cmd, *cmdargs;
@@ -451,10 +450,10 @@ noreturn void execcw(int argc,char **argv){
      cwexit(1,"dup2() failed.");
     close(fde[0]);
     close(fde[1]);
-   }
 #ifdef HAVE_SETSID
-   if(!cfgtable.nocolor)setsid();
+    setsid();
 #endif
+   }
    if(cfgtable.cmd)
     execle("/bin/sh",strpname(scrname),"-c",cfgtable.cmd,(char *)0,environ);
    else{
@@ -662,8 +661,6 @@ static void c_handler(char *line,size_t l,int argc){
   }
   else c_error(l,"'match' syntax error: cannot find regex argument");
  }
- else if(!strcmp(parameter(line," ",0),"nocolor"))cfgtable.nocolor=true;
- else if(!strcmp(parameter(line," ",0),"forcecolor"))cfgtable.fc=true;
  else if(!o)c_error(l,"invalid definition instruction.");
 }
 
@@ -748,7 +745,6 @@ int main(int argc,char **argv){
   unsetenv("NOCOLOR_NEXT");
  }
  if(cfgtable.z.on)cfgtable.invert=false;
- if(cfgtable.fc&&cfgtable.nocolor)cfgtable.nocolor=false;
  cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
  cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
  execcw(argc,argv);

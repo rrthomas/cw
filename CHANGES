@@ -36,6 +36,7 @@ version 1.0.17:
 ! Renamed other instruction to 'command'.
 ! Removed CW_CHK_SETCODE and CW_CHK_NOCOLOR environment variables.
 ! Removed ifexit, ifexit-else and ifnexit instructions, and ! and @ commands.
+! Removed nocolor and forcecolor instructions.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
