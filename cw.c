@@ -44,6 +44,7 @@
 #include "dirname.h"
 #include "gl_xlist.h"
 #include "gl_linked_list.h"
+#include "xalloc.h"
 
 #ifndef HAVE_OPENPTY
 #define NO_PTY
@@ -137,10 +138,8 @@ noreturn void cwexit(signed char level,const char *reason){
  exit(level);
 }
 
-static void *cwmalloc(size_t n) {
- void *p = calloc(1, n);
- if (!p) cwexit(1,"malloc() failed.");
- return p;
+void xalloc_die(void) {
+ cwexit(1,"malloc() failed.");
 }
 
 /* checks for a regex match of a string. */
@@ -166,13 +165,12 @@ static char *parameter(const char *string,const char *delim,size_t p){
  size_t n=p;
  char *arg;
  free(fptr);
- fptr=arg=(char *)cwmalloc(strlen(string)+1);
- strcpy(arg,string);
+ fptr=arg=xstrdup(string);
  arg=strtok(arg,delim);
  while(n&&(arg=strtok(0,delim)))n--;
  if(!arg){
   free(fptr);
-  fptr=arg=(char *)cwmalloc(3);
+  fptr=arg=(char *)xzalloc(3);
   arg=NULL;
  }
  return(pptr=arg);
@@ -183,9 +181,8 @@ static char *remove_dir_from_path(const char *path, const char *dir){
  if(path){
   char *canon_dir=canonicalize_file_name(dir);
   size_t s=strlen(path),i=0;
-  char *newpath=(char *)cwmalloc(s+1);
-  char *tmp=(char *)cwmalloc(s+1);
-  strcpy(tmp,path);
+  char *newpath=(char *)xzalloc(s+1);
+  char *tmp=xstrdup(path);
   while(parameter(tmp,":",i++)){
    char *canon_pptr=canonicalize_file_name(pptr);
    if(strcmp(canon_pptr,canon_dir)){
@@ -258,11 +255,9 @@ static signed char execot(char *prog,bool no_io,size_t l){
  signed char r=0;
  bool on=false;
  int e=0;
- size_t i=0,j=0,k=0;
- char *str;
+ size_t i=0,j=0,k=strlen(prog);
  pid_t p=0;
- k=strlen(prog);
- str=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
+ char *str=(char *)xzalloc(k+strlen(cfgtable.cmdargs)+1);
  for(j=i=0;k>i;i++){
   if(!on&&!strncmp(prog+i,"{}",2)){
    strcpy(str+j,cfgtable.cmdargs);
@@ -310,19 +305,17 @@ static char *convert_string(const char *line){
  char *buf;
  regex_t re;
  regmatch_t pm;
- char *tbuf=(char *)cwmalloc(strlen(line)+1);
- strcpy(tbuf,line);
+ char *tbuf=xstrdup(line);
  /* start processing the 'match' definitions. */
  for(j=0,i=gl_list_iterator(cfgtable.m);gl_list_iterator_next(&i,(const void **)&m,NULL);){
-  char *tmp,*tmpcmp;
   size_t s=strlen(tbuf);
   bool on=false;
   j=l=k=0;
   if(!regcomp(&re,m->data,REG_EXTENDED)){
-   tmp=(char *)cwmalloc(s*(gl_list_size(cfgtable.m)*16+1)+s+1);
+   char *tmpcmp,*tmp=(char *)xzalloc(s*(gl_list_size(cfgtable.m)*16+1)+s+1);
    while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
     if(pm.rm_so){
-     tmpcmp=(char *)cwmalloc(pm.rm_so+1);
+     tmpcmp=(char *)xzalloc(pm.rm_so+1);
      strncpy(tmpcmp,tbuf+k,pm.rm_so);
      strcpy(tmp+j,tmpcmp);
      j+=strlen(tmpcmp);
@@ -333,7 +326,7 @@ static char *convert_string(const char *line){
      on=true;
     }
     l=(pm.rm_eo-pm.rm_so);
-    tmpcmp=(char *)cwmalloc(l+1);
+    tmpcmp=(char *)xzalloc(l+1);
     k+=pm.rm_so;
     strncpy(tmpcmp,tbuf+k,l);
     if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->b!=17){
@@ -354,13 +347,11 @@ static char *convert_string(const char *line){
    regfree(&re);
    if(s>k)strcpy(tmp+j,tbuf+k);
    free(tbuf);
-   tbuf=(char *)cwmalloc(strlen(tmp)+1);
-   strcpy(tbuf,tmp);
-   free(tmp);
+   tbuf=tmp;
    on=false;
   }
  }
- buf=(char *)cwmalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)+4+1);
+ buf=(char *)xzalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)+4+1);
  sprintf(buf,"%s%s%s",pal2[cfgtable.base],tbuf,pal2[16]);
  free(tbuf);
  free(aptr);
@@ -484,9 +475,9 @@ noreturn void execcw(int argc,char **argv){
 #ifdef INT_SETPROCTITLE
    initsetproctitle(argc,argv,environ);
 #endif
-   setproctitle("wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
+   setproctitle("cw: wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
 #endif
-   buf=(char *)cwmalloc(BUFSIZE+1);
+   buf=(char *)xzalloc(BUFSIZE+1);
 #ifndef NO_PTY
    if(cfgtable.p.on){
     close(fds[0]);
@@ -507,13 +498,11 @@ noreturn void execcw(int argc,char **argv){
      if((s=read(fd,buf,BUFSIZE))&&s>0){
       if(!on){
        j=0;
-       tmp=(char *)cwmalloc(s+1);
+       tmp=(char *)xzalloc(s+1);
        on=true;
       }
-      else{
-       if(!(tmp=(char *)realloc(tmp,s+j+1)))
-        cwexit(1,"realloc() failed.");
-      }
+      else
+       tmp=(char *)xrealloc(tmp,s+j+1);
       for(i=0;s>i;i++){
        if(buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
         son=false;
@@ -535,7 +524,7 @@ noreturn void execcw(int argc,char **argv){
         free(tmp);
         on=false;
         if(s>i){
-         tmp=(char *)cwmalloc(s-i+1);
+         tmp=(char *)xzalloc(s-i+1);
          on=true;
         }
         j=0;
@@ -570,8 +559,7 @@ static void c_handler(char *line,size_t l,int argc){
   cfgtable.ifosa=o=true;
   if(!parameter(line," ",1))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
+   tmp=xstrdup(pptr);
    for(j=i=0;!j&&!parameter(tmp,":",i);i++){
     if(!strcmp(pptr,"<any>"))j=1;
     else j=(struncmp(pptr)?0:1);
@@ -607,8 +595,7 @@ static void c_handler(char *line,size_t l,int argc){
   cfgtable.ifarga=o=true;
   if(!parameter(line," ",1))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   strcpy(tmp,pptr);
+   tmp=xstrdup(pptr);
    for(j=i=0;!j&&!parameter(tmp,":",i);i++){
     if(!strcmp(pptr,"<any>")||(!strcmp(pptr,"<none>")&&argc<3))j=1;
     else j=!regxcmp(cfgtable.cmdargs,pptr);
@@ -627,8 +614,7 @@ static void c_handler(char *line,size_t l,int argc){
   for(i=0;j>i;i++)line[i]=line[i+1];
   line=strtok(line,"=");
   if(line&&strlen(line)){
-   tmp=(char *)cwmalloc(strlen(line)+1);
-   strcpy(tmp,line);
+   tmp=xstrdup(line);
    line=strtok(0,"");
    if(line&&strlen(line))
     setenv(tmp,line,1);
@@ -646,7 +632,7 @@ static void c_handler(char *line,size_t l,int argc){
   ptr=strtok(0,"");
   if((k=strlen(ptr))){
    if(cfgtable.cmd)free(cfgtable.cmd);
-   cfgtable.cmd=(char *)cwmalloc(k+strlen(cfgtable.cmdargs)+1);
+   cfgtable.cmd=(char *)xzalloc(k+strlen(cfgtable.cmdargs)+1);
    for(on=false,j=i=0;k>i;i++){
     if(!on&&!strncmp(ptr+i,"{}",2)){
      strcpy(cfgtable.cmd+j,cfgtable.cmdargs);
@@ -670,9 +656,8 @@ static void c_handler(char *line,size_t l,int argc){
  }
  else if(!strcmp(parameter(line," ",0),"match")){
   if(parameter(line," ",1)){
-   tmp=(char *)cwmalloc(strlen(pptr)+1);
-   match *m=(match *)cwmalloc(sizeof(match));
-   strcpy(tmp,pptr);
+   match *m=(match *)XZALLOC(match);
+   tmp=xstrdup(pptr);
    if(color_atoi(parameter(tmp,":",0))>-1)
     m->b=color_atoi(parameter(tmp,":",0));
    else{
@@ -687,14 +672,11 @@ static void c_handler(char *line,size_t l,int argc){
    }
    free(tmp);
    if(parameter(line," ",2)){
-    tmp=(char *)cwmalloc(strlen(line)+1);
-    strcpy(tmp,line);
-    ptr=tmp;
+    ptr=tmp=xstrdup(line);
     tmp=strtok(tmp," ");
     tmp=strtok(0," ");
     tmp=strtok(0,"");
-    m->data=(char *)cwmalloc(strlen(tmp)+1);
-    strcpy(m->data,tmp);
+    m->data=xstrdup(tmp);
     gl_list_add_last(cfgtable.m,m);
     free(ptr);
    }
@@ -752,7 +734,7 @@ int main(int argc,char **argv){
  }
  free(basename);
  for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
- cfgtable.cmdargs=(char *)cwmalloc(j+1);
+ cfgtable.cmdargs=(char *)xzalloc(j+1);
  j=0;
  for(i=2;argc>i;i++){
   sprintf(cfgtable.cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
@@ -761,15 +743,12 @@ int main(int argc,char **argv){
  if(argc>1){
   if(access(argv[1],F_OK))
    cwexit(1,"non-existent path to definition file.");
-  scrname=(char *)cwmalloc(strlen(argv[1])+1);
-  strcpy(scrname,argv[1]);
+  scrname=xstrdup(argv[1]);
  }
  else
   usage();
- for(i=0;18>i;i++){
-  pal2[i]=(char *)cwmalloc(strlen(pal2_orig[i])+1);
-  strcpy(pal2[i],pal2_orig[i]);
- }
+ for(i=0;18>i;i++)
+  pal2[i]=xstrdup(pal2_orig[i]);
  cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=false;
  cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=false;
@@ -805,7 +784,7 @@ void initsetproctitle(int argc,char **argv,char **envp){
  char *s;
  for(i=0;envp[i]!=0;i++)
   envpsize+=(strlen(envp[i])+1);
- environ=(char **)cwmalloc((sizeof(char *)*(i+1))+envpsize+1);
+ environ=(char **)xzalloc((sizeof(char *)*(i+1))+envpsize+1);
  s=((char *)environ)+((sizeof(char *)*(i+1)));
  for(i=0;envp[i]!=0;i++){
   strcpy(s,envp[i]);
@@ -813,8 +792,7 @@ void initsetproctitle(int argc,char **argv,char **envp){
   s+=(strlen(s)+1);
  }
  environ[i]=0;
- proct.name=(char *)cwmalloc(strlen(argv[0])+1);
- strcpy(proct.name,argv[0]);
+ proct.name=xstrdup(argv[0]);
  proct.argv=argv;
  for(i=0;i<argc;i++){
   if(i==0||proct.largv+1==argv[i])
@@ -829,18 +807,14 @@ void initsetproctitle(int argc,char **argv,char **envp){
 void setproctitle(const char *fmt,...){
  size_t i;
  char buf[BUFSIZE+1];
- char buf2[BUFSIZE+4+1];
  char *p;
  va_list param;
  va_start(param,fmt);
  vsnprintf(buf,sizeof(buf),fmt,param);
  va_end(param);
- sprintf(buf2,"cw: %s",buf);
- memset(buf,0,sizeof(buf));
- strncpy(buf,buf2,(sizeof(buf)-1));
  if((i=strlen(buf))>(size_t)(proct.largv-proct.argv[0]-2)){
   i=proct.largv-proct.argv[0]-2;
-  buf[i]=0;
+  buf[i]='\0';
  }
  strcpy(proct.argv[0],buf);
  p=&proct.argv[0][i];
