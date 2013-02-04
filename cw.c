@@ -733,13 +733,12 @@ int main(int argc,char **argv){
  if(!cfgtable.z.on&&(ptr=(char *)getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=true;
- /* Set PATH for child processes; may be overridden by configuration file. */
+ /* Set PATH for child processes; may be overridden by definition file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
  c_read(scrname,argc);
- cfgtable.nocolor+=(getenv("NOCOLOR")?1:0);
- cfgtable.nocolor+=(getenv("MAKELEVEL")?1:0); /* FIXME: document this */
+ cfgtable.nocolor+=getenv("NOCOLOR")?1:(getenv("MAKELEVEL")?1:0);
  if(getenv("NOCOLOR_NEXT")){
   setenv("NOCOLOR","1",1);
   unsetenv("NOCOLOR_NEXT");
