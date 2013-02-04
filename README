@@ -29,8 +29,8 @@ part of the command to
 cw works by prepending the cw definition directory to the PATH
 environment variable.  You should do this in your shell's interactive
 startup file (you don't want cw being run by non-interactive
-commands).  For example, for bash, add the following line to your
-~/.bashrc:
+commands).  For example, for bash and other Bourne-compatible
+shells, add the following line to your ~/.profile:
 
   export PATH=/usr/local/libexec/cw:$PATH
 
