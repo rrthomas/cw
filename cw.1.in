@@ -23,17 +23,8 @@ reverse of \fBifarg\fR
 \fBifarg\-else\fR
 this will use the definitions to follow if the previous \fBifarg\fR or \fBifnarg\fR was false
 .TP
-\fBifexit\fR [\fIvalue\fR]
-compares the \fBvalue\fR to the last returned exit code from the \fB!\fR and \fB@\fR definition instructions.  if the \fBvalue\fR matches, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifexit\fR, \fBifnexit\fR or \fBifexit\-else\fR definition instruction is used.  this definition instruction is intended to create a gateway to the system to check for special scenarios in the form of user\-made scripts/programs.  \fBifexit\fR definition instructions are a higher priority than \fBifarg\fR.  \fBvalue\fR must be a numerical value between \-127 and 127, if nothing is placed in \fBvalue\fR it will default to \-1 ("\fB<any>\fR" can be used as a constant value for any value.)
-.TP
-\fBifnexit\fR [\fIvalue\fR]
-reverse of \fBifexit\fR
-.TP
-\fBifexit\-else\fR
-this will use the definitions to follow if the previous \fBifexit\fR or \fBifnexit\fR was false
-.TP
 \fBifos\fR [\fIregex:regex:...\fR]
-list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBregex\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR and \fBifexit\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
+list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBregex\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
 .TP
 \fBifnos\fR [\fIregex:regex:...\fR]
 reverse of \fBifos\fR
@@ -52,12 +43,6 @@ forces color wrapping no matter what anti\-coloring measures are enabled
 .TP
 \fBnocolor\fR
 turns off all coloring (the only real purpose of this is for \fBif\fR\-related definition instructions)
-.TP
-\fB!\fR[\fIprogram\fR]
-executes the \fBprogram\fR string as it is placed in the definition file.  this is intended to either simply run a program before the wrapped program, or for special purposes relating to the \fBifexit\fR definition instructions.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments (the \fBprogram\fR string is in a shell execution format)
-.TP
-\fB@\fR[\fIprogram\fR]
-this is the same as \fB!\fR, except it does not display the output or allow input
 .TP
 \fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
 sets the environment variable \fBVAR\fR to \fBVALUE\fR

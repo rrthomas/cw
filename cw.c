@@ -69,7 +69,6 @@ struct{
 /* configuration table. */
 struct{
  bool ifarg, ifarga;
- bool ifexit, ifexita;
  bool ifos, ifosa;
  bool base;
  bool ec;
@@ -248,47 +247,6 @@ static void setcolorize(char *str){
   }
   if(r>=0&&r<9)cfgtable.z.on=true;
  }
-}
-
-/* handles and executes other programs. */
-static signed char execot(char *prog,bool no_io,size_t l){
- signed char r=0;
- bool on=false;
- int e=0;
- size_t i=0,j=0,k=strlen(prog);
- pid_t p=0;
- char *str=(char *)xzalloc(k+strlen(cfgtable.cmdargs)+1);
- for(j=i=0;k>i;i++){
-  if(!on&&!strncmp(prog+i,"{}",2)){
-   strcpy(str+j,cfgtable.cmdargs);
-   j+=strlen(cfgtable.cmdargs);
-   i++;
-   on=true;
-  }
-  else{
-   str[j]=prog[i];
-   j++;
-  }
- }
- str[j]=0;
- switch((p=fork())){
-  case -1:
-   c_error(l,"'!'/'@' failed to execute background program.");
-   break;
-  case 0:
-   if(no_io){
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-   }
-   execle("/bin/sh","sh","-c",str,(char *)0,environ);
-  default:
-    if(waitpid(p,&e,0)>=0&&WIFEXITED(e))
-     r=WEXITSTATUS(e);
-    else r=0;
- }
- free(str);
- return(r);
 }
 
 /* just like basename(), except no conflicts on different systems. */
@@ -570,27 +528,12 @@ static void c_handler(char *line,size_t l,int argc){
     cfgtable.ifos=(cfgtable.ifos?0:1);
   }
  }
- else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit-else"))){
-  o=true;
-  if(cfgtable.ifexita)cfgtable.ifexit=(cfgtable.ifexit?0:1);
-  else c_error(l,"'ifexit-else' used before any previous comparison.");
- }
- else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifexit")||!strcmp(pptr,"ifnexit"))){
-  cfgtable.ifexita=o=true;
-  if(atoi(parameter(line," ",1))>127||atoi(pptr)<-127)
-   c_error(l,"'ifexit'/'ifnexit' invalid exit level. (-127..127)");
-  else{
-   if(!strcmp(pptr,"<any>")||atoi(pptr)==cfgtable.ec)cfgtable.ifexit=true;
-   if(!strcmp(parameter(line," ",0),"ifexit"))
-    cfgtable.ifexit=(cfgtable.ifexit?0:1);
-  }
- }
- else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg-else"))){
+ else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg-else"))){
   o=true;
   if(cfgtable.ifarga)cfgtable.ifarg=(cfgtable.ifarg?0:1);
   else c_error(l,"'ifarg-else' used before any previous comparison.");
  }
- else if(!cfgtable.ifexit&&!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
+ else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
  !strcmp(pptr,"ifnarg"))){
   cfgtable.ifarga=o=true;
   if(!parameter(line," ",1))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
@@ -606,7 +549,7 @@ static void c_handler(char *line,size_t l,int argc){
     cfgtable.ifarg=(cfgtable.ifarg?0:1);
   }
  }
- if(cfgtable.ifos||cfgtable.ifexit||cfgtable.ifarg)
+ if(cfgtable.ifos||cfgtable.ifarg)
   return;
  if(line[0]=='#')return;
  else if(line[0]=='$'){
@@ -622,10 +565,6 @@ static void c_handler(char *line,size_t l,int argc){
    free(tmp);
   }
   else c_error(l,"environment variable name missing.");
- }
- else if(line[0]=='!'||line[0]=='@'){
-  if(strlen(line)>1)
-   cfgtable.ec=execot(line+1,line[0]=='@',l);
  }
  else if(!strcmp(parameter(line," ",0),"command")){
   ptr=strtok(line," ");
@@ -751,7 +690,7 @@ int main(int argc,char **argv){
   pal2[i]=xstrdup(pal2_orig[i]);
  cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=false;
- cfgtable.ifos=cfgtable.ifosa=cfgtable.ifexit=cfgtable.ifexita=false;
+ cfgtable.ifos=cfgtable.ifosa=false;
 #ifndef NO_PTY
  cfgtable.p.on=false;
 #endif

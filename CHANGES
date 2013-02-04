@@ -35,6 +35,7 @@ version 1.0.17:
 ! Removed path instruction. Set $PATH if still needed.
 ! Renamed other instruction to 'command'.
 ! Removed CW_CHK_SETCODE and CW_CHK_NOCOLOR environment variables.
+! Removed ifexit, ifexit-else and ifnexit instructions, and ! and @ commands.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
