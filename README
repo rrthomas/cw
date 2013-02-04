@@ -1,84 +1,81 @@
-FAQ-style readme:
+                                  cw
+                                  --
 
-1. What is cw (color wrapper)?
-2. How does cw work?
-3. How do I install cw?
-4. How do I turn cw off?
-5. Is there a more fine-grained way to turn coloring on and off?
-6. How can I make/modify the coloring of a specific program?
-7. Can interactive programs be color wrapped?
-8. There are too many different colors!
-9. My terminal has a white background, why can't I see text?
+              (c) 2004-2010 v9/fakehalo <v9@fakehalo.us>
+                (c) 2013 Reuben Thomas <rrt@sc3d.org>
 
 
-
-1. What is cw (color wrapper)?
-
-cw is a non-intrusive real-time ANSI color wrapper for common
-non-interactive commands.  cw is designed to simulate the environment
-of the commands being executed, so that if a person types 'du', 'df',
-'ping', etc. in their shell it will automatically color the output in
-real time according to a definition file containing the color format
-desired.  cw has support for regex match coloring, case scenario
-coloring, command line dependent definition coloring, and includes
-over 70 pre-made definition files.
+cw is a colorer for command-line programs.  It is designed to
+simulate the environment of the commands being executed, so that when
+you type 'du', 'df', 'ping', etc. in your shell the output is
+automatically colored according to a definition file.  Named colors
+can be matched to regexs, and according to the arguments to the
+original program and the OS under which it is running.  cw includes
+over 70 definition files, and it's easy to write more.
 
 
-2. How does cw work?
+Installation
+------------
 
-cw works by prepending the a of the cw definition directory to the PATH
-environment variable. this is usually set by
-"export PATH=/usr/local/libexec/cw:$PATH" (in bash).  in the cw definition
-directory you will see file(s) under the very same name of the program
-they are designed to color.  these files appear as the common executable
-binaries you may be used to using, but they are just text files that
-contain instructions for cw to use, including the path to the "real"
-binary.
+First build the program with
 
+  ./configure && make && make install
 
-3. How do I install cw?
+or, to install it in your user account, for example, change the first
+part of the command to
 
-see the INSTALL file.  note that you need GNU Make to build it.
+  ./configure --prefix=$HOME/.local
 
+cw works by prepending the cw definition directory to the PATH
+environment variable.  You should do this in your shell's interactive
+startup file (you don't want cw being run by non-interactive
+commands).  For example, for bash, add the following line to your
+~/.bashrc:
 
-4. How do I turn cw off?
+  export PATH=/usr/local/libexec/cw:$PATH
 
-set NOCOLOR=1 in your environment to turn cw off.
-
-
-5. Is there a more fine-grained way to turn coloring on and off?
-
-if all the anti-coloring precautions implemented into cw are not
-enough, you may make your own program/shell expression to test the 
-system environment.  this is done by setting CW_CHK_NOCOLOR="program/
-shell expression" in the environment, and if the exit code returned is
-non-zero it will disable the coloring.  for example, setting
-CW_CHK_NOCOLOR='if [ "`whoami`" = "root" ];then exit 1;fi' would disable
-coloring for the root user only.
+Start a new shell and try some commands, which should now be colored!
 
 
-6. How can I make/modify the coloring of a specific program?
+Use
+---
 
-first off I recommend reading the "cw" manpage for a little understanding
-of the instructions available to use.  after that it's as simple as opening/
-creating the selected definition file (e.g. /usr/local/libexec/cw/df) in your
-favorite text editor and making the desired changes.
+My terminal has a white background and the colors are horrible!
 
-
-7. Can interactive programs be color wrapped?
-
-not really: cw is only designed for wrapping non-interactive programs.
+cw is set up for a black background by default.  Set CW_INVERT=1 in
+your environment to invert cw's colors: this will swap black with
+white and the lighter colors with the darker.
 
 
-8. There are too many different colors!
+How can I change the coloring of a program?
 
-if you find that there are too many color schemes for each program
-then you may want to set CW_COLORIZE in your environment.  see the
-"cw" manual page for the proper syntax of CW_COLORIZE.
+Read cw(1) (the cw man page) for a description of coloring definition
+files.  Try starting by modifying an existing file; you can find the
+directory they are in by asking your shell where it finds a color
+wrapper, e.g.:
+
+  which ps
+
+Open or create the desired definition file in that directory, and edit
+it as desired.  If you create a new definition, remember to make the
+file executable:
+
+  chmod +x /path/to/foo
 
 
-9. My terminal has a white background, why can't I see text?
+There are too many different colors!
 
-cw expects a black background by default.  however,  you may set
-CW_INVERT=1 in your environment to invert cw's internal colorset.
-this will swap black with white and the lighter colors with the darker.
+If you find that there are too many colors for each program then you
+may want to set CW_COLORIZE in your environment.  See cw(1) for
+the proper syntax of CW_COLORIZE.
+
+
+Can I turn cw off temporarily?
+
+Set NOCOLOR=1 in your environment to turn cw off.
+
+
+Can cw color interactive programs?
+
+You can try, but it probably won't work well: cw is only designed to
+color non-interactive programs.
