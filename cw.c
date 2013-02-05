@@ -378,12 +378,22 @@ static void sighandler(int sig){
 #ifdef SIGCHLD
  else if(sig==SIGCHLD)ext=true;
 #endif
- else if(sig==SIGPIPE||sig==SIGINT){
+ if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"%s",pal2[16]);
   fflush(stderr);
   cwexit(0,0);
  }
 }
+
+static void sig_catch(int sig, void (*handler)(int))
+{
+  struct sigaction sa;
+  sa.sa_handler = handler;
+  sa.sa_flags = 0;
+  sigemptyset(&sa.sa_mask);
+  sigaction(sig, &sa, 0);         /* XXX ignores errors */
+}
+
 
 /* handles and executes the desired program. */
 noreturn void execcw(int argc,char **argv){
@@ -412,12 +422,12 @@ noreturn void execcw(int argc,char **argv){
  sa.sa_flags=SA_NOCLDSTOP;
  if(sigaction(SIGCHLD,&sa,0)<0){
 #endif
-  signal(SIGTSTP,SIG_IGN);
+  sig_catch(SIGTSTP,SIG_IGN);
 #ifdef SIGCHLD
-  signal(SIGCHLD,sighandler);
+  sig_catch(SIGCHLD,sighandler);
  }
 #endif
- signal(SIGPIPE,sighandler);
+ sig_catch(SIGPIPE,sighandler);
  switch(cfgtable.nocolor?0:(pid_c=fork())){
   case -1:
    cwexit(1,"fork() error.");
@@ -461,7 +471,7 @@ noreturn void execcw(int argc,char **argv){
   default:
    /* parent process to read the program's output. (forwards SIGINT to child) */
    cfgtable.eint=true;
-   signal(SIGINT,sighandler);
+   sig_catch(SIGINT,sighandler);
 #ifdef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
    initsetproctitle(argc,argv,environ);
