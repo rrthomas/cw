@@ -1,6 +1,6 @@
 # for -exec's, if another color wrapped program is called it will not
 # be colored. (lets this definition file take over)
-$NOCOLOR_NEXT=1
+$NOCOLOR=1
 base cyan
 match cyan+:default /
 match cyan+:default \[

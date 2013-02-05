@@ -48,13 +48,10 @@ The color values used are in the text form of:
 \fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default, none\fR
 .TP
 Colors with a \fB+\fR designate a brighter color.
-.SH "ENVIRONMENT"
+.SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
 disables color wrapping when set to any value. Note that cw does not color unless it is connected to a terminal (it detects this separately for standard output and standard error), and doesn't color when being run by make (i.e., when MAKELEVEL is set in the environment).
-.TP
-\fBNOCOLOR_NEXT\fR
-disables color wrapping at the next process using color wrapper.  this is mainly useful to include in cw definition files if the program being wrapped is using other commands that are already being wrapped (this is for stopping colors from being processed as values by programs, any value placed in the variable will enable)
 .TP
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)

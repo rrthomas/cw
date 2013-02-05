@@ -735,12 +735,8 @@ int main(int argc,char **argv){
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
- c_read(scrname,argc);
  cfgtable.nocolor+=getenv("NOCOLOR")?1:(getenv("MAKELEVEL")?1:0);
- if(getenv("NOCOLOR_NEXT")){
-  setenv("NOCOLOR","1",1);
-  unsetenv("NOCOLOR_NEXT");
- }
+ c_read(scrname,argc);
  if(cfgtable.z.on)cfgtable.invert=false;
  cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
  cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);

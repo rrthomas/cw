@@ -1,8 +1,6 @@
-# this is a hack of sorts.  makefiles may include some third party
-# programs that may be colored by cw, if so they could fail do to the
-# colors(ANSI) included.  this will simply turn the color off during the
-# make process.
-$NOCOLOR_NEXT=1
+# makefiles may include programs colored by cw, and the coloring could
+# mess things up, so turn it off.
+$NOCOLOR=1
 # don't want to color kernel dialog compiling.
 ifnarg menuconfig
 base grey+

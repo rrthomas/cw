@@ -1,8 +1,6 @@
-# this is a hack of sorts.  configure scripts may include some third party
-# programs that may be colored by cw, if so they could fail do to the
-# colors(ANSI) included.  this will simply turn the color off during the
-# next process.  same as make's, sometimes can be the same thing.
-$NOCOLOR_NEXT=1
+# Configure scripts may include some third party programs that may be
+# colored by cw, which could mess up the configure script.
+$NOCOLOR=1
 command ./configure
 base grey+
 match green+:default yes$
