@@ -148,7 +148,7 @@ char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 static bool ext=false;
 static unsigned char rexit=0;
-static char *pal2[18],*aptr,*fptr,*pptr,*scrname;
+static char *pal2[18],*aptr,*fptr,*pptr,*scrname,*base_scrname;
 static pid_t pid_c;
 extern char **environ;
 
@@ -285,12 +285,6 @@ static void setcolorize(char *str){
   }
   if(r>=0&&r<9)cfgtable.z.on=true;
  }
-}
-
-/* just like basename(), except no conflicts on different systems. */
-static _GL_ATTRIBUTE_PURE char *strpname(char *file){
- char *ptr=strrchr(file,'/');
- return(ptr?ptr+1:file);
 }
 
 /* converts the original string to a color string based on the config file. */
@@ -460,10 +454,10 @@ noreturn void execcw(int argc,char **argv){
 #endif
    }
    if(cfgtable.cmd)
-    execle("/bin/sh",strpname(scrname),"-c",cfgtable.cmd,(char *)0,environ);
+    execle("/bin/sh",base_name(scrname),"-c",cfgtable.cmd,(char *)0,environ);
    else{
-    argv[1]=strpname(scrname);
-    execvpe(base_name(scrname),&argv[1],environ);
+    argv[1]=base_scrname;
+    execvpe(argv[1],&argv[1],environ);
    }
    /* shouldn't make it here. (no point to stay alive) */
    exit(1);
@@ -476,7 +470,7 @@ noreturn void execcw(int argc,char **argv){
 #ifdef INT_SETPROCTITLE
    initsetproctitle(argc,argv,environ);
 #endif
-   setproctitle("cw: wrapping [%s] {pid=%u}",strpname(scrname),pid_c);
+   setproctitle("cw: wrapping [%s] {pid=%u}",base_scrname,pid_c);
 #endif
    buf=(char *)xzalloc(BUFSIZE+1);
 #ifndef NO_PTY
@@ -694,12 +688,13 @@ void c_read(char *file,int argc){
 /* program start. */
 int main(int argc,char **argv){
  int i=0,j=0;
- char *ptr,*basename,*newpath;
+ char *ptr,*newpath;
  set_program_name(argv[0]);
- basename=base_name(program_name);
+ scrname=xstrdup(argv[1]);
+ base_scrname=base_name(scrname);
  cfgtable.z.l=cfgtable.z.h=-1;
  cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
- if(!strcmp(basename,"cw")){
+ if(argc>1&&*argv[1]=='-'){
   for(i=1;i<argc;i++){
    if(!strcmp("--help",argv[i]))
     usage();
@@ -715,7 +710,6 @@ int main(int argc,char **argv){
    }
   }
  }
- free(basename);
  for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
  cfgtable.cmdargs=(char *)xzalloc(j+1);
  j=0;
@@ -727,7 +721,6 @@ int main(int argc,char **argv){
   usage();
  if(access(argv[1],F_OK))
   cwexit(1,"cannot find definition file.");
- scrname=xstrdup(argv[1]);
  for(i=0;18>i;i++)
   pal2[i]=xstrdup(pal2_orig[i]);
  cfgtable.base=-1;
