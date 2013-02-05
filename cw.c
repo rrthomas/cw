@@ -558,7 +558,7 @@ static void c_handler(char *line,size_t l,int argc){
   if(!parameter(line," ",1))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
    tmp=xstrdup(pptr);
-   for(j=i=0;!j&&!parameter(tmp,":",i);i++){
+   for(j=i=0;!j&&parameter(tmp,":",i);i++){
     if(!strcmp(pptr,"<any>"))j=1;
     else j=(struncmp(pptr)?0:1);
    }
@@ -579,7 +579,7 @@ static void c_handler(char *line,size_t l,int argc){
   if(!parameter(line," ",1))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
    tmp=xstrdup(pptr);
-   for(j=i=0;!j&&!parameter(tmp,":",i);i++){
+   for(j=i=0;!j&&parameter(tmp,":",i);i++){
     if(!strcmp(pptr,"<any>")||(!strcmp(pptr,"<none>")&&argc<3))j=1;
     else j=!regxcmp(cfgtable.cmdargs,pptr);
    }
