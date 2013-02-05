@@ -149,7 +149,7 @@ char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 static bool ext=false;
 static unsigned char rexit=0;
 static char *pal2[18],*aptr,*fptr,*pptr,*scrname;
-static pid_t pid_p,pid_c;
+static pid_t pid_c;
 extern char **environ;
 
 static const char *pal1[]={"black","blue","green","cyan","red","purple","brown",
@@ -376,11 +376,8 @@ static void sighandler(int sig){
   }
  }
 #ifdef SIGCHLD
- else if(sig==SIGCHLD){
-  if(pid_p)kill(pid_p,SIGUSR1);
- }
+ else if(sig==SIGCHLD)ext=true;
 #endif
- else if(sig==SIGUSR1)ext=true;
  else if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"%s",pal2[16]);
   fflush(stderr);
@@ -408,7 +405,6 @@ noreturn void execcw(int argc,char **argv){
 #endif
   if(pipe(fds)<0)cwexit(1,"pipe() failed.");
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
-  pid_p=getpid();
  }
 #ifdef SIGCHLD
  sa.sa_handler=sighandler;
@@ -421,7 +417,6 @@ noreturn void execcw(int argc,char **argv){
   signal(SIGCHLD,sighandler);
  }
 #endif
- signal(SIGUSR1,sighandler);
  signal(SIGPIPE,sighandler);
  switch(cfgtable.nocolor?0:(pid_c=fork())){
   case -1:
