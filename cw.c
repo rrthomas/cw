@@ -486,17 +486,20 @@ noreturn void execcw(int argc,char **argv){
     fds[0]=cfgtable.p.mout;
     fde[0]=cfgtable.p.merr;
    }
+   fcntl(fds[0],F_SETFL,O_NONBLOCK);
+   fcntl(fde[0],F_SETFL,O_NONBLOCK);
 #endif
    fdm=((fds[0]>fde[0]?fds[0]:fde[0])+1);
-   while(!ext){
+   while(s>0||!ext){
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
     FD_SET(fde[0],&rfds);
     if(select(fdm,&rfds,0,0,0)>=0){
      if(FD_ISSET(fds[0],&rfds))fd=fds[0];
-     else fd=fde[0];
+     else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
+     else continue;
      memset(buf,0,BUFSIZE);
-     if((s=read(fd,buf,BUFSIZE))&&s>0){
+     while((s=read(fd,buf,BUFSIZE))>0){
       if(!on){
        j=0;
        tmp=(char *)xzalloc(s+1);
