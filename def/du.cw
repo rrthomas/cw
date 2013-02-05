@@ -3,7 +3,7 @@ ifnarg --help
 match cyan+:default /
 match default:default M
 match default:default K
-match green+:default [^\t]+
+match green+:default [^	]+
 ifarg-else
 match green+:default \[
 match green+:default \]
