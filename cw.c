@@ -59,7 +59,8 @@ struct{
  char *largv;
  char *name;
 }proct;
-/* initialize pseudo-setproctitle. */
+
+/* Initialize pseudo setproctitle. */
 static void initsetproctitle(int argc,char **argv,char **envp){
  int i=0;
  size_t envpsize=0;
@@ -85,7 +86,8 @@ static void initsetproctitle(int argc,char **argv,char **envp){
    proct.largv=(envp[i]+strlen(envp[i]));
  }
 }
-/* pseudo-setproctitle. */
+
+/* Pseudo setproctitle. */
 static void setproctitle(const char *fmt,...){
  size_t i;
  char buf[BUFSIZE+1];
@@ -105,7 +107,7 @@ static void setproctitle(const char *fmt,...){
 }
 #endif
 
-/* configuration table. */
+/* Configuration table. */
 struct{
  bool ifarg, ifarga;
  bool ifos, ifosa;
@@ -127,7 +129,7 @@ struct{
  }p;
 }cfgtable;
 
-/* match instruction. */
+/* Match instruction. */
 typedef struct{
   char *data;
   unsigned char b;
@@ -153,12 +155,12 @@ static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
 
-/* configuration error message. */
+/* Definition error message. */
 void c_error(size_t l,const char *text){
- fprintf(stdout,"cw:definition_error:%zu: %s\n",l,text);
+ fprintf(stdout,"cw:definition error:%zu: %s\n",l,text);
 }
 
-/* exit with or without a reason, resets color too. */
+/* Exit with or without a reason. */
 noreturn void cwexit(signed char level,const char *reason){
  if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
  fflush(stdout);
@@ -169,7 +171,7 @@ void xalloc_die(void) {
  cwexit(1,"malloc() failed.");
 }
 
-/* checks for a regex match of a string. */
+/* Check for a regex match of a string. */
 static bool regxcmp(char *str,char *pattern){
  int r;
  regex_t re;
@@ -187,7 +189,7 @@ static bool struncmp(char *cmp){
  return regxcmp(un.sysname,cmp);
 }
 
-/* plucks a requested token out of a string. */
+/* Parse a delimited token out of a string. */
 static char *parameter(const char *string,const char *delim,size_t n){
  char *arg;
  free(fptr);
@@ -201,7 +203,7 @@ static char *parameter(const char *string,const char *delim,size_t n){
  return(pptr=arg);
 }
 
-/* filter a directory out of a PATH-like colon-separated path list. */
+/* Filter a directory out of a PATH-like colon-separated path list. */
 static char *remove_dir_from_path(const char *path, const char *dir){
  if(path){
   char *canon_dir=canonicalize_file_name(dir);
@@ -231,7 +233,7 @@ static void usage(void){
  cwexit(0,0);
 }
 
-/* converts the color string to a numerical storage value. (0-17) */
+/* Convert a color string to a color array index. (0-17) */
 static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  signed char i=0;
  const char **palptr=cfgtable.invert?pal1_invert:pal1;
@@ -251,7 +253,7 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  return(i<18?i:-1);
 }
 
-/* sets colorize values. */
+/* Set colorize values. */
 static void setcolorize(char *str){
  signed char r=0;
  cfgtable.invert=cfgtable.z.on=false;
@@ -272,7 +274,7 @@ static void setcolorize(char *str){
  }
 }
 
-/* converts the original string to a color string based on the config file. */
+/* Color a string based on the definition file. */
 static char *convert_string(const char *line){
  gl_list_iterator_t i;
  size_t j=0,k=0,l=0;
@@ -281,7 +283,7 @@ static char *convert_string(const char *line){
  regex_t re;
  regmatch_t pm;
  char *tbuf=xstrdup(line);
- /* start processing the 'match' definitions. */
+ /* Process the 'match' definitions. */
  for(j=0,i=gl_list_iterator(cfgtable.m);gl_list_iterator_next(&i,(const void **)&m,NULL);){
   size_t s=strlen(tbuf);
   bool on=false;
@@ -333,7 +335,7 @@ static char *convert_string(const char *line){
  return(aptr=buf);
 }
 
-/* creates a pty pair. (master/slave) */
+/* Create a master-slave pty pair. */
 static bool make_ptypair(unsigned char v){
 #ifdef HAVE_OPENPTY
  return openpty(&cfgtable.p.master[v],&cfgtable.p.slave[v],0,0,0)==0;
@@ -342,7 +344,6 @@ static bool make_ptypair(unsigned char v){
 #endif
 }
 
-/* all-purpose signal handler. */
 static void sighandler(int sig){
  if(sig==SIGINT&&cfgtable.eint){
   if(pid_c){
@@ -370,7 +371,7 @@ static void sig_catch(int sig, void (*handler)(int))
 }
 
 
-/* handles and executes the desired program. */
+/* Execute and color a program. */
 noreturn void execcw(int argc,char **argv){
  bool on=false,son=false;
  ssize_t i=0,j=0,k=0,s=0;
@@ -421,13 +422,9 @@ noreturn void execcw(int argc,char **argv){
    }
    if(cfgtable.cmd)
     execle("/bin/sh",base_name(scrname),"-c",cfgtable.cmd,(char *)0,environ);
-   else{
-    argv[1]=base_scrname;
-    execvpe(argv[1],&argv[1],environ);
-   }
-   /* shouldn't make it here. (no point to stay alive) */
-   exit(1);
-   break;
+   argv[1]=base_scrname;
+   execvpe(argv[1],&argv[1],environ);
+   abort(); /* We never get here. */
   default:
    /* parent process to read the program's output. (forwards SIGINT to child) */
    cfgtable.eint=true;
@@ -507,7 +504,7 @@ noreturn void execcw(int argc,char **argv){
  }
 }
 
-/* handles each config file line. */
+/* Process a definition file line. */
 static void c_handler(char *line,size_t l,int argc){
  bool o=false,on=false;
  size_t i=0,j=0,k=0;
@@ -630,7 +627,7 @@ static void c_handler(char *line,size_t l,int argc){
  else if(!o)c_error(l,"invalid definition instruction.");
 }
 
-/* reads the config file, passing the lines to c_handler(). */
+/* Read the config file, passing the lines to c_handler(). */
 void c_read(char *file,int argc){
  size_t i=0,l=0;
  char buf[BUFSIZE+1];
@@ -649,7 +646,6 @@ void c_read(char *file,int argc){
  if(cfgtable.base<0)cfgtable.base=7;
 }
 
-/* program start. */
 int main(int argc,char **argv){
  int i=0;
  size_t j=0;
