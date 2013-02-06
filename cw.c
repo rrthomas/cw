@@ -244,11 +244,9 @@ static void usage(void){
 }
 
 /* converts the color string to a numerical storage value. (0-17) */
-static _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
+static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  signed char i=0;
- const char **palptr;
- if(cfgtable.invert)palptr=pal1_invert;
- else palptr=pal1;
+ const char **palptr=cfgtable.invert?pal1_invert:pal1;
  if(cfgtable.z.on){
   if(!strcmp(color,"default")){
    if(cfgtable.base<9)i=cfgtable.z.l;
@@ -260,9 +258,8 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(char *color){
    else i=cfgtable.z.h;
   }
  }
- else{
+ else
   while(strcmp(palptr[i],color)&&i<18)i++;
- }
  return(i<18?i:-1);
 }
 
