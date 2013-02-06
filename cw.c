@@ -208,7 +208,7 @@ static char *parameter(const char *string,const char *delim,size_t p){
  while(n&&(arg=strtok(0,delim)))n--;
  if(!arg){
   free(fptr);
-  fptr=arg=(char *)xzalloc(3);
+  fptr=(char *)xzalloc(3);
   arg=NULL;
  }
  return(pptr=arg);
@@ -685,7 +685,8 @@ void c_read(char *file,int argc){
 
 /* program start. */
 int main(int argc,char **argv){
- int i=0,j=0;
+ int i=0;
+ size_t j=0;
  char *ptr,*newpath;
  set_program_name(argv[0]);
  scrname=xstrdup(argv[1]);
