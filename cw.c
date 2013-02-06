@@ -1,5 +1,6 @@
 /* cw -- customizable color wrapper for common unix commands.
 ** Copyright (C) 2004 v9/fakehalo [v9@fakehalo.us]
+** Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
 **
 ** This program is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License
