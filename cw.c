@@ -111,11 +111,11 @@ static void setproctitle(const char *fmt,...){
 struct{
  bool ifarg, ifarga;
  bool ifos, ifosa;
- bool base;
  bool ec;
  bool eint;
  bool invert;
  bool nocolor, nocolor_stdout, nocolor_stderr;
+ signed char base;
  char *cmd, *cmdargs;
 #ifdef HAVE_SETPROCTITLE
  char *title;
