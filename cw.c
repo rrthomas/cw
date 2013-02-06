@@ -733,7 +733,7 @@ int main(int argc,char **argv){
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
- cfgtable.nocolor+=getenv("NOCOLOR")?1:(getenv("MAKELEVEL")?1:0);
+ if(getenv("NOCOLOR"))cfgtable.nocolor=true;
  c_read(scrname,argc);
  if(cfgtable.z.on)cfgtable.invert=false;
  cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);

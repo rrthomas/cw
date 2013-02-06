@@ -51,7 +51,7 @@ Colors with a \fB+\fR designate a brighter color.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
-disables color wrapping when set to any value. Note that cw does not color unless it is connected to a terminal (it detects this separately for standard output and standard error), and doesn't color when being run by make (i.e., when MAKELEVEL is set in the environment).
+disables color wrapping when set to any value. Note that cw does not color unless it is connected to a terminal (it detects this separately for standard output and standard error).
 .TP
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
