@@ -49,9 +49,6 @@
 
 #define BUFSIZE 1024
 
-#ifndef HAVE_OPENPTY
-#define NO_PTY
-#endif
 #if !defined(HAVE_SETPROCTITLE) && (defined(__APPLE_CC__) || defined(__linux__))
 #define INT_SETPROCTITLE
 #define HAVE_SETPROCTITLE
@@ -127,13 +124,11 @@ struct{
   signed char h;
   bool on;
  }z;
-#ifndef NO_PTY
  struct{
   int master[2];
   int slave[2];
   bool on;
  }p;
-#endif
 }cfgtable;
 
 /* match instruction. */
@@ -342,12 +337,14 @@ static char *convert_string(const char *line){
  return(aptr=buf);
 }
 
-#ifndef NO_PTY
 /* creates a pty pair. (master/slave) */
-static signed char make_ptypair(unsigned char v){
+static bool make_ptypair(unsigned char v){
+#ifdef HAVE_OPENPTY
  return openpty(&cfgtable.p.master[v],&cfgtable.p.slave[v],0,0,0)==0;
-}
+#else
+ return false;
 #endif
+}
 
 /* all-purpose signal handler. */
 static void sighandler(int sig){
@@ -391,9 +388,7 @@ noreturn void execcw(int argc,char **argv){
  if(!(cfgtable.m))
   cfgtable.nocolor=true;
  if(!cfgtable.nocolor){
-#ifndef NO_PTY
   cfgtable.p.on=make_ptypair(0)&&make_ptypair(1);
-#endif
   if(pipe(fds)<0)cwexit(1,"pipe() failed.");
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
  }
@@ -420,19 +415,11 @@ noreturn void execcw(int argc,char **argv){
     ioctl(fds[0],FIONCLEX,0);
     ioctl(fde[0],FIONCLEX,0);
 #endif
-#ifndef NO_PTY
     if(dup2((cfgtable.p.on?cfgtable.p.slave[0]:fds[1]),STDOUT_FILENO)<0)
-#else
-    if(dup2(fds[1],STDOUT_FILENO)<0)
-#endif
      cwexit(1,"dup2() failed.");
     close(fds[0]);
     close(fds[1]);
-#ifndef NO_PTY
     if(dup2((cfgtable.p.on?cfgtable.p.slave[1]:fde[1]),STDERR_FILENO)<0)
-#else
-    if(dup2(fde[1],STDERR_FILENO)<0)
-#endif
      cwexit(1,"dup2() failed.");
     close(fde[0]);
     close(fde[1]);
@@ -460,7 +447,6 @@ noreturn void execcw(int argc,char **argv){
    setproctitle("cw: wrapping [%s] {pid=%u}",base_scrname,pid_c);
 #endif
    buf=(char *)xzalloc(BUFSIZE+1);
-#ifndef NO_PTY
    if(cfgtable.p.on){
     close(fds[0]);
     close(fde[0]);
@@ -469,7 +455,6 @@ noreturn void execcw(int argc,char **argv){
    }
    fcntl(fds[0],F_SETFL,O_NONBLOCK);
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
-#endif
    fdm=((fds[0]>fde[0]?fds[0]:fde[0])+1);
    while(s>0||!ext){
     FD_ZERO(&rfds);
@@ -688,7 +673,7 @@ int main(int argc,char **argv){
     usage();
    else if(!strcmp("--version",argv[i])){
     cwexit(1,"cw (color wrapper) v"VERSION" (features="
-#ifndef NO_PTY
+#ifdef HAVE_OPENPTY
            "pty"
 #endif
 #ifdef HAVE_SETPROCTITLE
@@ -714,9 +699,7 @@ int main(int argc,char **argv){
  cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=false;
  cfgtable.ifos=cfgtable.ifosa=false;
-#ifndef NO_PTY
  cfgtable.p.on=false;
-#endif
  if(!cfgtable.z.on&&(ptr=getenv("CW_COLORIZE")))
   setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=true;
