@@ -37,6 +37,9 @@ version 1.0.17:
 ! Removed CW_CHK_SETCODE and CW_CHK_NOCOLOR environment variables.
 ! Removed ifexit, ifexit-else and ifnexit instructions, and ! and @ commands.
 ! Removed nocolor and forcecolor instructions.
+! Removed NOCOLOR_NEXT (made redundant by tweaking the way NOCOLOR is
+  implemented).
+* Fixed a bug in regex matching ends of lines.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.
