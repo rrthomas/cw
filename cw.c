@@ -411,10 +411,6 @@ noreturn void execcw(int argc,char **argv){
   case 0:
    /* child process to execute the program. */
    if(!cfgtable.nocolor){
-#ifdef FIONCLEX
-    ioctl(fds[0],FIONCLEX,0);
-    ioctl(fde[0],FIONCLEX,0);
-#endif
     if(dup2((cfgtable.p.on?cfgtable.p.slave[0]:fds[1]),STDOUT_FILENO)<0)
      cwexit(1,"dup2() failed.");
     close(fds[0]);
