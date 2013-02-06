@@ -651,8 +651,8 @@ int main(int argc,char **argv){
  size_t j=0;
  char *ptr,*newpath;
  set_program_name(argv[0]);
- scrname=xstrdup(argv[1]);
- base_scrname=base_name(scrname);
+ if(argc>1)scrname=xstrdup(argv[1]);
+ base_scrname=base_name(scrname?scrname:program_name);
  cfgtable.z.l=cfgtable.z.h=-1;
  cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  if(argc>1&&*argv[1]=='-'){
