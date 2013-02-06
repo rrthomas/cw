@@ -203,13 +203,12 @@ static char *parameter(const char *string,const char *delim,size_t p){
  size_t n=p;
  char *arg;
  free(fptr);
- fptr=arg=xstrdup(string);
- arg=strtok(arg,delim);
+ fptr=xstrdup(string);
+ arg=strtok(fptr,delim);
  while(n&&(arg=strtok(0,delim)))n--;
  if(!arg){
   free(fptr);
   fptr=(char *)xzalloc(3);
-  arg=NULL;
  }
  return(pptr=arg);
 }
