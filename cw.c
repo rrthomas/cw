@@ -115,9 +115,6 @@ struct{
  bool nocolor, nocolor_stdout, nocolor_stderr;
  signed char base;
  char *cmd, *cmdargs;
-#ifdef HAVE_SETPROCTITLE
- char *title;
-#endif
  gl_list_t m;
  struct{
   signed char l;
