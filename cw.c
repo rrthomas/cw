@@ -524,7 +524,7 @@ noreturn void execcw(int argc,char **argv){
         }
         j=0;
        }
-       else tmp[j++]=buf[i];
+       else if(buf[i]!='\r')tmp[j++]=buf[i];
       }
      }
     }
