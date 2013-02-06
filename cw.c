@@ -701,5 +701,4 @@ int main(int argc,char **argv){
  cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
  cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
  execcw(argc,argv);
- cwexit(0,0);
 }
