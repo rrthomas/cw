@@ -199,8 +199,7 @@ static bool struncmp(char *cmp){
 }
 
 /* plucks a requested token out of a string. */
-static char *parameter(const char *string,const char *delim,size_t p){
- size_t n=p;
+static char *parameter(const char *string,const char *delim,size_t n){
  char *arg;
  free(fptr);
  fptr=xstrdup(string);
