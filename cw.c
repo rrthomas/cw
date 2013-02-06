@@ -129,10 +129,8 @@ struct{
  }z;
 #ifndef NO_PTY
  struct{
-  int mout;
-  int sout;
-  int merr;
-  int serr;
+  int master[2];
+  int slave[2];
   bool on;
  }p;
 #endif
@@ -347,13 +345,7 @@ static char *convert_string(const char *line){
 #ifndef NO_PTY
 /* creates a pty pair. (master/slave) */
 static signed char make_ptypair(unsigned char v){
- if(v){
-  if(openpty(&cfgtable.p.merr,&cfgtable.p.serr,0,0,0))return(0);
- }
- else{
-  if(openpty(&cfgtable.p.mout,&cfgtable.p.sout,0,0,0))return(0);
- }
- return(1);
+ return openpty(&cfgtable.p.master[v],&cfgtable.p.slave[v],0,0,0)==0;
 }
 #endif
 
@@ -400,8 +392,7 @@ noreturn void execcw(int argc,char **argv){
   cfgtable.nocolor=true;
  if(!cfgtable.nocolor){
 #ifndef NO_PTY
-  if(!make_ptypair(0)||!make_ptypair(1))cfgtable.p.on=false;
-  else cfgtable.p.on=true;
+  cfgtable.p.on=make_ptypair(0)&&make_ptypair(1);
 #endif
   if(pipe(fds)<0)cwexit(1,"pipe() failed.");
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
@@ -430,7 +421,7 @@ noreturn void execcw(int argc,char **argv){
     ioctl(fde[0],FIONCLEX,0);
 #endif
 #ifndef NO_PTY
-    if(dup2((cfgtable.p.on?cfgtable.p.sout:fds[1]),STDOUT_FILENO)<0)
+    if(dup2((cfgtable.p.on?cfgtable.p.slave[0]:fds[1]),STDOUT_FILENO)<0)
 #else
     if(dup2(fds[1],STDOUT_FILENO)<0)
 #endif
@@ -438,7 +429,7 @@ noreturn void execcw(int argc,char **argv){
     close(fds[0]);
     close(fds[1]);
 #ifndef NO_PTY
-    if(dup2((cfgtable.p.on?cfgtable.p.serr:fde[1]),STDERR_FILENO)<0)
+    if(dup2((cfgtable.p.on?cfgtable.p.slave[1]:fde[1]),STDERR_FILENO)<0)
 #else
     if(dup2(fde[1],STDERR_FILENO)<0)
 #endif
@@ -473,8 +464,8 @@ noreturn void execcw(int argc,char **argv){
    if(cfgtable.p.on){
     close(fds[0]);
     close(fde[0]);
-    fds[0]=cfgtable.p.mout;
-    fde[0]=cfgtable.p.merr;
+    fds[0]=cfgtable.p.master[0];
+    fde[0]=cfgtable.p.master[1];
    }
    fcntl(fds[0],F_SETFL,O_NONBLOCK);
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
