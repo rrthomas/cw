@@ -1,7 +1,7 @@
 # Configure scripts may include some third party programs that may be
 # colored by cw, which could mess up the configure script.
 $NOCOLOR=1
-command ./configure
+command ./configure {}
 base grey+
 match green+:default yes$
 match red+:default no$
