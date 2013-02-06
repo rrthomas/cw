@@ -1,4 +1,5 @@
 base grey+
+ifnarg --help:<none>
 match white:default [[:digit:]]
 match yellow:default :
 match white:default \.
