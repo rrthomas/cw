@@ -36,7 +36,7 @@ this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\f
 color used if no other definitions state otherwise (if this is the only definition used it will be ignored)
 .TP
 \fBmatch\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
-changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  be aware that regex matching is the last definition instruction to be compared against output text, as such it can have an adverse effect on the previous (coloring) definition instructions.  see regex(7) for the syntax of regular expressions.
+changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  see regex(7) for the syntax of regular expressions.
 .TP
 \fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
 sets the environment variable \fBVAR\fR to \fBVALUE\fR
