@@ -517,9 +517,7 @@ static void c_handler(char *line,size_t l,int argc){
   return;
  if(line[0]=='#')return;
  else if(line[0]=='$'){
-  j=strlen(line);
-  for(i=0;j>i;i++)line[i]=line[i+1];
-  line=strtok(line,"=");
+  line=strtok(line+1,"=");
   if(line&&strlen(line)){
    tmp=xstrdup(line);
    line=strtok(0,"");
