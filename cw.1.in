@@ -7,56 +7,56 @@ cw \- colorer for command-line programs
 [\fI\-\-version|\-\-help\fR]
 .SH "DESCRIPTION"
 .PP
-\fBcw\fR colors the output of command-line programs.  The colors applied are based on the definition instructions in a cw executable file.  These definition files have the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
+\fBcw\fR colors the output of command-line programs.  The colors to use are defined in a cw definition file.  These definition files have the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
 .SH "DEFINITION INSTRUCTIONS"
 The following instructions occur one per line in a definition file.
 .TP
 \fBcommand\fR [\fIprogram\fR]
-specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
+Specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
 .TP
 \fBifarg\fR [\fIregex:regex:...\fR]
-list separated by colons which will be compared against the arguments called to the program.  if the \fBregex\fR matches the arguments, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR definition instruction is used.  "\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments.
+The colon-separated list is compared against the program's command-line arguments.  If the regex matches the arguments, then the following instructions are used; otherwise, processing skips to the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR instruction.  "\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments.
 .TP
 \fBifnarg\fR [\fIregex:regex:...\fR]
-reverse of \fBifarg\fR
+Reverse of \fBifarg\fR.
 .TP
 \fBifarg\-else\fR
-this will use the definitions to follow if the previous \fBifarg\fR or \fBifnarg\fR was false
+This gives definitions to use if the previous \fBifarg\fR or \fBifnarg\fR was false.
 .TP
 \fBifos\fR [\fIregex:regex:...\fR]
-list separated by colons which will be compared against the operating system name (equal to uname \-s).  if the \fBregex\fR matches the operating system name, then the definitions to follow will be used\-\-otherwise they will not.  this will continue until the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR definition instruction is used.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
+The colon-separated list is compared against the operating system name (equal to \fBuname \-s\fR).  If any regex matches, then the following instructions are used; otherwise, processing skips to the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR instruction.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
 .TP
 \fBifnos\fR [\fIregex:regex:...\fR]
 reverse of \fBifos\fR
 .TP
 \fBifos\-else\fR
-this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\fR was false
+This gives definitions to use if the previous \fBifos\fR or \fBifnos\fR was false.
 .TP
 \fBmatch\fR [\fIbefore type:after type\fR] [\fIregex pattern\fR]
-changes the color type before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions.
+Changes the color type before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matches output from the program.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions.
 .TP
 \fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
-sets the environment variable \fBVAR\fR to \fBVALUE\fR
+Sets the environment variable \fBVAR\fR to \fBVALUE\fR
 .TP
-\fB#\fR[\fItext\fR]
-ignores the following \fBtext\fR for processing. (for comments)
+\fB#\fR[\fIcomment\fR]
+A line starting with a hash is ignored.
 .SH COLORS
 .PP
 Colors are referenced by types denoting their function.  The standard list of color types is:
-\fBdefault, bright, highlight, neutral, error, none\fR.  The mapping of color types to physical names can be changed by the \fBCW_COLORS\fR environment variable (see below).
+\fBdefault, bright, highlight, lowlight, neutral, warning, error, punctuation, none\fR.  The mapping of color types to physical names can be changed by the \fBCW_COLORS\fR environment variable (see below).
 .PP
 The available colors are:
 \fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, none\fR. Colors with a \fB+\fR designate a brighter color.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
-disables color wrapping when set to any value. Note that cw does not color unless it is connected to a terminal (it detects this separately for standard output and standard error).
+Disables color wrapping when set to any value. Note that cw does not color unless it is connected to a terminal (it detects this separately for standard output and standard error).
 .TP
 \fBCW_INVERT\fR
-re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
+Redefines the internal colormap to the opposite colors.  This is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .TP
 \fBCW_COLORS\fR
-defines a mapping from color names to colors.  The format is \fBCW_COLORS=name=color\fR[\fB:name=color:...\fR].
+Defines a mapping from color names to colors.  The format is \fBCW_COLORS=name=color\fR[\fB:name=color:...\fR].
 .SH "AUTHOR"
 Written by v9/fakehalo <v9@fakehalo.us> and Reuben Thomas <rrt@sc3d.org>
 .SH "BUGS"
