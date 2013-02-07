@@ -1,14 +1,13 @@
 ifnarg -G:-U
-base cyan
-match green+:default [[:digit:]]
-match white:default |
-match white:default ---
-match cyan+:default -
-match white:default `
-match white:default +
-match yellow:default *
-match white:default [
-match white:default ]
-match white:default (
-match white:default )
-match white:default init
+match highlight:default [[:digit:]]
+match neutral:default |
+match neutral:default ---
+match bright:default -
+match neutral:default `
+match neutral:default +
+match warning:default *
+match neutral:default [
+match neutral:default ]
+match neutral:default (
+match neutral:default )
+match neutral:default init

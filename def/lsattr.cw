@@ -1,12 +1,11 @@
-base cyan
-match white:default :
-match white:default ;
-match green+:default \.
-match cyan+:default -
-match cyan+:default /
-match green+:default \[
-match green+:default \]
-match green+:default (
-match green+:default )
+match neutral:default :
+match neutral:default ;
+match highlight:default \.
+match bright:default -
+match bright:default /
+match highlight:default \[
+match highlight:default \]
+match highlight:default (
+match highlight:default )
 ifnarg --help
-match green+:default [^ ]+
+match highlight:default [^ ]+

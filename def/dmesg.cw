@@ -1,6 +1,5 @@
-base cyan+
-match cyan+:cyan :
+match bright:punctuation :
 ifarg -h:--help
-match cyan+:cyan -
-match grey:cyan \[
-match grey:cyan \]
+match bright:punctuation -
+match punctuation:punctuation \[
+match punctuation:punctuation \]

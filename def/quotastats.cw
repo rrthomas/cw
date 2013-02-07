@@ -1,6 +1,6 @@
-base white
-match grey:default :
-match grey:cyan (
-match grey:default )
-match grey:cyan /
-match grey+:default [^:]+
+base neutral
+match punctuation:default :
+match punctuation:punctuation (
+match punctuation:default )
+match punctuation:punctuation /
+match punctuation:default [^:]+

@@ -1,7 +1,6 @@
 command tail -f /var/log/syslog
-base cyan
-match white:cyan+ \(
-match white:default )
-match white:cyan+ \[
-match white:default \]
-match white:green+ ^[[:alpha:]]+ +[[:digit:]]+ +[[:digit:]:]+
+match neutral:bright \(
+match neutral:default )
+match neutral:bright \[
+match neutral:default \]
+match neutral:highlight ^[[:alpha:]]+ +[[:digit:]]+ +[[:digit:]:]+

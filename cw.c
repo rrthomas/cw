@@ -19,6 +19,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdnoreturn.h>
 #include <stdlib.h>
@@ -45,6 +46,7 @@
 #include "dirname.h"
 #include "gl_xlist.h"
 #include "gl_linked_list.h"
+#include "hash.h"
 #include "xalloc.h"
 
 #define BUFSIZE 1024
@@ -114,7 +116,6 @@ struct{
  bool eint;
  bool invert;
  bool nocolor, nocolor_stdout, nocolor_stderr;
- signed char base;
  char *cmd, *cmdargs;
  gl_list_t m;
  struct{
@@ -131,11 +132,18 @@ typedef struct{
   unsigned char a;
 }match;
 
+/* Colormap hash entry. */
+typedef struct{
+ const char *log;
+ const char *phys;
+}colormap_t;
+
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 static bool ext=false;
 static unsigned char rexit=0;
 static char *pal2[18],*scrname,*base_scrname;
+static Hash_table *colormap;
 static pid_t pid_c;
 extern char **environ;
 
@@ -225,14 +233,62 @@ static void usage(void){
  cwexit(0,0);
 }
 
-/* Convert a color string to a color array index. (0-17) */
+/* Convert a logical color string to a physical color array index. (0-17) */
 static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
- signed char i=0;
- const char **palptr=cfgtable.invert?pal1_invert:pal1;
- if(!color)
-  return(-1);
- while(strcmp(palptr[i],color)&&i<18)i++;
- return(i<18?i:-1);
+ if(color){
+  colormap_t *c=XZALLOC(colormap_t),*ent;
+  signed char i=0;
+  const char **palptr=cfgtable.invert?pal1_invert:pal1;
+  c->log=color;
+  ent=hash_lookup(colormap,c);
+  if(!ent){ /* Use "default" if the color type is undefined. */
+   c->log="default";
+   ent=hash_lookup(colormap,c);
+  }
+  free(c);
+  if(ent){
+   while(strcmp(palptr[i],ent->phys)&&i<18)i++;
+   return(i<18?i:-1);
+  }
+ }
+ return(-1);
+}
+
+const char *default_colormap="default=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white:warning=yellow:error=red+:none=none:punctuation=blue+";
+
+static size_t colormap_hash (const void *c, size_t n){
+ return hash_string(((const colormap_t *)c)->log,n);
+}
+
+static bool colormap_cmp (const void *c1, const void *c2){
+ return !strcmp(((const colormap_t *)c1)->log, ((const colormap_t *)c2)->log);
+}
+
+/* Set user color map. */
+static void setcolors(const char *str){
+ char *ass,*tmp=xstrdup(str);
+ size_t i;
+ for(i=0;(ass=parameter(tmp,":",i));i++){
+  char *tmp2=strtok(ass,"=");
+  if(tmp2&&strlen(tmp2)){
+   char *log=xstrdup(tmp2);
+   char *phys=strtok(0,"");
+   if(phys&&strlen(phys)){
+    colormap_t *c=XZALLOC(colormap_t);
+    c->log=xstrdup(log);
+    c->phys=xstrdup(phys);
+    hash_delete(colormap,c); /* Later entries override earlier ones. */
+    assert(hash_insert(colormap,c));
+   }
+   else cwexit(1,"physical color missing or invalid.");
+   free(log);
+  }
+  else cwexit(1,"logical color missing or invalid.");
+  free(ass);
+ }
+ free(tmp);
+ if(color_atoi("default")==-1)
+  setcolors("default=white");
 }
 
 /* Color a string based on the definition file. */
@@ -268,15 +324,15 @@ static char *convert_string(const char *line){
     k+=pm.rm_so;
     strncpy(tmpcmp,tbuf+k,l);
     if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->b!=17){
-     strcpy(tmp+j,pal2[m->b==16?cfgtable.base:m->b]);
-     j+=strlen(pal2[m->b==16?cfgtable.base:m->b]);
+     strcpy(tmp+j,pal2[m->b==16?color_atoi("default"):m->b]);
+     j+=strlen(pal2[m->b==16?color_atoi("default"):m->b]);
     }
     strcpy(tmp+j,tmpcmp);
     j+=strlen(tmpcmp);
     free(tmpcmp);
     if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->a!=17){
-     strcpy(tmp+j,pal2[m->a==16?cfgtable.base:m->a]);
-     j+=strlen(pal2[m->a==16?cfgtable.base:m->a]);
+     strcpy(tmp+j,pal2[m->a==16?color_atoi("default"):m->a]);
+     j+=strlen(pal2[m->a==16?color_atoi("default"):m->a]);
     }
     on=false;
     k-=pm.rm_so;
@@ -289,8 +345,8 @@ static char *convert_string(const char *line){
    on=false;
   }
  }
- buf=(char *)xzalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)+4+1);
- sprintf(buf,"%s%s%s",pal2[cfgtable.base],tbuf,pal2[16]);
+ buf=(char *)xzalloc(strlen(pal2[color_atoi("default")])+strlen(tbuf)+4+1);
+ sprintf(buf,"%s%s%s",pal2[color_atoi("default")],tbuf,pal2[16]);
  free(tbuf);
  return(buf);
 }
@@ -550,12 +606,6 @@ static void c_handler(char *line,size_t l,int argc){
   }
   else c_error(l,"'command' instruction missing command.");
  }
- else if(!strcmp(ins,"base")){
-  if((cfgtable.base=color_atoi((ptr=parameter(line," ",1))))<0)
-   c_error(l,"'base' definition used an invalid color.");
-  if(cfgtable.base==16)cfgtable.base=7;
-  free(ptr);
- }
  else if(!strcmp(ins,"match")){
   if((tmp=parameter(line," ",1))){
    match *m=(match *)XZALLOC(match);
@@ -610,7 +660,6 @@ void c_read(char *file,int argc){
   }
  }
  fclose(fs);
- if(cfgtable.base<0)cfgtable.base=7;
 }
 
 int main(int argc,char **argv){
@@ -650,10 +699,13 @@ int main(int argc,char **argv){
   cwexit(1,"cannot find definition file.");
  for(i=0;18>i;i++)
   pal2[i]=xstrdup(pal2_orig[i]);
- cfgtable.base=-1;
  cfgtable.ifarg=cfgtable.ifarga=false;
  cfgtable.ifos=cfgtable.ifosa=false;
  cfgtable.p.on=false;
+ colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
+ if((ptr=getenv("CW_COLORS")))
+  setcolors(ptr);
+ else setcolors(default_colormap);
  if(getenv("CW_INVERT"))cfgtable.invert=true;
  /* Set PATH for child processes; may be overridden by definition file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);

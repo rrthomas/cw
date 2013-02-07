@@ -1,19 +1,18 @@
-base cyan
 ifos sunos
-match cyan+:blue+ ----
-match white:default is alive
+match bright:punctuation ----
+match neutral:default is alive
 ifos <any>
-match cyan+:blue+ ---
+match bright:punctuation ---
 ifnarg --help
-match green+:cyan+ =
+match highlight:bright =
 ifarg <any>
-match white:cyan+ :
-match white:green+ (
-match white:default )
-match green+:cyan+ \[
-match green+:default \]
-match cyan+:default ,
-match green+:default  ms
-match none:green+  from 
-match none:green+ From 
-match blue+:none PING
+match neutral:bright :
+match neutral:highlight (
+match neutral:default )
+match highlight:bright \[
+match highlight:default \]
+match bright:default ,
+match highlight:default  ms
+match none:highlight  from 
+match none:highlight From 
+match punctuation:none PING

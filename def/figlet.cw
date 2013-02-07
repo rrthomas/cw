@@ -1,3 +1,2 @@
-base cyan
-match cyan+:default |
-match cyan+:default _
+match bright:default |
+match bright:default _

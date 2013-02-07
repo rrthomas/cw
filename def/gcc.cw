@@ -1,16 +1,16 @@
-base grey+
+base punctuation
 ifnarg --help:<none>
-match white:default [[:digit:]]
-match yellow:default :
-match white:default \.
-match white:default `
-match white:default '
-match white:default "
-match white:default /
-match white:default -
-match yellow:default <
-match yellow:default >
-match yellow:default \[
-match yellow:default \]
-match green+:default warning:
-match red+:default error:
+match neutral:default [[:digit:]]
+match warning:default :
+match neutral:default \.
+match neutral:default `
+match neutral:default '
+match neutral:default "
+match neutral:default /
+match neutral:default -
+match warning:default <
+match warning:default >
+match warning:default \[
+match warning:default \]
+match highlight:default warning:
+match error:default error:

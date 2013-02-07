@@ -1,14 +1,14 @@
-base grey+
+base punctuation
 ifnarg <none>:-i:-ki
-match cyan:default [[:digit:]]
-match white:none USER
+match punctuation:default [[:digit:]]
+match neutral:none USER
 ifnarg -i:-ki
-match white:default -
-match white:default /
-match grey:default \.
-match cyan+:default :
-match cyan+:default |
-match cyan:default \[
-match cyan:default \]
-match white:default (
-match white:default )
+match neutral:default -
+match neutral:default /
+match punctuation:default \.
+match bright:default :
+match bright:default |
+match punctuation:default \[
+match punctuation:default \]
+match neutral:default (
+match neutral:default )

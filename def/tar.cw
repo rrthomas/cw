@@ -1,14 +1,13 @@
 # coloring the output stream of tar would create a broken archive.
 ifnarg -c:--create
-base cyan
-match white:cyan :
-match white:default =
-match cyan+:default /
-match cyan+:default -
-match cyan+:default \.
-match cyan+:default `
-match cyan+:default '
-match white:default \[
-match white:default \]
-match white:default <
-match white:default >
+match neutral:punctuation :
+match neutral:default =
+match bright:default /
+match bright:default -
+match bright:default \.
+match bright:default `
+match bright:default '
+match neutral:default \[
+match neutral:default \]
+match neutral:default <
+match neutral:default >

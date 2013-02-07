@@ -1,11 +1,10 @@
-base cyan
-match cyan+:default [[:digit:]]
-match cyan+:default /
-match cyan+:default \.
-match green+:default :
-match grey:default \[
-match grey:default \]
-match white:none Hosts
-match white:none All
-match white:none Directories
-match white:none Export
+match bright:default [[:digit:]]
+match bright:default /
+match bright:default \.
+match highlight:default :
+match punctuation:default \[
+match punctuation:default \]
+match neutral:none Hosts
+match neutral:none All
+match neutral:none Directories
+match neutral:none Export

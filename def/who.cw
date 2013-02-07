@@ -1,25 +1,25 @@
-base grey+
+base punctuation
 ifarg --help
-match white:default \?
-match white:default \+
-match white:default  - 
+match neutral:default \?
+match neutral:default \+
+match neutral:default  - 
 ifarg -
-match green+:default  \+ 
-match green:default  - 
+match highlight:default  \+ 
+match lowlight:default  - 
 ifarg <any>
-match white:default -
-match white:default :
-match white:default \.
-match white:default =
-match grey:default /
-match grey:default (
-match grey:default )
-match grey:default <
-match grey:default >
-match grey:default \[
-match grey:default \]
-match white:default tty
-match white:default pts
-match grey:default LOGIN
-match white:default root
-match cyan+:default ... .. ..:..
+match neutral:default -
+match neutral:default :
+match neutral:default \.
+match neutral:default =
+match punctuation:default /
+match punctuation:default (
+match punctuation:default )
+match punctuation:default <
+match punctuation:default >
+match punctuation:default \[
+match punctuation:default \]
+match neutral:default tty
+match neutral:default pts
+match punctuation:default LOGIN
+match neutral:default root
+match bright:default ... .. ..:..

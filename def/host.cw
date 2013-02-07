@@ -1,12 +1,11 @@
-base cyan
-match cyan+:default \.
-match cyan+:default :
-match cyan+:default -
-match cyan+:default \[
-match cyan+:default \]
-match cyan+:white (
-match cyan+:default )
-match cyan+:default SOA
-match cyan+:default mail is handled by
-match cyan+:default name server
-match cyan+:default domain name pointer
+match bright:default \.
+match bright:default :
+match bright:default -
+match bright:default \[
+match bright:default \]
+match bright:neutral (
+match bright:default )
+match bright:default SOA
+match bright:default mail is handled by
+match bright:default name server
+match bright:default domain name pointer

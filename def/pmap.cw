@@ -1,6 +1,6 @@
-base purple
-match purple+:default [[:digit:]]
-match purple+:default /
-match red+:default -
-match red+:red \[
-match red+:default \]
+base punctuation
+match punctuation:default [[:digit:]]
+match punctuation:default /
+match error:default -
+match error:error \[
+match error:default \]

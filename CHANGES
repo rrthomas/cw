@@ -41,6 +41,8 @@ version 1.0.17:
   implemented).
 * Fixed a bug in regex matching ends of lines.
 ! Removed CW_COLORIZE.
+* Use logical color names instead of physical color names; add
+  CW_COLORS to customize the default set.
 
 version 1.0.16:
 * Fixed compiling issue on newer Fedora(/other?) distributions.

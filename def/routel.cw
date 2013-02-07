@@ -1,6 +1,5 @@
-base cyan
-match cyan+:default [[:digit:]]
-match green+:default \.
-match green+:default /
-match green+:default broadcast
-match yellow:none target
+match bright:default [[:digit:]]
+match highlight:default \.
+match highlight:default /
+match highlight:default broadcast
+match warning:none target

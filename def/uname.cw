@@ -1,9 +1,8 @@
-base cyan
-match cyan+:default [[:digit:]]
-match cyan+:default /
-match cyan+:default :
-match cyan+:default \.
-match cyan+:default -
-match cyan+:default #
+match bright:default [[:digit:]]
+match bright:default /
+match bright:default :
+match bright:default \.
+match bright:default -
+match bright:default #
 ifnarg --help:--version
-match cyan+:default [^ ]+
+match bright:default [^ ]+

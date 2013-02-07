@@ -1,7 +1,7 @@
-base white
-match cyan+:cyan ;
-match cyan+:cyan <
-match cyan+:cyan >
-match cyan+:default :
-match cyan+:default -
-match cyan+:default \+
+base neutral
+match bright:punctuation ;
+match bright:punctuation <
+match bright:punctuation >
+match bright:default :
+match bright:default -
+match bright:default \+

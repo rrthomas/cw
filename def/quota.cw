@@ -1,10 +1,9 @@
-base cyan
-match green+:default [[:digit:]]
-match cyan+:default /
-match green+:default :
-match green+:default \.
-match green+:green (
-match green+:default )
-match green+:green \[
-match green+:default \]
-match cyan+:none Filesystem
+match highlight:default [[:digit:]]
+match bright:default /
+match highlight:default :
+match highlight:default \.
+match highlight:lowlight (
+match highlight:default )
+match highlight:lowlight \[
+match highlight:default \]
+match bright:none Filesystem

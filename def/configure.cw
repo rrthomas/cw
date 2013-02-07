@@ -2,29 +2,29 @@
 # colored by cw, which could mess up the configure script.
 $NOCOLOR=1
 command ./configure {}
-base grey+
-match green+:default yes$
-match red+:default no$
-match cyan:default \.
-match grey:default -
-match grey:default /
-match cyan:default \\
-match cyan+:default :
-match cyan+:default '
-match cyan+:default `
-match cyan+:default "
-match green+:default &
-match white:default =
-match white:default \[
-match white:default \]
-match green+:default \*\*\*
-match white:default \*
-match white:default checking
-match yellow:default updating
-match cyan+:default creating
-match cyan+:default loading
-match grey:default (cached)
-match green+:default warning: 
-match red+:default error: 
-match red+:default Error
-match yellow:default Interrupt
+base punctuation
+match highlight:default yes$
+match error:default no$
+match punctuation:default \.
+match punctuation:default -
+match punctuation:default /
+match punctuation:default \\
+match bright:default :
+match bright:default '
+match bright:default `
+match bright:default "
+match highlight:default &
+match neutral:default =
+match neutral:default \[
+match neutral:default \]
+match highlight:default \*\*\*
+match neutral:default \*
+match neutral:default checking
+match warning:default updating
+match bright:default creating
+match bright:default loading
+match punctuation:default (cached)
+match highlight:default warning: 
+match error:default error: 
+match error:default Error
+match warning:default Interrupt

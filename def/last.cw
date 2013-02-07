@@ -1,12 +1,11 @@
-base cyan
-match cyan+:default [[:digit:]]
-match grey:default \[
-match grey:default \]
-match white:default (
-match white:default )
-match white:default \+
-match cyan+:default -
-match green+:default :
-match red+:default root
+match bright:default [[:digit:]]
+match punctuation:default \[
+match punctuation:default \]
+match neutral:default (
+match neutral:default )
+match neutral:default \+
+match bright:default -
+match highlight:default :
+match error:default root
 ifnarg --help
-match cyan+:default [^ ]+
+match bright:default [^ ]+

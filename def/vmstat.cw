@@ -1,19 +1,18 @@
 ifarg -m
-base green+
-match green:default _
-match green:default -
-match white:none Cache
-match white:none Num
-match white:none Total
-match white:none Size
-match white:none Pages
-match cyan:none  .*
+base highlight
+match lowlight:default _
+match lowlight:default -
+match neutral:none Cache
+match neutral:none Num
+match neutral:none Total
+match neutral:none Size
+match neutral:none Pages
+match punctuation:none  .*
 ifarg-else
-base cyan+
-match cyan:default [[:digit:]]
-match white:default -
-match white:default \[
-match white:default \]
+match punctuation:default [[:digit:]]
+match neutral:default -
+match neutral:default \[
+match neutral:default \]
 ifarg <any>
-match white:cyan+ (
-match white:default )
+match neutral:bright (
+match neutral:default )

@@ -1,13 +1,13 @@
-base white
-match grey+:default [[:digit:]]
-match grey+:default \.
-match grey:default :
-match grey:default /
-match grey:default -
-match cyan+:default \*
-match grey:default \[
-match grey:default \]
-match cyan+:default (
-match cyan+:default )
+base neutral
+match punctuation:default [[:digit:]]
+match punctuation:default \.
+match punctuation:default :
+match punctuation:default /
+match punctuation:default -
+match bright:default \*
+match punctuation:default \[
+match punctuation:default \]
+match bright:default (
+match bright:default )
 ifarg <none>
-match cyan+:none Login
+match bright:none Login

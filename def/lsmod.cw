@@ -1,9 +1,8 @@
-base cyan
-match cyan+:default [[:digit:]]
-match cyan+:cyan+ (
-match cyan+:default )
-match cyan+:default \[
-match cyan+:default \]
-match cyan+:none Module
+match bright:default [[:digit:]]
+match bright:bright (
+match bright:default )
+match bright:default \[
+match bright:default \]
+match bright:none Module
 ifarg -h:--help
-match cyan+:default -
+match bright:default -

@@ -1,16 +1,15 @@
 ifarg -h:--help
-base cyan
-match cyan+:default >
-match cyan+:default <
-match cyan+:green+ \[
-match cyan+:default \]
-match cyan+:default -
+match bright:default >
+match bright:default <
+match bright:highlight \[
+match bright:default \]
+match bright:default -
 ifarg-else
-base white
-match cyan+:default >
-match green+:default <
-match yellow:default |
-match cyan+:default \+
-match yellow:default ---
-match green+:default -
-match yellow:none @@
+base neutral
+match bright:default >
+match highlight:default <
+match warning:default |
+match bright:default \+
+match warning:default ---
+match highlight:default -
+match warning:none @@

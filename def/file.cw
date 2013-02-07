@@ -1,10 +1,9 @@
-base cyan+
-match green+:default [[:digit:]]
-match white:default :
-match green+:default `
-match green+:default '
-match green+:white (
-match green+:default )
-match green+:white \[
-match green+:default \]
-match green+:default -
+match highlight:default [[:digit:]]
+match neutral:default :
+match highlight:default `
+match highlight:default '
+match highlight:neutral (
+match highlight:default )
+match highlight:neutral \[
+match highlight:default \]
+match highlight:default -

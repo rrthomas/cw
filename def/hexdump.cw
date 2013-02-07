@@ -1,4 +1,3 @@
-base cyan
-match yellow:default |
+match warning:default |
 ifnarg --help
-match white:default [^ ]+
+match neutral:default [^ ]+

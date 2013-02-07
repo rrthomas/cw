@@ -1,27 +1,26 @@
 ifarg --help
-base grey+
-match white:default -
+base punctuation
+match neutral:default -
 ifarg-else
-base cyan+
-match default:grey+ %
-match default:grey+ K 
-match default:grey+ M 
-match default:grey+ G 
-match default:grey+ T 
+match default:punctuation %
+match default:punctuation K 
+match default:punctuation M 
+match default:punctuation G 
+match default:punctuation T 
 match default:none K-blocks
 match default:none k-blocks
 match default:none -blocks
-match cyan+:default Mounted on
+match bright:default Mounted on
 ifarg <any>
-match white:grey+ [[:digit:]]
-match grey:grey+ /
-match grey:grey+ \.
-match grey:grey+ :
-match grey:grey+ <
-match grey:grey+ >
-match grey:grey+ (
-match grey:grey+ )
-match grey:grey+ \[
-match grey:grey+ \]
-match white:grey+ `
-match white:default '
+match neutral:punctuation [[:digit:]]
+match punctuation:punctuation /
+match punctuation:punctuation \.
+match punctuation:punctuation :
+match punctuation:punctuation <
+match punctuation:punctuation >
+match punctuation:punctuation (
+match punctuation:punctuation )
+match punctuation:punctuation \[
+match punctuation:punctuation \]
+match neutral:punctuation `
+match neutral:default '

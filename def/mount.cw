@@ -1,6 +1,4 @@
-base cyan
-match cyan+:cyan+ (
-match cyan+:default )
+match bright:bright (
+match bright:default )
 ifos sunos
-base cyan+
-match cyan+:cyan  on
+match bright:punctuation  on

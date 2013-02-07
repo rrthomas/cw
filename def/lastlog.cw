@@ -1,11 +1,11 @@
-base purple
-match white:default :
-match grey:default -
-match purple+:default /
-match purple+:default <
-match purple+:default >
-match purple+:default \[
-match purple+:default \]
-match red:red+ \*\*
-match purple+:none Username
-match red+:default root
+base punctuation
+match neutral:default :
+match punctuation:default -
+match punctuation:default /
+match punctuation:default <
+match punctuation:default >
+match punctuation:default \[
+match punctuation:default \]
+match error:error \*\*
+match punctuation:none Username
+match error:default root

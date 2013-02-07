@@ -1,12 +1,11 @@
-base cyan
-match cyan+:default [[:digit:]]
-match cyan+:default '
-match white:default :
-match white:default \.
-match white:default -
-match white:default /
-match white:default |
-match white:default \[
-match white:default \]
-match white:default (
-match white:default )
+match bright:default [[:digit:]]
+match bright:default '
+match neutral:default :
+match neutral:default \.
+match neutral:default -
+match neutral:default /
+match neutral:default |
+match neutral:default \[
+match neutral:default \]
+match neutral:default (
+match neutral:default )

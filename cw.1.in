@@ -1,5 +1,5 @@
 .\" color wrapper manual page.
-.TH "CW" "1" "August 2004" "v9/fakehalo" "Text Manipulation"
+.TH "CW" "1" "February 2013" "v9/fakehalo" "Text Manipulation"
 .SH "NAME"
 cw \- colorer for command-line programs
 .SH "SYNOPSIS"
@@ -32,22 +32,21 @@ reverse of \fBifos\fR
 \fBifos\-else\fR
 this will use the definitions to follow if the previous \fBifos\fR or \fBifnos\fR was false
 .TP
-\fBbase\fR [\fIcolor\fR]
-color used if no other definitions state otherwise (if this is the only definition used it will be ignored)
-.TP
-\fBmatch\fR [\fIbefore color:after color\fR] [\fIregex pattern\fR]
-changes the color before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  see regex(7) for the syntax of regular expressions.
+\fBmatch\fR [\fIbefore type:after type\fR] [\fIregex pattern\fR]
+changes the color type before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matched output from the program.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions.
 .TP
 \fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
 sets the environment variable \fBVAR\fR to \fBVALUE\fR
 .TP
 \fB#\fR[\fItext\fR]
 ignores the following \fBtext\fR for processing. (for comments)
-.TP
-The color values used are in the text form of:
-\fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default, none\fR
-.TP
-Colors with a \fB+\fR designate a brighter color.
+.SH COLORS
+.PP
+Colors are referenced by types denoting their function.  The standard list of color types is:
+\fBdefault, bright, highlight, neutral, error, none\fR.  The mapping of color types to physical names can be changed by the \fBCW_COLORS\fR environment variable (see below).
+.PP
+The available colors are:
+\fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, none\fR. Colors with a \fB+\fR designate a brighter color.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
@@ -55,6 +54,9 @@ disables color wrapping when set to any value. Note that cw does not color unles
 .TP
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
+.TP
+\fBCW_COLORS\fR
+defines a mapping from color names to colors.  The format is \fBCW_COLORS=name=color\fR[\fB:name=color:...\fR].
 .SH "AUTHOR"
 Written by v9/fakehalo <v9@fakehalo.us> and Reuben Thomas <rrt@sc3d.org>
 .SH "BUGS"

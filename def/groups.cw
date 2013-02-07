@@ -1,6 +1,5 @@
-base cyan
-match cyan+:default -
-match cyan+:default \[
-match cyan+:default \]
-match cyan+:default root
-match cyan+:default wheel
+match bright:default -
+match bright:default \[
+match bright:default \]
+match bright:default root
+match bright:default wheel

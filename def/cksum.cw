@@ -1,6 +1,5 @@
-base cyan
-match cyan+:default /
+match bright:default /
 ifarg --h
-match cyan+:default -
+match bright:default -
 ifarg-else
-match cyan+:default [^ ]+ [^ ]+
+match bright:default [^ ]+ [^ ]+

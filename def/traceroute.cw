@@ -1,13 +1,12 @@
-base cyan
-match cyan+:default [[:digit:]]
-match cyan+:default \.
-match cyan+:default :
-match cyan+:default \*
-match cyan+:default (
-match cyan+:default )
-match cyan+:cyan+ \[
-match cyan+:default \]
-match cyan+:default =
-match cyan+:default ,
-match cyan+:default  ms
-match cyan+:default traceroute
+match bright:default [[:digit:]]
+match bright:default \.
+match bright:default :
+match bright:default \*
+match bright:default (
+match bright:default )
+match bright:bright \[
+match bright:default \]
+match bright:default =
+match bright:default ,
+match bright:default  ms
+match bright:default traceroute

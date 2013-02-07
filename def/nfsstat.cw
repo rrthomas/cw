@@ -1,7 +1,7 @@
-base green
-match green+:default [[:digit:]]
-match white:default :
-match white:default %
-match white:default %
-match white:none Client
-match white:none Server
+base lowlight
+match highlight:default [[:digit:]]
+match neutral:default :
+match neutral:default %
+match neutral:default %
+match neutral:none Client
+match neutral:none Server

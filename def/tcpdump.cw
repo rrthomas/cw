@@ -1,14 +1,13 @@
-base cyan
-match cyan+:default [[:digit:]]
-match grey:default \.
-match white:default :
-match yellow:default ,
-match yellow:default <
-match yellow:default >
-match blue+:default \[
-match blue+:default \]
-match blue+:default (
-match blue+:default )
-match white:default tcpdump
-match green+:default tcp
-match green+:default udp
+match bright:default [[:digit:]]
+match punctuation:default \.
+match neutral:default :
+match warning:default ,
+match warning:default <
+match warning:default >
+match punctuation:default \[
+match punctuation:default \]
+match punctuation:default (
+match punctuation:default )
+match neutral:default tcpdump
+match highlight:default tcp
+match highlight:default udp

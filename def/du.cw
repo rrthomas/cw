@@ -1,17 +1,16 @@
-base cyan
 ifnarg --help
-match cyan+:default /
+match bright:default /
 match default:default M
 match default:default K
-match green+:default [^	]+
+match highlight:default [^	]+
 ifarg-else
-match green+:default \[
-match green+:default \]
-match green+:default <
-match green+:default >
-match green+:default :
-match cyan+:default ,
-match cyan+:default =
-match cyan+:default -
+match highlight:default \[
+match highlight:default \]
+match highlight:default <
+match highlight:default >
+match highlight:default :
+match bright:default ,
+match bright:default =
+match bright:default -
 ifarg <any>
 match default:none Try

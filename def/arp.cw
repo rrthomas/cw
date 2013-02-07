@@ -1,16 +1,15 @@
-base cyan
-match white:default [a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}
+match neutral:default [a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}
 ifos sunos
-match cyan+:none Device
-match cyan+:none -----
+match bright:none Device
+match bright:none -----
 ifos-else
-match cyan+:none Address
-match cyan+:default -
+match bright:none Address
+match bright:default -
 ifos <any>
-match cyan+:default \.
-match cyan+:default \[
-match cyan+:default \]
-match white:default <
-match white:default >
-match green+:default (
-match green+:default )
+match bright:default \.
+match bright:default \[
+match bright:default \]
+match neutral:default <
+match neutral:default >
+match highlight:default (
+match highlight:default )

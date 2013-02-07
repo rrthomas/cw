@@ -1,3 +1,2 @@
 ifnarg --h
-base cyan
-match cyan+:default [^=]+
+match bright:default [^=]+

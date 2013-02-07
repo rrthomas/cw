@@ -1,13 +1,12 @@
-base cyan
-match cyan+:default [[:digit:]]
-match cyan+:default [[:upper:]]
-match green+:default -
-match grey:default :
-match grey:default \.
-match grey:default `
-match grey:default '
-match grey:default \[
-match grey:default \]
-match grey:default (
-match grey:default )
-match green+:none target  
+match bright:default [[:digit:]]
+match bright:default [[:upper:]]
+match highlight:default -
+match punctuation:default :
+match punctuation:default \.
+match punctuation:default `
+match punctuation:default '
+match punctuation:default \[
+match punctuation:default \]
+match punctuation:default (
+match punctuation:default )
+match highlight:none target  
