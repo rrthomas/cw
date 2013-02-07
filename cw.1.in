@@ -9,37 +9,34 @@ cw \- colorer for command-line programs
 .PP
 \fBcw\fR colors the output of command-line programs.  The colors to use are defined in a cw definition file.  These definition files have the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
 .SH "DEFINITION INSTRUCTIONS"
-The following instructions occur one per line in a definition file.
+The following instructions occur one per line in a definition file. A line starting with a hash is a comment, and is ignored.
 .TP
-\fBcommand\fR [\fIprogram\fR]
+\fBcommand\fR \fIprogram\fR
 Specifies a shell command to execute.  "\fB{}\fR" can be used in the \fBprogram\fR string to insert the command\-line arguments.
 .TP
-\fBifarg\fR [\fIregex:regex:...\fR]
+\fBifarg\fR \fIregex:regex:...\fR
 The colon-separated list is compared against the program's command-line arguments.  If the regex matches the arguments, then the following instructions are used; otherwise, processing skips to the next \fBifarg\fR, \fBifnarg\fR or \fBifarg\-else\fR instruction.  "\fB<any>\fR" can be used as a constant value for any value, including no value.  "\fB<none>\fR" can be used as a constant value for no command\-line arguments.
 .TP
-\fBifnarg\fR [\fIregex:regex:...\fR]
+\fBifnarg\fR \fIregex:regex:...\fR
 Reverse of \fBifarg\fR.
 .TP
 \fBifarg\-else\fR
 This gives definitions to use if the previous \fBifarg\fR or \fBifnarg\fR was false.
 .TP
-\fBifos\fR [\fIregex:regex:...\fR]
+\fBifos\fR \fIregex:regex:...\fR
 The colon-separated list is compared against the operating system name (equal to \fBuname \-s\fR).  If any regex matches, then the following instructions are used; otherwise, processing skips to the next \fBifos\fR, \fBifnos\fR or \fBifos\-else\fR instruction.  \fBifos\fR definition instructions are a higher priority than \fBifarg\fR.  "\fB<any>\fR" can be used as a constant value for any value, including no value.
 .TP
-\fBifnos\fR [\fIregex:regex:...\fR]
+\fBifnos\fR \fIregex:regex:...\fR
 reverse of \fBifos\fR
 .TP
 \fBifos\-else\fR
 This gives definitions to use if the previous \fBifos\fR or \fBifnos\fR was false.
 .TP
-\fBmatch\fR [\fIbefore type:after type\fR] [\fIregex pattern\fR]
+\fBmatch\fR \fIbefore type:after type\fR \fIregex pattern\fR
 Changes the color type before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matches output from the program.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions.
 .TP
-\fB$\fR[\fIVAR\fR]\fI=\fR[\fIVALUE\fR]
+\fB$\fR\fIVAR\fR\fI=\fR\fIVALUE\fR
 Sets the environment variable \fBVAR\fR to \fBVALUE\fR
-.TP
-\fB#\fR[\fIcomment\fR]
-A line starting with a hash is ignored.
 .SH COLORS
 .PP
 Colors are referenced by types denoting their function.  The standard list of color types is:
