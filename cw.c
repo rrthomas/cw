@@ -118,11 +118,6 @@ struct{
  char *cmd, *cmdargs;
  gl_list_t m;
  struct{
-  signed char l;
-  signed char h;
-  bool on;
- }z;
- struct{
   int master[2];
   int slave[2];
   bool on;
@@ -236,44 +231,8 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  const char **palptr=cfgtable.invert?pal1_invert:pal1;
  if(!color)
   return(-1);
- if(cfgtable.z.on){
-  if(!strcmp(color,"default")){
-   if(cfgtable.base<9)i=cfgtable.z.l;
-   else i=cfgtable.z.h;
-  }
-  else if(!strcmp(color,"none"))i=17;
-  else{
-   if(!strchr(color,'+'))i=cfgtable.z.l;
-   else i=cfgtable.z.h;
-  }
- }
- else
-  while(strcmp(palptr[i],color)&&i<18)i++;
+ while(strcmp(palptr[i],color)&&i<18)i++;
  return(i<18?i:-1);
-}
-
-/* Set colorize values. */
-static void setcolorize(char *str){
- signed char r=0;
- char *col;
- cfgtable.invert=cfgtable.z.on=false;
- cfgtable.z.l=color_atoi((col=parameter(str,":",0)));
- free(col);
- cfgtable.z.h=color_atoi((col=parameter(str,":",1)));
- free(col);
- if(cfgtable.z.l>=0&&cfgtable.z.h>=0)cfgtable.z.on=true;
- else{
-  r=color_atoi(str);
-  if(r>=0&&r<8){
-   cfgtable.z.l=r;
-   cfgtable.z.h=(r+8);
-  }
-  else if(r==8){
-   cfgtable.z.l=8;
-   cfgtable.z.h=7;
-  }
-  if(r>=0&&r<9)cfgtable.z.on=true;
- }
 }
 
 /* Color a string based on the definition file. */
@@ -663,7 +622,6 @@ int main(int argc,char **argv){
  set_program_name(argv[0]);
  if(argc>1)scrname=xstrdup(argv[1]);
  base_scrname=base_name(scrname?scrname:program_name);
- cfgtable.z.l=cfgtable.z.h=-1;
  cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  if(argc>1&&*argv[1]=='-'){
   for(i=1;i<argc;i++){
@@ -698,8 +656,6 @@ int main(int argc,char **argv){
  cfgtable.ifarg=cfgtable.ifarga=false;
  cfgtable.ifos=cfgtable.ifosa=false;
  cfgtable.p.on=false;
- if(!cfgtable.z.on&&(ptr=getenv("CW_COLORIZE")))
-  setcolorize(ptr);
  if(getenv("CW_INVERT"))cfgtable.invert=true;
  /* Set PATH for child processes; may be overridden by definition file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
@@ -707,7 +663,6 @@ int main(int argc,char **argv){
  free(newpath);
  if(getenv("NOCOLOR"))cfgtable.nocolor=true;
  c_read(scrname,argc);
- if(cfgtable.z.on)cfgtable.invert=false;
  cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
  cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
  execcw(argc,argv);
