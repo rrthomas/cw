@@ -140,7 +140,7 @@ char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 static bool ext=false;
 static unsigned char rexit=0;
-static char *pal2[18],*aptr,*fptr,*pptr,*scrname,*base_scrname;
+static char *pal2[18],*scrname,*base_scrname;
 static pid_t pid_c;
 extern char **environ;
 
@@ -189,18 +189,14 @@ static bool struncmp(char *cmp){
  return regxcmp(un.sysname,cmp);
 }
 
-/* Parse a delimited token out of a string. */
+/* Parse the n-th delim-delimited token out of a string. */
 static char *parameter(const char *string,const char *delim,size_t n){
- char *arg;
- free(fptr);
- fptr=xstrdup(string);
- arg=strtok(fptr,delim);
+ char *fptr=xstrdup(string);
+ char *arg=strtok(fptr,delim);
  while(n&&(arg=strtok(0,delim)))n--;
- if(!arg){
-  free(fptr);
-  fptr=(char *)xzalloc(3);
- }
- return(pptr=arg);
+ arg=arg?xstrdup(arg):NULL;
+ free(fptr);
+ return arg;
 }
 
 /* Filter a directory out of a PATH-like colon-separated path list. */
@@ -209,15 +205,16 @@ static char *remove_dir_from_path(const char *path, const char *dir){
   char *canon_dir=canonicalize_file_name(dir);
   size_t s=strlen(path),i=0;
   char *newpath=(char *)xzalloc(s+1);
-  char *tmp=xstrdup(path);
-  while(parameter(tmp,":",i++)){
-   char *canon_pptr=canonicalize_file_name(pptr);
+  char *tmp=xstrdup(path),*ptr;
+  while((ptr=parameter(tmp,":",i++))){
+   char *canon_pptr=canonicalize_file_name(ptr);
    if(strcmp(canon_pptr,canon_dir)){
     if(*newpath)
      strcat(newpath,":");
-    strcat(newpath,pptr);
+    strcat(newpath,ptr);
    }
    free(canon_pptr);
+   free(ptr);
   }
   free(tmp);
   free(canon_dir);
@@ -237,6 +234,8 @@ static void usage(void){
 static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  signed char i=0;
  const char **palptr=cfgtable.invert?pal1_invert:pal1;
+ if(!color)
+  return(-1);
  if(cfgtable.z.on){
   if(!strcmp(color,"default")){
    if(cfgtable.base<9)i=cfgtable.z.l;
@@ -256,9 +255,12 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
 /* Set colorize values. */
 static void setcolorize(char *str){
  signed char r=0;
+ char *col;
  cfgtable.invert=cfgtable.z.on=false;
- cfgtable.z.l=color_atoi(parameter(str,":",0));
- cfgtable.z.h=color_atoi(parameter(str,":",1));
+ cfgtable.z.l=color_atoi((col=parameter(str,":",0)));
+ free(col);
+ cfgtable.z.h=color_atoi((col=parameter(str,":",1)));
+ free(col);
  if(cfgtable.z.l>=0&&cfgtable.z.h>=0)cfgtable.z.on=true;
  else{
   r=color_atoi(str);
@@ -331,8 +333,7 @@ static char *convert_string(const char *line){
  buf=(char *)xzalloc(strlen(pal2[cfgtable.base])+strlen(tbuf)+4+1);
  sprintf(buf,"%s%s%s",pal2[cfgtable.base],tbuf,pal2[16]);
  free(tbuf);
- free(aptr);
- return(aptr=buf);
+ return(buf);
 }
 
 /* Create a master-slave pty pair. */
@@ -474,11 +475,13 @@ noreturn void execcw(int argc,char **argv){
         }
        }
        else if(buf[i]=='\n'){
+        char *aptr=NULL;
         tmp[j]=0;
         if(fd==fds[0])
-          fprintf(stdout,"%s\n",cfgtable.nocolor_stdout?tmp:convert_string(tmp));
+         fprintf(stdout,"%s\n",cfgtable.nocolor_stdout?tmp:(aptr=convert_string(tmp)));
         else
-          fprintf(stderr,"%s\n",cfgtable.nocolor_stderr?tmp:convert_string(tmp));
+         fprintf(stderr,"%s\n",cfgtable.nocolor_stderr?tmp:(aptr=convert_string(tmp)));
+        free(aptr);
         fflush(fd==fds[0]?stdout:stderr);
         free(tmp);
         on=false;
@@ -508,45 +511,46 @@ noreturn void execcw(int argc,char **argv){
 static void c_handler(char *line,size_t l,int argc){
  bool o=false,on=false;
  size_t i=0,j=0,k=0;
- char *tmp,*ptr;
- if(!strcmp(parameter(line," ",0),"ifos-else")){
+ char *tmp,*ptr,*ins=parameter(line," ",0);
+ if(!strcmp(ins,"ifos-else")){
   o=true;
   if(cfgtable.ifosa)cfgtable.ifos=(cfgtable.ifos?0:1);
   else c_error(l,"'ifos-else' used before any previous comparison.");
  }
- else if(!strcmp(parameter(line," ",0),"ifos")||!strcmp(pptr,"ifnos")){
+ else if(!strcmp(ins,"ifos")||!strcmp(ins,"ifnos")){
   cfgtable.ifosa=o=true;
-  if(!parameter(line," ",1))c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
+  tmp=parameter(line," ",1);
+  if(!tmp)c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
-   tmp=xstrdup(pptr);
-   for(j=i=0;!j&&parameter(tmp,":",i);i++){
-    if(!strcmp(pptr,"<any>"))j=1;
-    else j=(struncmp(pptr)?0:1);
+   for(j=i=0;!j&&(ptr=parameter(tmp,":",i));i++){
+    if(!strcmp(ptr,"<any>"))j=1;
+    else j=(struncmp(ptr)?0:1);
+    free(ptr);
    }
    free(tmp);
    cfgtable.ifos=j;
-   if(!strcmp(parameter(line," ",0),"ifos"))
+   if(!strcmp(ins,"ifos"))
     cfgtable.ifos=(cfgtable.ifos?0:1);
   }
  }
- else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg-else"))){
+ else if(!cfgtable.ifos&&(!strcmp(ins,"ifarg-else"))){
   o=true;
   if(cfgtable.ifarga)cfgtable.ifarg=(cfgtable.ifarg?0:1);
   else c_error(l,"'ifarg-else' used before any previous comparison.");
  }
- else if(!cfgtable.ifos&&(!strcmp(parameter(line," ",0),"ifarg")||
- !strcmp(pptr,"ifnarg"))){
+ else if(!cfgtable.ifos&&(!strcmp(ins,"ifarg")||!strcmp(ins,"ifnarg"))){
   cfgtable.ifarga=o=true;
-  if(!parameter(line," ",1))c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
+  tmp=parameter(line," ",1);
+  if(!tmp)c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
-   tmp=xstrdup(pptr);
-   for(j=i=0;!j&&parameter(tmp,":",i);i++){
-    if(!strcmp(pptr,"<any>")||(!strcmp(pptr,"<none>")&&argc<3))j=1;
-    else j=!regxcmp(cfgtable.cmdargs,pptr);
+   for(j=i=0;!j&&(ptr=parameter(tmp,":",i));i++){
+    if(!strcmp(ptr,"<any>")||(!strcmp(ptr,"<none>")&&argc<3))j=1;
+    else j=!regxcmp(cfgtable.cmdargs,ptr);
+    free(ptr);
    }
    free(tmp);
    cfgtable.ifarg=j;
-   if(!strcmp(parameter(line," ",0),"ifarg"))
+   if(!strcmp(ins,"ifarg"))
     cfgtable.ifarg=(cfgtable.ifarg?0:1);
   }
  }
@@ -567,7 +571,7 @@ static void c_handler(char *line,size_t l,int argc){
   }
   else c_error(l,"environment variable name missing.");
  }
- else if(!strcmp(parameter(line," ",0),"command")){
+ else if(!strcmp(ins,"command")){
   ptr=strtok(line," ");
   ptr=strtok(0,"");
   if((k=strlen(ptr))){
@@ -589,29 +593,34 @@ static void c_handler(char *line,size_t l,int argc){
   }
   else c_error(l,"'command' instruction missing command.");
  }
- else if(!strcmp(parameter(line," ",0),"base")){
-  if((cfgtable.base=color_atoi(parameter(line," ",1)))<0)
+ else if(!strcmp(ins,"base")){
+  if((cfgtable.base=color_atoi((ptr=parameter(line," ",1))))<0)
    c_error(l,"'base' definition used an invalid color.");
   if(cfgtable.base==16)cfgtable.base=7;
+  free(ptr);
  }
- else if(!strcmp(parameter(line," ",0),"match")){
-  if(parameter(line," ",1)){
+ else if(!strcmp(ins,"match")){
+  if((tmp=parameter(line," ",1))){
    match *m=(match *)XZALLOC(match);
-   tmp=xstrdup(pptr);
-   if(color_atoi(parameter(tmp,":",0))>-1)
-    m->b=color_atoi(parameter(tmp,":",0));
+   if(color_atoi((ptr=parameter(tmp,":",0)))>-1){
+    m->b=color_atoi(ptr);
+    free(ptr);
+   }
    else{
     c_error(l,"invalid first color in 'match' definition. (defaulting)");
     m->b=16;
    }
-   if(color_atoi(parameter(tmp,":",1))>-1)
-    m->a=color_atoi(parameter(tmp,":",1));
+   if(color_atoi((ptr=parameter(tmp,":",1)))>-1){
+    m->a=color_atoi(ptr);
+    free(ptr);
+   }
    else{
     c_error(l,"invalid second color in 'match' definition. (defaulting)");
     m->a=16;
    }
    free(tmp);
-   if(parameter(line," ",2)){
+   if((ptr=parameter(line," ",2))){
+    free(ptr);
     ptr=tmp=xstrdup(line);
     tmp=strtok(tmp," ");
     tmp=strtok(0," ");
@@ -625,6 +634,7 @@ static void c_handler(char *line,size_t l,int argc){
   else c_error(l,"'match' syntax error: cannot find regex argument");
  }
  else if(!o)c_error(l,"invalid definition instruction.");
+ free(ins);
 }
 
 /* Read the config file, passing the lines to c_handler(). */
