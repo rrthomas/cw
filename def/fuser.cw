@@ -1,4 +1,3 @@
-base punctuation
 ifnarg <none>:-i:-ki
 match punctuation:default [[:digit:]]
 match neutral:none USER

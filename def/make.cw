@@ -3,7 +3,6 @@
 $NOCOLOR=1
 # don't want to color kernel dialog compiling.
 ifnarg menuconfig
-base punctuation
 match punctuation:default \.
 match punctuation:default -
 match punctuation:default /

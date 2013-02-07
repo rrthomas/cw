@@ -1,5 +1,4 @@
 ifarg -m
-base highlight
 match lowlight:default _
 match lowlight:default -
 match neutral:none Cache

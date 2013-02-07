@@ -1,4 +1,3 @@
-base punctuation
 match neutral:default :
 match punctuation:default -
 match punctuation:default /

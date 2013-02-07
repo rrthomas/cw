@@ -1,4 +1,3 @@
-base punctuation
 ifarg --help
 match neutral:default \?
 match neutral:default \+

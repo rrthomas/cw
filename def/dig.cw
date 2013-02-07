@@ -1,4 +1,3 @@
-base neutral
 match bright:punctuation ;
 match bright:punctuation <
 match bright:punctuation >

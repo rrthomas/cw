@@ -2,7 +2,6 @@
 # colored by cw, which could mess up the configure script.
 $NOCOLOR=1
 command ./configure {}
-base punctuation
 match highlight:default yes$
 match error:default no$
 match punctuation:default \.

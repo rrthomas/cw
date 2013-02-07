@@ -1,4 +1,3 @@
-base lowlight
 match highlight:default [[:digit:]]
 match neutral:default :
 match neutral:default %

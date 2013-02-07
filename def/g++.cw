@@ -1,4 +1,3 @@
-base punctuation
 match neutral:default [[:digit:]]
 match warning:default :
 match neutral:default \.

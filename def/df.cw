@@ -1,5 +1,4 @@
 ifarg --help
-base punctuation
 match neutral:default -
 ifarg-else
 match default:punctuation %

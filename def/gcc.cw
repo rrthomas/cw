@@ -1,4 +1,3 @@
-base punctuation
 ifnarg --help:<none>
 match neutral:default [[:digit:]]
 match warning:default :

@@ -1,4 +1,3 @@
-base highlight
 match bright:default [[:digit:]]
 match punctuation:default :
 match lowlight:default /
