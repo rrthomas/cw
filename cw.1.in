@@ -56,7 +56,7 @@ disables color wrapping when set to any value. Note that cw does not color unles
 \fBCW_INVERT\fR
 re\-defines the internal colormap to the opposite colors.  this is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .SH "AUTHOR"
-Written by v9/fakehalo <v9@fakehalo.us>
+Written by v9/fakehalo <v9@fakehalo.us> and Reuben Thomas <rrt@sc3d.org>
 .SH "BUGS"
 Report bugs to <v9@fakehalo.us>.
 .SH "COPYRIGHT"
