@@ -109,22 +109,6 @@ static void setproctitle(const char *fmt,...){
 }
 #endif
 
-/* Configuration table. */
-struct{
- bool ifarg, ifarga;
- bool ifos, ifosa;
- bool eint;
- bool invert;
- bool nocolor, nocolor_stdout, nocolor_stderr;
- char *cmd, *cmdargs;
- gl_list_t m;
- struct{
-  int master[2];
-  int slave[2];
-  bool on;
- }p;
-}cfgtable;
-
 /* Match instruction. */
 typedef struct{
   char *data;
@@ -146,6 +130,16 @@ static char *pal2[18],*scrname,*base_scrname;
 static Hash_table *colormap;
 static pid_t pid_c;
 extern char **environ;
+static bool ifarg, ifarga;
+static bool ifos, ifosa;
+static bool eint;
+static bool invert;
+static bool nocolor, nocolor_stdout, nocolor_stderr;
+static char *cmd, *cmdargs;
+static gl_list_t matches;
+static int master[2];
+static int slave[2];
+static bool ptys_on;
 
 static const char *pal1[]={"black","blue","green","cyan","red","purple","brown",
  "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",
@@ -238,7 +232,7 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  if(color){
   colormap_t *c=XZALLOC(colormap_t),*ent;
   signed char i=0;
-  const char **palptr=cfgtable.invert?pal1_invert:pal1;
+  const char **palptr=invert?pal1_invert:pal1;
   c->log=color;
   ent=hash_lookup(colormap,c);
   if(!ent){ /* Use "default" if the color type is undefined. */
@@ -301,12 +295,12 @@ static char *convert_string(const char *line){
  regmatch_t pm;
  char *tbuf=xstrdup(line);
  /* Process the 'match' definitions. */
- for(j=0,i=gl_list_iterator(cfgtable.m);gl_list_iterator_next(&i,(const void **)&m,NULL);){
+ for(j=0,i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
   size_t s=strlen(tbuf);
   bool on=false;
   j=l=k=0;
   if(!regcomp(&re,m->data,REG_EXTENDED)){
-   char *tmpcmp,*tmp=(char *)xzalloc(s*(gl_list_size(cfgtable.m)*16+1)+s+1);
+   char *tmpcmp,*tmp=(char *)xzalloc(s*(gl_list_size(matches)*16+1)+s+1);
    while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
     if(pm.rm_so){
      tmpcmp=(char *)xzalloc(pm.rm_so+1);
@@ -354,17 +348,17 @@ static char *convert_string(const char *line){
 /* Create a master-slave pty pair. */
 static bool make_ptypair(unsigned char v){
 #ifdef HAVE_OPENPTY
- return openpty(&cfgtable.p.master[v],&cfgtable.p.slave[v],0,0,0)==0;
+ return openpty(&master[v],&slave[v],0,0,0)==0;
 #else
  return false;
 #endif
 }
 
 static void sighandler(int sig){
- if(sig==SIGINT&&cfgtable.eint){
+ if(sig==SIGINT&&eint){
   if(pid_c){
    kill(pid_c,SIGINT);
-   cfgtable.eint=false;
+   eint=false;
   }
  }
 #ifdef SIGCHLD
@@ -398,10 +392,10 @@ noreturn void execcw(int argc,char **argv){
 #ifdef SIGCHLD
  struct sigaction sa;
 #endif
- if(!(cfgtable.m))
-  cfgtable.nocolor=true;
- if(!cfgtable.nocolor){
-  cfgtable.p.on=make_ptypair(0)&&make_ptypair(1);
+ if(!matches)
+  nocolor=true;
+ if(!nocolor){
+  ptys_on=make_ptypair(0)&&make_ptypair(1);
   if(pipe(fds)<0)cwexit(1,"pipe() failed.");
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
  }
@@ -417,18 +411,18 @@ noreturn void execcw(int argc,char **argv){
  }
 #endif
  sig_catch(SIGPIPE,sighandler);
- switch(cfgtable.nocolor?0:(pid_c=fork())){
+ switch(nocolor?0:(pid_c=fork())){
   case -1:
    cwexit(1,"fork() error.");
    break;
   case 0:
    /* child process to execute the program. */
-   if(!cfgtable.nocolor){
-    if(dup2((cfgtable.p.on?cfgtable.p.slave[0]:fds[1]),STDOUT_FILENO)<0)
+   if(!nocolor){
+    if(dup2((ptys_on?slave[0]:fds[1]),STDOUT_FILENO)<0)
      cwexit(1,"dup2() failed.");
     close(fds[0]);
     close(fds[1]);
-    if(dup2((cfgtable.p.on?cfgtable.p.slave[1]:fde[1]),STDERR_FILENO)<0)
+    if(dup2((ptys_on?slave[1]:fde[1]),STDERR_FILENO)<0)
      cwexit(1,"dup2() failed.");
     close(fde[0]);
     close(fde[1]);
@@ -436,14 +430,14 @@ noreturn void execcw(int argc,char **argv){
     setsid();
 #endif
    }
-   if(cfgtable.cmd)
-    execle("/bin/sh",base_name(scrname),"-c",cfgtable.cmd,(char *)0,environ);
+   if(cmd)
+    execle("/bin/sh",base_name(scrname),"-c",cmd,(char *)0,environ);
    argv[1]=base_scrname;
    execvpe(argv[1],&argv[1],environ);
    abort(); /* We never get here. */
   default:
    /* parent process to read the program's output. (forwards SIGINT to child) */
-   cfgtable.eint=true;
+   eint=true;
    sig_catch(SIGINT,sighandler);
 #ifdef HAVE_SETPROCTITLE
 #ifdef INT_SETPROCTITLE
@@ -452,11 +446,11 @@ noreturn void execcw(int argc,char **argv){
    setproctitle("cw: wrapping [%s] {pid=%u}",base_scrname,pid_c);
 #endif
    buf=(char *)xzalloc(BUFSIZE+1);
-   if(cfgtable.p.on){
+   if(ptys_on){
     close(fds[0]);
     close(fde[0]);
-    fds[0]=cfgtable.p.master[0];
-    fde[0]=cfgtable.p.master[1];
+    fds[0]=master[0];
+    fde[0]=master[1];
    }
    fcntl(fds[0],F_SETFL,O_NONBLOCK);
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
@@ -493,9 +487,9 @@ noreturn void execcw(int argc,char **argv){
         char *aptr=NULL;
         tmp[j]=0;
         if(fd==fds[0])
-         fprintf(stdout,"%s\n",cfgtable.nocolor_stdout?tmp:(aptr=convert_string(tmp)));
+         fprintf(stdout,"%s\n",nocolor_stdout?tmp:(aptr=convert_string(tmp)));
         else
-         fprintf(stderr,"%s\n",cfgtable.nocolor_stderr?tmp:(aptr=convert_string(tmp)));
+         fprintf(stderr,"%s\n",nocolor_stderr?tmp:(aptr=convert_string(tmp)));
         free(aptr);
         fflush(fd==fds[0]?stdout:stderr);
         free(tmp);
@@ -529,11 +523,11 @@ static void c_handler(char *line,size_t l,int argc){
  char *tmp,*ptr,*ins=parameter(line," ",0);
  if(!strcmp(ins,"ifos-else")){
   o=true;
-  if(cfgtable.ifosa)cfgtable.ifos=(cfgtable.ifos?0:1);
+  if(ifosa)ifos=(ifos?0:1);
   else c_error(l,"'ifos-else' used before any previous comparison.");
  }
  else if(!strcmp(ins,"ifos")||!strcmp(ins,"ifnos")){
-  cfgtable.ifosa=o=true;
+  ifosa=o=true;
   tmp=parameter(line," ",1);
   if(!tmp)c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
   else{
@@ -543,33 +537,33 @@ static void c_handler(char *line,size_t l,int argc){
     free(ptr);
    }
    free(tmp);
-   cfgtable.ifos=j;
+   ifos=j;
    if(!strcmp(ins,"ifos"))
-    cfgtable.ifos=(cfgtable.ifos?0:1);
+    ifos=(ifos?0:1);
   }
  }
- else if(!cfgtable.ifos&&(!strcmp(ins,"ifarg-else"))){
+ else if(!ifos&&(!strcmp(ins,"ifarg-else"))){
   o=true;
-  if(cfgtable.ifarga)cfgtable.ifarg=(cfgtable.ifarg?0:1);
+  if(ifarga)ifarg=(ifarg?0:1);
   else c_error(l,"'ifarg-else' used before any previous comparison.");
  }
- else if(!cfgtable.ifos&&(!strcmp(ins,"ifarg")||!strcmp(ins,"ifnarg"))){
-  cfgtable.ifarga=o=true;
+ else if(!ifos&&(!strcmp(ins,"ifarg")||!strcmp(ins,"ifnarg"))){
+  ifarga=o=true;
   tmp=parameter(line," ",1);
   if(!tmp)c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
   else{
    for(j=i=0;!j&&(ptr=parameter(tmp,":",i));i++){
     if(!strcmp(ptr,"<any>")||(!strcmp(ptr,"<none>")&&argc<3))j=1;
-    else j=!regxcmp(cfgtable.cmdargs,ptr);
+    else j=!regxcmp(cmdargs,ptr);
     free(ptr);
    }
    free(tmp);
-   cfgtable.ifarg=j;
+   ifarg=j;
    if(!strcmp(ins,"ifarg"))
-    cfgtable.ifarg=(cfgtable.ifarg?0:1);
+    ifarg=(ifarg?0:1);
   }
  }
- if(cfgtable.ifos||cfgtable.ifarg)
+ if(ifos||ifarg)
   return;
  if(line[0]=='#')return;
  else if(line[0]=='$'){
@@ -588,21 +582,21 @@ static void c_handler(char *line,size_t l,int argc){
   ptr=strtok(line," ");
   ptr=strtok(0,"");
   if((k=strlen(ptr))){
-   if(cfgtable.cmd)free(cfgtable.cmd);
-   cfgtable.cmd=(char *)xzalloc(k+strlen(cfgtable.cmdargs)+1);
+   if(cmd)free(cmd);
+   cmd=(char *)xzalloc(k+strlen(cmdargs)+1);
    for(on=false,j=i=0;k>i;i++){
     if(!on&&!strncmp(ptr+i,"{}",2)){
-     strcpy(cfgtable.cmd+j,cfgtable.cmdargs);
-     j+=strlen(cfgtable.cmdargs);
+     strcpy(cmd+j,cmdargs);
+     j+=strlen(cmdargs);
      i++;
      on=true;
     }
     else{
-     cfgtable.cmd[j]=ptr[i];
+     cmd[j]=ptr[i];
      j++;
     }
    }
-   cfgtable.cmd[j]=0;
+   cmd[j]=0;
   }
   else c_error(l,"'command' instruction missing command.");
  }
@@ -633,7 +627,7 @@ static void c_handler(char *line,size_t l,int argc){
     tmp=strtok(0," ");
     tmp=strtok(0,"");
     m->data=xstrdup(tmp);
-    gl_list_add_last(cfgtable.m,m);
+    gl_list_add_last(matches,m);
     free(ptr);
    }
    else c_error(l,"'match' syntax error: cannot find colors argument)");
@@ -669,7 +663,7 @@ int main(int argc,char **argv){
  set_program_name(argv[0]);
  if(argc>1)scrname=xstrdup(argv[1]);
  base_scrname=base_name(scrname?scrname:program_name);
- cfgtable.m=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
+ matches=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  if(argc>1&&*argv[1]=='-'){
   for(i=1;i<argc;i++){
    if(!strcmp("--help",argv[i]))
@@ -687,10 +681,10 @@ int main(int argc,char **argv){
   }
  }
  for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
- cfgtable.cmdargs=(char *)xzalloc(j+1);
+ cmdargs=(char *)xzalloc(j+1);
  j=0;
  for(i=2;argc>i;i++){
-  sprintf(cfgtable.cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
+  sprintf(cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
   j+=(strlen(argv[i])+1);
  }
  if(argc<=1)
@@ -699,21 +693,21 @@ int main(int argc,char **argv){
   cwexit(1,"cannot find definition file.");
  for(i=0;18>i;i++)
   pal2[i]=xstrdup(pal2_orig[i]);
- cfgtable.ifarg=cfgtable.ifarga=false;
- cfgtable.ifos=cfgtable.ifosa=false;
- cfgtable.p.on=false;
+ ifarg=ifarga=false;
+ ifos=ifosa=false;
+ ptys_on=false;
  colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
  if((ptr=getenv("CW_COLORS")))
   setcolors(ptr);
  else setcolors(default_colormap);
- if(getenv("CW_INVERT"))cfgtable.invert=true;
+ if(getenv("CW_INVERT"))invert=true;
  /* Set PATH for child processes; may be overridden by definition file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
- if(getenv("NOCOLOR"))cfgtable.nocolor=true;
+ if(getenv("NOCOLOR"))nocolor=true;
  c_read(scrname,argc);
- cfgtable.nocolor_stdout=!isatty(STDOUT_FILENO);
- cfgtable.nocolor_stderr=!isatty(STDERR_FILENO);
+ nocolor_stdout=!isatty(STDOUT_FILENO);
+ nocolor_stderr=!isatty(STDERR_FILENO);
  execcw(argc,argv);
 }
