@@ -7,7 +7,7 @@ cw \- colorer for command-line programs
 [\fI\-\-version|\-\-help\fR]
 .SH "DESCRIPTION"
 .PP
-\fBcw\fR colors the output of command-line programs.  The colors applied are based on the definition instructions in a cw executable file.  These definition files appear under the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
+\fBcw\fR colors the output of command-line programs.  The colors applied are based on the definition instructions in a cw executable file.  These definition files have the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
 .SH "DEFINITION INSTRUCTIONS"
 The following instructions occur one per line in a definition file.
 .TP
