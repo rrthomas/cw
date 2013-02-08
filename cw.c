@@ -32,9 +32,7 @@
 #include <stropts.h>
 #endif
 #include <fcntl.h>
-#ifdef HAVE_PTY_H
 #include <pty.h>
-#endif
 #include <ctype.h>
 #include <regex.h>
 #include <sys/ioctl.h>
@@ -347,11 +345,7 @@ static char *convert_string(const char *line){
 
 /* Create a master-slave pty pair. */
 static bool make_ptypair(unsigned char v){
-#ifdef HAVE_OPENPTY
  return openpty(&master[v],&slave[v],0,0,0)==0;
-#else
- return false;
-#endif
 }
 
 static void sighandler(int sig){
@@ -668,16 +662,8 @@ int main(int argc,char **argv){
   for(i=1;i<argc;i++){
    if(!strcmp("--help",argv[i]))
     usage();
-   else if(!strcmp("--version",argv[i])){
-    cwexit(1,"cw (color wrapper) v"VERSION" (features="
-#ifdef HAVE_OPENPTY
-           "pty"
-#endif
-#ifdef HAVE_SETPROCTITLE
-           "setproctitle"
-#endif
-           ")");
-   }
+   else if(!strcmp("--version",argv[i]))
+    cwexit(1,"cw (color wrapper) v"VERSION);
   }
  }
  for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
