@@ -46,6 +46,7 @@
 #include "gl_linked_list.h"
 #include "hash.h"
 #include "xalloc.h"
+#include "minmax.h"
 
 #define BUFSIZE 1024
 
@@ -440,7 +441,7 @@ noreturn void execcw(int argc,char **argv){
    }
    fcntl(fds[0],F_SETFL,O_NONBLOCK);
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
-   fdm=((fds[0]>fde[0]?fds[0]:fde[0])+1);
+   fdm=MAX(fds[0],fde[0])+1;
    while(s>0||!ext){
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
