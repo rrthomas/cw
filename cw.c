@@ -232,20 +232,19 @@ static void usage(void){
 /* Convert a logical color string to a physical color array index. (0..colors - 1).
    Returns -1 if color type undefined and no base color defined. */
 static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
- if(color){
-  colormap_t *c=XZALLOC(colormap_t),*ent;
-  c->log=color;
+ colormap_t *c=XZALLOC(colormap_t),*ent;
+ assert(color);
+ c->log=color;
+ ent=hash_lookup(colormap,c);
+ if(!ent){ /* Use "base" if the color type is undefined. */
+  c->log="base";
   ent=hash_lookup(colormap,c);
-  if(!ent){ /* Use "base" if the color type is undefined. */
-   c->log="base";
-   ent=hash_lookup(colormap,c);
-  }
-  free(c);
-  if(ent){
-   signed char i;
-   for(i=0;i<colors;i++)
-    if(!strcmp(color_name[i],ent->phys))return(i);
-  }
+ }
+ free(c);
+ if(ent){
+  signed char i;
+  for(i=0;i<colors;i++)
+   if(!strcmp(color_name[i],ent->phys))return(i);
  }
  return(-1);
 }
