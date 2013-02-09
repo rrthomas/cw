@@ -125,7 +125,7 @@ static bool ext=false;
 static unsigned char rexit=0;
 static char *scrname,*base_scrname;
 static Hash_table *colormap;
-static unsigned char default_color;
+static unsigned char base_color;
 static pid_t pid_c;
 extern char **environ;
 static bool ifarg, ifarga;
@@ -138,17 +138,21 @@ static int master[2];
 static int slave[2];
 static bool ptys_on;
 
-static const char **pal1;
-static const char *pal1_real[]={"black","blue","green","cyan","red","purple","brown",
+static const char **color_name;
+static const char *color_name_real[]={"black","blue","green","cyan","red","purple","brown",
  "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",
- "default","none",""};
-static const char *pal1_real_invert[]={"white","blue+","green+","cyan+","red+","purple+",
+ "default"};
+static const char *color_name_real_invert[]={"white","blue+","green+","cyan+","red+","purple+",
  "yellow","grey","grey+","blue","green","cyan","red","purple","brown","black",
- "default","none",""};
-static const char *pal2[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
+ "default"};
+/* #define so that initializers are both constant without repeating the expression. */
+#define COLORS sizeof(color_name_real)/sizeof(*color_name_real)
+static size_t colors=COLORS;
+static size_t default_color=COLORS-1;
+static const char *color_code[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
- "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m",""};
+ "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m"};
 
 /* Definition error message. */
 void c_error(size_t l,const char *text){
@@ -225,27 +229,27 @@ static void usage(void){
  cwexit(0,0);
 }
 
-/* Convert a logical color string to a physical color array index. (0-17) */
+/* Convert a logical color string to a physical color array index. (0..colors - 1) */
 static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  if(color){
   colormap_t *c=XZALLOC(colormap_t),*ent;
   signed char i=0;
   c->log=color;
   ent=hash_lookup(colormap,c);
-  if(!ent){ /* Use "default" if the color type is undefined. */
-   c->log="default";
+  if(!ent){ /* Use "base" if the color type is undefined. */
+   c->log="base";
    ent=hash_lookup(colormap,c);
   }
   free(c);
   if(ent){
-   while(strcmp(pal1[i],ent->phys)&&i<18)i++;
-   return(i<18?i:-1);
+   while(strcmp(color_name[i],ent->phys)&&i<colors)i++;
+   return(i<colors?i:-1);
   }
  }
  return(-1);
 }
 
-const char *default_colormap="default=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white:warning=yellow:error=red+:none=none:punctuation=blue+";
+const char *default_colormap="base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white:warning=yellow:error=red+:punctuation=blue+";
 
 static size_t colormap_hash (const void *c, size_t n){
  return hash_string(((const colormap_t *)c)->log,n);
@@ -278,9 +282,9 @@ static void setcolors(const char *str){
   free(ass);
  }
  free(tmp);
- default_color=color_atoi("default");
- if(default_color==-1)
-  setcolors("default=white");
+ base_color=color_atoi("base");
+ if(base_color==-1)
+  setcolors("base=default");
 }
 
 /* Create a coloring array for a string. */
@@ -291,7 +295,7 @@ static unsigned char *make_colors(const char *string){
  regmatch_t pm;
  size_t s=strlen(string);
  char *buf=xzalloc(s);
- memset(buf,default_color,s); /* Fill color array with default color. */
+ memset(buf,base_color,s); /* Fill color array with base color. */
  for(i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
   if(!regcomp(&re,m->data,REG_EXTENDED)){
    size_t j;
@@ -307,20 +311,20 @@ static unsigned char *make_colors(const char *string){
 
 /* Color a string given a coloring array. */
 static char *apply_colors(const char *string, const unsigned char *colors){
- unsigned char col=color_atoi("none");
+ unsigned char col=255; /* Invalid value to guarantee immediate change of color. */
  size_t i,j=0,s=strlen(string);
  char *tbuf=xzalloc((s+1)*(8+1)); /* longest escape sequence is 8 characters, +1 for the text. */
  for(i=0;i<s;i++){
   if(col!=colors[i]){
-   const char *esc=pal2[colors[i]];
+   const char *esc=color_code[colors[i]];
    col=colors[i];
    strcpy(tbuf+j,esc);
    j+=strlen(esc);
   }
   tbuf[j++]=string[i];
  }
- if(col!=16)
-  strcpy(tbuf+j,pal2[16]);
+ if(col!=default_color)
+  strcpy(tbuf+j,color_code[default_color]);
  return(tbuf);
 }
 
@@ -348,7 +352,7 @@ static void sighandler(int sig){
  else if(sig==SIGCHLD)ext=true;
 #endif
  if(sig==SIGPIPE||sig==SIGINT){
-  fprintf(stderr,"%s",pal2[16]);
+  fprintf(stderr,"%s",color_code[default_color]);
   fflush(stderr);
   cwexit(0,0);
  }
@@ -654,7 +658,7 @@ int main(int argc,char **argv){
  ifarg=ifarga=false;
  ifos=ifosa=false;
  ptys_on=false;
- pal1=getenv("CW_INVERT")?pal1_real_invert:pal1_real;
+ color_name=getenv("CW_INVERT")?color_name_real_invert:color_name_real;
  setcolors((ptr=getenv("CW_COLORS"))?ptr:default_colormap);
  /* Set PATH for child processes; may be overridden by definition file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
