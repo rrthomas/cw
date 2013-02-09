@@ -53,8 +53,7 @@
 #if !defined(HAVE_SETPROCTITLE) && (defined(__APPLE_CC__) || defined(__linux__))
 #define INT_SETPROCTITLE
 #define HAVE_SETPROCTITLE
-#endif
-#ifdef INT_SETPROCTITLE
+
 struct{
  char **argv;
  char *largv;
