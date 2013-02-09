@@ -1,28 +1,27 @@
-match bright:punctuation [[:digit:]]
-match warning:default /
-match bright:default -
-match bright:default \+
-match highlight:default \[
-match highlight:default \]
-match highlight:warning (
-match highlight:default )
-match neutral:default \*
-match punctuation:default UDP
-match punctuation:default TCP
-match punctuation:default TPI
+match bright [[:digit:]]
+match warning /
+match bright -
+match bright \+
+match highlight \[
+match highlight \]
+match warning \([^)]*\)
+match neutral \*
+match punctuation UDP
+match punctuation TCP
+match punctuation TPI
 ifos linux
-match punctuation:default REG
-match punctuation:default DIR
-match punctuation:default CHR
-match punctuation:default FIFO
-match error:default DEL
+match punctuation REG
+match punctuation DIR
+match punctuation CHR
+match punctuation FIFO
+match error DEL
 ifos-else
-match punctuation:default VREG
-match punctuation:default VDIR
-match punctuation:default VCHR
-match punctuation:default VFIFO
-match error:default VDEL
+match punctuation VREG
+match punctuation VDIR
+match punctuation VCHR
+match punctuation VFIFO
+match error VDEL
 ifos <any>
-match default:default COMMAND
+match default COMMAND
 ifnarg -h:--help
-match highlight:default [^ ]+
+match highlight [^ ]+

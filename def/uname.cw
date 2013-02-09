@@ -1,8 +1,8 @@
-match bright:default [[:digit:]]
-match bright:default /
-match bright:default :
-match bright:default \.
-match bright:default -
-match bright:default #
+match bright [[:digit:]]
+match bright /
+match bright :
+match bright \.
+match bright -
+match bright #
 ifnarg --help:--version
-match bright:default [^ ]+
+match bright [^ ]+

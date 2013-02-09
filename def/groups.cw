@@ -1,5 +1,5 @@
-match bright:default -
-match bright:default \[
-match bright:default \]
-match bright:default root
-match bright:default wheel
+match bright -
+match bright \[
+match bright \]
+match bright root
+match bright wheel

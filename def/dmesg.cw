@@ -1,5 +1,4 @@
-match bright:punctuation :
+match bright :
 ifarg -h:--help
-match bright:punctuation -
-match punctuation:punctuation \[
-match punctuation:punctuation \]
+match bright -
+match punctuation \[[^]]*\]

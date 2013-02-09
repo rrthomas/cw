@@ -1,17 +1,16 @@
 ifarg -m
-match lowlight:default _
-match lowlight:default -
-match neutral:none Cache
-match neutral:none Num
-match neutral:none Total
-match neutral:none Size
-match neutral:none Pages
-match punctuation:none  .*
+match lowlight _
+match lowlight -
+match neutral Cache
+match neutral Num
+match neutral Total
+match neutral Size
+match neutral Pages
+match punctuation  .*
 ifarg-else
-match punctuation:default [[:digit:]]
-match neutral:default -
-match neutral:default \[
-match neutral:default \]
+match punctuation [[:digit:]]
+match neutral -
+match neutral \[
+match neutral \]
 ifarg <any>
-match neutral:bright (
-match neutral:default )
+match bright \([^)]*\)

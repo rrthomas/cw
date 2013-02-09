@@ -1,16 +1,16 @@
-match bright:default [[:digit:]]
-match bright:default (
-match bright:default )
-match bright:default \[
-match bright:default \]
-match bright:default {
-match bright:default }
-match bright:default :
-match bright:default \.
-match bright:default ,
-match bright:default -
-match bright:default =
-match bright:default /
-match default:default USER
+match bright [[:digit:]]
+match bright \(
+match bright \)
+match bright \[
+match bright \]
+match bright \{
+match bright \}
+match bright :
+match bright \.
+match bright ,
+match bright -
+match bright =
+match bright /
+match default USER
 ifnarg --help
-match bright:default [^ ]+
+match bright [^ ]+

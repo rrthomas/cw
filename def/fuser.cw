@@ -1,13 +1,13 @@
 ifnarg <none>:-i:-ki
-match punctuation:default [[:digit:]]
-match neutral:none USER
+match punctuation [[:digit:]]
+match neutral USER
 ifnarg -i:-ki
-match neutral:default -
-match neutral:default /
-match punctuation:default \.
-match bright:default :
-match bright:default |
-match punctuation:default \[
-match punctuation:default \]
-match neutral:default (
-match neutral:default )
+match neutral -
+match neutral /
+match punctuation \.
+match bright :
+match bright |
+match punctuation \[
+match punctuation \]
+match neutral \(
+match neutral \)

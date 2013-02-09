@@ -1,4 +1,3 @@
-match bright:bright (
-match bright:default )
+match bright \([^)]*\)
 ifos sunos
-match bright:punctuation  on
+match bright  on

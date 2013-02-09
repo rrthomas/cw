@@ -1,5 +1,5 @@
-match warning:default |
-match highlight:default >
-match highlight:default <
-match bright:default \+
-match bright:default -
+match warning |
+match highlight >
+match highlight <
+match bright \+
+match bright -

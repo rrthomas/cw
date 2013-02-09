@@ -1,8 +1,7 @@
-match bright:default [[:digit:]]
-match bright:bright (
-match bright:default )
-match bright:default \[
-match bright:default \]
-match bright:none Module
+match bright [[:digit:]]
+match bright \([^)]*\)
+match bright \[
+match bright \]
+match bright Module
 ifarg -h:--help
-match bright:default -
+match bright -

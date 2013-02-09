@@ -1,16 +1,16 @@
 ifnarg --help
-match bright:default /
-match default:default M
-match default:default K
-match highlight:default [^	]+
+match bright /
+match default M
+match default K
+match highlight [^	]+
 ifarg-else
-match highlight:default \[
-match highlight:default \]
-match highlight:default <
-match highlight:default >
-match highlight:default :
-match bright:default ,
-match bright:default =
-match bright:default -
+match highlight \[
+match highlight \]
+match highlight <
+match highlight >
+match highlight :
+match bright ,
+match bright =
+match bright -
 ifarg <any>
-match default:none Try
+match default Try

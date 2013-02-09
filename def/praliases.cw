@@ -1,2 +1,2 @@
-match bright:default :
-match bright:default [^:]+
+match bright :
+match bright [^:]+

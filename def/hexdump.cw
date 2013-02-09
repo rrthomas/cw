@@ -1,3 +1,3 @@
-match warning:default |
+match warning |
 ifnarg --help
-match neutral:default [^ ]+
+match neutral [^ ]+

@@ -1,2 +1,2 @@
 ifnarg --h
-match bright:default [^=]+
+match bright [^=]+

@@ -32,8 +32,8 @@ reverse of \fBifos\fR
 \fBifos\-else\fR
 This gives definitions to use if the previous \fBifos\fR or \fBifnos\fR was false.
 .TP
-\fBmatch\fR \fIbefore type:after type\fR \fIregex pattern\fR
-Changes the color type before and after the \fBregex pattern\fR, if the \fBregex pattern\fR matches output from the program.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions.
+\fBmatch\fR \fIcolor-type\fR \fIregex\fR
+Changes the color type of text matching the \fBregex\fR. Match instructions are applied in order, so a later match will override the color type of characters matched earlier.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions.
 .TP
 \fB$\fR\fIVAR\fR\fI=\fR\fIVALUE\fR
 Sets the environment variable \fBVAR\fR to \fBVALUE\fR

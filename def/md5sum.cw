@@ -1,5 +1,5 @@
-match bright:default /
+match bright /
 ifarg --h
-match bright:default -
+match bright -
 ifarg-else
-match bright:default [^ ]+
+match bright [^ ]+

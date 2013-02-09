@@ -1,14 +1,13 @@
 ifarg -h:--help
-match bright:default >
-match bright:default <
-match bright:highlight \[
-match bright:default \]
-match bright:default -
+match bright >
+match bright <
+match highlight \[[^]]*\]
+match bright -
 ifarg-else
-match bright:default >
-match highlight:default <
-match warning:default |
-match bright:default \+
-match warning:default ---
-match highlight:default -
-match warning:none @@
+match bright >
+match highlight <
+match warning |
+match bright \+
+match warning ---
+match highlight -
+match warning @@

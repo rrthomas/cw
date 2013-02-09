@@ -1,9 +1,8 @@
-match bright:default [[:digit:]]
-match punctuation:default :
-match lowlight:default /
-match punctuation:default \.
-match bright:default -
-match bright:default _
-match bright:default =
-match highlight:neutral \[
-match highlight:default \]
+match bright [[:digit:]]
+match punctuation :
+match lowlight /
+match punctuation \.
+match bright -
+match bright _
+match bright =
+match highlight \[[^]]*\]

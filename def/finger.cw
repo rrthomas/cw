@@ -1,12 +1,12 @@
-match punctuation:default [[:digit:]]
-match punctuation:default \.
-match punctuation:default :
-match punctuation:default /
-match punctuation:default -
-match bright:default \*
-match punctuation:default \[
-match punctuation:default \]
-match bright:default (
-match bright:default )
+match punctuation [[:digit:]]
+match punctuation \.
+match punctuation :
+match punctuation /
+match punctuation -
+match bright \*
+match punctuation \[
+match punctuation \]
+match bright \(
+match bright \)
 ifarg <none>
-match bright:none Login
+match bright Login

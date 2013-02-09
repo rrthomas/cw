@@ -1,9 +1,8 @@
-match bright:default [[:digit:]]
-match bright:default \.
-match bright:default :
-match bright:default *
-match bright:default (
-match bright:default )
-match bright:bright \[
-match bright:default \]
-match bright:default =
+match bright [[:digit:]]
+match bright \.
+match bright :
+match bright \*
+match bright \(
+match bright \)
+match bright \[[^]]*\]
+match bright =

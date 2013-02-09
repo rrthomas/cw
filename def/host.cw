@@ -1,11 +1,10 @@
-match bright:default \.
-match bright:default :
-match bright:default -
-match bright:default \[
-match bright:default \]
-match bright:neutral (
-match bright:default )
-match bright:default SOA
-match bright:default mail is handled by
-match bright:default name server
-match bright:default domain name pointer
+match bright \.
+match bright :
+match bright -
+match bright \[
+match bright \]
+match bright \([^)]*\)
+match bright SOA
+match bright mail is handled by
+match bright name server
+match bright domain name pointer

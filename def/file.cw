@@ -1,9 +1,7 @@
-match highlight:default [[:digit:]]
-match neutral:default :
-match highlight:default `
-match highlight:default '
-match highlight:neutral (
-match highlight:default )
-match highlight:neutral \[
-match highlight:default \]
-match highlight:default -
+match highlight [[:digit:]]
+match neutral :
+match highlight `
+match highlight '
+match highlight \([^)]*\)
+match highlight \[[^]]*\]
+match highlight -

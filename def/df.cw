@@ -1,25 +1,24 @@
 ifarg --help
-match neutral:default -
+match neutral -
 ifarg-else
-match default:punctuation %
-match default:punctuation K 
-match default:punctuation M 
-match default:punctuation G 
-match default:punctuation T 
-match default:none K-blocks
-match default:none k-blocks
-match default:none -blocks
-match bright:default Mounted on
+match punctuation %
+match punctuation K 
+match punctuation M 
+match punctuation G 
+match punctuation T 
+match default K-blocks
+match default k-blocks
+match default -blocks
+match bright Mounted on
 ifarg <any>
-match neutral:punctuation [[:digit:]]
-match punctuation:punctuation /
-match punctuation:punctuation \.
-match punctuation:punctuation :
-match punctuation:punctuation <
-match punctuation:punctuation >
-match punctuation:punctuation (
-match punctuation:punctuation )
-match punctuation:punctuation \[
-match punctuation:punctuation \]
-match neutral:punctuation `
-match neutral:default '
+match neutral [[:digit:]]
+match punctuation /
+match punctuation \.
+match punctuation :
+match punctuation <
+match punctuation >
+match punctuation \(
+match punctuation \)
+match punctuation \[
+match punctuation \]
+match punctuation `[^']*'

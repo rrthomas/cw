@@ -1,24 +1,24 @@
 ifarg --help
-match neutral:default \?
-match neutral:default \+
-match neutral:default  - 
+match neutral \?
+match neutral \+
+match neutral  - 
 ifarg -
-match highlight:default  \+ 
-match lowlight:default  - 
+match highlight  \+ 
+match lowlight  - 
 ifarg <any>
-match neutral:default -
-match neutral:default :
-match neutral:default \.
-match neutral:default =
-match punctuation:default /
-match punctuation:default (
-match punctuation:default )
-match punctuation:default <
-match punctuation:default >
-match punctuation:default \[
-match punctuation:default \]
-match neutral:default tty
-match neutral:default pts
-match punctuation:default LOGIN
-match neutral:default root
-match bright:default ... .. ..:..
+match neutral -
+match neutral :
+match neutral \.
+match neutral =
+match punctuation /
+match punctuation \(
+match punctuation \)
+match punctuation <
+match punctuation >
+match punctuation \[
+match punctuation \]
+match neutral tty
+match neutral pts
+match punctuation LOGIN
+match neutral root
+match bright ... .. ..:..

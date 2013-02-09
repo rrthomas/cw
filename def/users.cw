@@ -1,4 +1,4 @@
-match bright:default -
-match bright:default [
-match bright:default ]
-match bright:default root
+match bright -
+match bright [
+match bright ]
+match bright root

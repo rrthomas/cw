@@ -110,8 +110,7 @@ static void setproctitle(const char *fmt,...){
 /* Match instruction. */
 typedef struct{
   char *data;
-  unsigned char b;
-  unsigned char a;
+  unsigned char col;
 }match;
 
 /* Colormap hash entry. */
@@ -124,14 +123,14 @@ char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 static bool ext=false;
 static unsigned char rexit=0;
-static char *pal2[18],*scrname,*base_scrname;
+static char *scrname,*base_scrname;
 static Hash_table *colormap;
+static unsigned char default_color;
 static pid_t pid_c;
 extern char **environ;
 static bool ifarg, ifarga;
 static bool ifos, ifosa;
 static bool eint;
-static bool invert;
 static bool nocolor, nocolor_stdout, nocolor_stderr;
 static char *cmd, *cmdargs;
 static gl_list_t matches;
@@ -139,16 +138,17 @@ static int master[2];
 static int slave[2];
 static bool ptys_on;
 
-static const char *pal1[]={"black","blue","green","cyan","red","purple","brown",
+static const char **pal1;
+static const char *pal1_real[]={"black","blue","green","cyan","red","purple","brown",
  "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",
  "default","none",""};
-static const char *pal1_invert[]={"white","blue+","green+","cyan+","red+","purple+",
+static const char *pal1_real_invert[]={"white","blue+","green+","cyan+","red+","purple+",
  "yellow","grey","grey+","blue","green","cyan","red","purple","brown","black",
  "default","none",""};
-static const char *pal2_orig[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
+static const char *pal2[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
- "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[0m",""};
+ "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m",""};
 
 /* Definition error message. */
 void c_error(size_t l,const char *text){
@@ -230,7 +230,6 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  if(color){
   colormap_t *c=XZALLOC(colormap_t),*ent;
   signed char i=0;
-  const char **palptr=invert?pal1_invert:pal1;
   c->log=color;
   ent=hash_lookup(colormap,c);
   if(!ent){ /* Use "default" if the color type is undefined. */
@@ -239,7 +238,7 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
   }
   free(c);
   if(ent){
-   while(strcmp(palptr[i],ent->phys)&&i<18)i++;
+   while(strcmp(pal1[i],ent->phys)&&i<18)i++;
    return(i<18?i:-1);
   }
  }
@@ -279,68 +278,58 @@ static void setcolors(const char *str){
   free(ass);
  }
  free(tmp);
- if(color_atoi("default")==-1)
+ default_color=color_atoi("default");
+ if(default_color==-1)
   setcolors("default=white");
 }
 
-/* Color a string based on the definition file. */
-static char *convert_string(const char *line){
+/* Create a coloring array for a string. */
+static unsigned char *make_colors(const char *string){
  gl_list_iterator_t i;
- size_t j=0,k=0,l=0;
  const match *m;
- char *buf;
  regex_t re;
  regmatch_t pm;
- char *tbuf=xstrdup(line);
- /* Process the 'match' definitions. */
- for(j=0,i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
-  size_t s=strlen(tbuf);
-  bool on=false;
-  j=l=k=0;
+ size_t s=strlen(string);
+ char *buf=xzalloc(s);
+ memset(buf,default_color,s); /* Fill color array with default color. */
+ for(i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
   if(!regcomp(&re,m->data,REG_EXTENDED)){
-   char *tmpcmp,*tmp=(char *)xzalloc(s*(gl_list_size(matches)*16+1)+s+1);
-   while(k<s&&!regexec(&re,tbuf+k,1,&pm,(k?REG_NOTBOL:0))){
-    if(pm.rm_so){
-     tmpcmp=(char *)xzalloc(pm.rm_so+1);
-     strncpy(tmpcmp,tbuf+k,pm.rm_so);
-     strcpy(tmp+j,tmpcmp);
-     j+=strlen(tmpcmp);
-     free(tmpcmp);
-    }
-    if(!pm.rm_so&&!pm.rm_eo){
-     pm.rm_eo++;
-     on=true;
-    }
-    l=(pm.rm_eo-pm.rm_so);
-    tmpcmp=(char *)xzalloc(l+1);
-    k+=pm.rm_so;
-    strncpy(tmpcmp,tbuf+k,l);
-    if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->b!=17){
-     strcpy(tmp+j,pal2[m->b==16?color_atoi("default"):m->b]);
-     j+=strlen(pal2[m->b==16?color_atoi("default"):m->b]);
-    }
-    strcpy(tmp+j,tmpcmp);
-    j+=strlen(tmpcmp);
-    free(tmpcmp);
-    if(!on&&!memchr(tbuf+(k-(k<7?k:7)),'\x1b',(k<7?k:7))&&m->a!=17){
-     strcpy(tmp+j,pal2[m->a==16?color_atoi("default"):m->a]);
-     j+=strlen(pal2[m->a==16?color_atoi("default"):m->a]);
-    }
-    on=false;
-    k-=pm.rm_so;
-    k+=pm.rm_eo;
+   size_t j;
+   for(j=0;j<s&&!regexec(&re,string+j,1,&pm,j?REG_NOTBOL:0);j+=pm.rm_eo){
+    memset(buf+j+pm.rm_so,m->col,pm.rm_eo-pm.rm_so);
+    if(pm.rm_eo==0)j++; /* Make sure we advance at least one character. */
    }
    regfree(&re);
-   if(s>k)strcpy(tmp+j,tbuf+k);
-   free(tbuf);
-   tbuf=tmp;
-   on=false;
   }
  }
- buf=(char *)xzalloc(strlen(pal2[color_atoi("default")])+strlen(tbuf)+4+1);
- sprintf(buf,"%s%s%s",pal2[color_atoi("default")],tbuf,pal2[16]);
- free(tbuf);
  return(buf);
+}
+
+/* Color a string given a coloring array. */
+static char *apply_colors(const char *string, const unsigned char *colors){
+ unsigned char col=color_atoi("none");
+ size_t i,j=0,s=strlen(string);
+ char *tbuf=xzalloc((s+1)*(8+1)); /* longest escape sequence is 8 characters, +1 for the text. */
+ for(i=0;i<s;i++){
+  if(col!=colors[i]){
+   const char *esc=pal2[colors[i]];
+   col=colors[i];
+   strcpy(tbuf+j,esc);
+   j+=strlen(esc);
+  }
+  tbuf[j++]=string[i];
+ }
+ if(col!=16)
+  strcpy(tbuf+j,pal2[16]);
+ return(tbuf);
+}
+
+/* Color a string based on the definition file. */
+static char *convert_string(const char *string){
+ char *colors=make_colors(string);
+ char *colored_line=apply_colors(string,colors);
+ free(colors);
+ return(colored_line);
 }
 
 /* Create a master-slave pty pair. */
@@ -373,7 +362,6 @@ static void sig_catch(int sig, void (*handler)(int))
   sigemptyset(&sa.sa_mask);
   sigaction(sig, &sa, 0);         /* XXX ignores errors */
 }
-
 
 /* Execute and color a program. */
 noreturn void execcw(int argc,char **argv){
@@ -597,22 +585,7 @@ static void c_handler(char *line,size_t l,int argc){
  else if(!strcmp(ins,"match")){
   if((tmp=parameter(line," ",1))){
    match *m=(match *)XZALLOC(match);
-   if(color_atoi((ptr=parameter(tmp,":",0)))>-1){
-    m->b=color_atoi(ptr);
-    free(ptr);
-   }
-   else{
-    c_error(l,"invalid first color in 'match' definition. (defaulting)");
-    m->b=16;
-   }
-   if(color_atoi((ptr=parameter(tmp,":",1)))>-1){
-    m->a=color_atoi(ptr);
-    free(ptr);
-   }
-   else{
-    c_error(l,"invalid second color in 'match' definition. (defaulting)");
-    m->a=16;
-   }
+   m->col=color_atoi(tmp);
    free(tmp);
    if((ptr=parameter(line," ",2))){
     free(ptr);
@@ -624,7 +597,7 @@ static void c_handler(char *line,size_t l,int argc){
     gl_list_add_last(matches,m);
     free(ptr);
    }
-   else c_error(l,"'match' syntax error: cannot find colors argument)");
+   else c_error(l,"'match' syntax error: cannot find color argument)");
   }
   else c_error(l,"'match' syntax error: cannot find regex argument");
  }
@@ -658,6 +631,7 @@ int main(int argc,char **argv){
  if(argc>1)scrname=xstrdup(argv[1]);
  base_scrname=base_name(scrname?scrname:program_name);
  matches=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
+ colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
  if(argc>1&&*argv[1]=='-'){
   for(i=1;i<argc;i++){
    if(!strcmp("--help",argv[i]))
@@ -677,16 +651,11 @@ int main(int argc,char **argv){
   usage();
  if(access(argv[1],F_OK))
   cwexit(1,"cannot find definition file.");
- for(i=0;18>i;i++)
-  pal2[i]=xstrdup(pal2_orig[i]);
  ifarg=ifarga=false;
  ifos=ifosa=false;
  ptys_on=false;
- colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
- if((ptr=getenv("CW_COLORS")))
-  setcolors(ptr);
- else setcolors(default_colormap);
- if(getenv("CW_INVERT"))invert=true;
+ pal1=getenv("CW_INVERT")?pal1_real_invert:pal1_real;
+ setcolors((ptr=getenv("CW_COLORS"))?ptr:default_colormap);
  /* Set PATH for child processes; may be overridden by definition file. */
  newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);

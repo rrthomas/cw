@@ -1,9 +1,7 @@
-match highlight:default [[:digit:]]
-match bright:default /
-match highlight:default :
-match highlight:default \.
-match highlight:lowlight (
-match highlight:default )
-match highlight:lowlight \[
-match highlight:default \]
-match bright:none Filesystem
+match highlight [[:digit:]]
+match bright /
+match highlight :
+match highlight \.
+match lowlight \([^)]*\)
+match lowlight \[[^]]*\]
+match bright Filesystem

@@ -1,6 +1,5 @@
-match bright:punctuation ;
-match bright:punctuation <
-match bright:punctuation >
-match bright:default :
-match bright:default -
-match bright:default \+
+match punctuation ;
+match bright <[^>]*>
+match bright :
+match bright -
+match bright \+

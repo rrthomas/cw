@@ -1,15 +1,15 @@
-match neutral:default [a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}
+match neutral [a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}:[a-fA-F0-9]{1,2}
 ifos sunos
-match bright:none Device
-match bright:none -----
+match bright Device
+match bright -----
 ifos-else
-match bright:none Address
-match bright:default -
+match bright Address
+match bright -
 ifos <any>
-match bright:default \.
-match bright:default \[
-match bright:default \]
-match neutral:default <
-match neutral:default >
-match highlight:default (
-match highlight:default )
+match bright \.
+match bright \[
+match bright \]
+match neutral <
+match neutral >
+match highlight \(
+match highlight \)

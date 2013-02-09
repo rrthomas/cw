@@ -3,22 +3,22 @@
 $NOCOLOR=1
 # don't want to color kernel dialog compiling.
 ifnarg menuconfig
-match punctuation:default \.
-match punctuation:default -
-match punctuation:default /
-match punctuation:default \
-match bright:default :
-match bright:default '
-match bright:default `
-match bright:default "
-match highlight:default &
-match neutral:default =
-match neutral:default \[
-match neutral:default \]
-match highlight:default \*\*\*
-match neutral:default \*
-match neutral:default checking
-match highlight:default warning: 
-match error:default error: 
-match error:default Error
-match warning:default Interrupt
+match punctuation \.
+match punctuation -
+match punctuation /
+match punctuation \\
+match bright :
+match bright '
+match bright `
+match bright "
+match highlight &
+match neutral =
+match neutral \[
+match neutral \]
+match highlight \*\*\*
+match neutral \*
+match neutral checking
+match highlight warning: 
+match error error: 
+match error Error
+match warning Interrupt

@@ -1,11 +1,11 @@
-match bright:default [[:digit:]]
-match punctuation:default \[
-match punctuation:default \]
-match neutral:default (
-match neutral:default )
-match neutral:default \+
-match bright:default -
-match highlight:default :
-match error:default root
+match bright [[:digit:]]
+match punctuation \[
+match punctuation \]
+match neutral \(
+match neutral \)
+match neutral \+
+match bright -
+match highlight :
+match error root
 ifnarg --help
-match bright:default [^ ]+
+match bright [^ ]+
