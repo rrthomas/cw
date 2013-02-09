@@ -509,7 +509,7 @@ static void c_handler(char *line,size_t l,int argc){
  char *tmp,*ptr,*ins=parameter(line," ",0);
  if(!strcmp(ins,"ifos-else")){
   o=true;
-  if(ifosa)ifos=(ifos?0:1);
+  if(ifosa)ifos=!ifos;
   else c_error(l,"'ifos-else' used before any previous comparison.");
  }
  else if(!strcmp(ins,"ifos")||!strcmp(ins,"ifnos")){
@@ -519,18 +519,18 @@ static void c_handler(char *line,size_t l,int argc){
   else{
    for(j=i=0;!j&&(ptr=parameter(tmp,":",i));i++){
     if(!strcmp(ptr,"<any>"))j=1;
-    else j=(struncmp(ptr)?0:1);
+    else j=!struncmp(ptr);
     free(ptr);
    }
    free(tmp);
    ifos=j;
    if(!strcmp(ins,"ifos"))
-    ifos=(ifos?0:1);
+    ifos=!ifos;
   }
  }
  else if(!ifos&&(!strcmp(ins,"ifarg-else"))){
   o=true;
-  if(ifarga)ifarg=(ifarg?0:1);
+  if(ifarga)ifarg=!ifarg;
   else c_error(l,"'ifarg-else' used before any previous comparison.");
  }
  else if(!ifos&&(!strcmp(ins,"ifarg")||!strcmp(ins,"ifnarg"))){
@@ -546,7 +546,7 @@ static void c_handler(char *line,size_t l,int argc){
    free(tmp);
    ifarg=j;
    if(!strcmp(ins,"ifarg"))
-    ifarg=(ifarg?0:1);
+    ifarg=!ifarg;
   }
  }
  if(ifos||ifarg)
