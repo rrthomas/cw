@@ -197,6 +197,7 @@ static char *parameter(const char *string,const char *delim,size_t n){
 static char *remove_dir_from_path(const char *path, const char *dir){
  if(path){
   char *canon_dir=canonicalize_file_name(dir);
+  if(!canon_dir)return(xstrdup(path));
   size_t s=strlen(path),i=0;
   char *newpath=(char *)xzalloc(s+1);
   char *tmp=xstrdup(path),*ptr;
