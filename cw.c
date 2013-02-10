@@ -612,12 +612,12 @@ static void c_handler(char *line,size_t l,int argc){
 
 /* Read the config file, passing the lines to c_handler(). */
 void c_read(char *file,int argc){
- size_t i=0,l=0;
  char buf[BUFSIZE+1];
- FILE *fs;
- if(!(fs=fopen(file,"r")))cwexit(1,"failed opening config file.");
+ FILE *fs=fopen(file,"r");
+ if(!fs)cwexit(1,"failed opening config file.");
+ size_t l=0;
  while(fgets(buf,BUFSIZE,fs)){
-  i=strlen(buf);
+  size_t i=strlen(buf);
   if(i>2){
    /* remove excess characters read, ex. \r\n. */
    if(!isprint((unsigned char)buf[i-1]))buf[i-1]=0;
