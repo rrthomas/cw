@@ -154,11 +154,6 @@ static const char *color_code[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m"};
 
-/* Definition error message. */
-void c_error(size_t l,const char *text){
- fprintf(stdout,"cw:definition error:%zu: %s\n",l,text);
-}
-
 /* Exit with or without a reason. */
 noreturn void cwexit(signed char level,const char *reason){
  if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
@@ -500,6 +495,11 @@ noreturn void execcw(int argc,char **argv){
    cwexit(re,0);
    break;
  }
+}
+
+/* Definition error message. */
+void c_error(size_t l,const char *text){
+ fprintf(stdout,"cw:definition error:%zu: %s\n",l,text);
 }
 
 /* Process a definition file line. */
