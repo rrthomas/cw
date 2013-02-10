@@ -128,15 +128,15 @@ static Hash_table *colormap;
 static unsigned char base_color;
 static pid_t pid_c;
 extern char **environ;
-static bool ifarg, ifarga;
-static bool ifos, ifosa;
+static bool ifarg=false, ifarga=false;
+static bool ifos=false, ifosa=false;
 static bool eint;
 static bool nocolor, nocolor_stdout, nocolor_stderr;
 static char *cmd, *cmdargs;
 static gl_list_t matches;
 static int master[2];
 static int slave[2];
-static bool ptys_on;
+static bool ptys_on=false;
 
 static const char **color_name;
 static const char *color_name_real[]={"black","blue","green","cyan","red","purple","brown",
@@ -628,45 +628,34 @@ void c_read(char *file,int argc){
 }
 
 int main(int argc,char **argv){
- int i=0;
- size_t j=0;
- char *ptr,*newpath;
  set_program_name(argv[0]);
- if(argc>1)scrname=xstrdup(argv[1]);
+ if(argc<=1||!strcmp("--help",argv[1]))
+  usage();
+ else if(!strcmp("--version",argv[1]))
+  cwexit(1,"cw (color wrapper) v"VERSION);
+ if(access(argv[1],F_OK))
+  cwexit(1,"cannot find definition file.");
+ scrname=xstrdup(argv[1]);
+ size_t j=0;
+ for(int i=2;argc>i;i++)j+=(strlen(argv[i])+1);
+ cmdargs=(char *)xzalloc(j+1);
+ for(int i=2;argc>i;i++){
+  strcat(cmdargs,argv[i]);
+  strcat(cmdargs," ");
+ }
  base_scrname=base_name(scrname?scrname:program_name);
  matches=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
- if(argc>1&&*argv[1]=='-'){
-  for(i=1;i<argc;i++){
-   if(!strcmp("--help",argv[i]))
-    usage();
-   else if(!strcmp("--version",argv[i]))
-    cwexit(1,"cw (color wrapper) v"VERSION);
-  }
- }
- for(i=2;argc>i;i++)j+=(strlen(argv[i])+1);
- cmdargs=(char *)xzalloc(j+1);
- j=0;
- for(i=2;argc>i;i++){
-  sprintf(cmdargs+j,"%s%c",argv[i],(argc-i==1?0:32));
-  j+=(strlen(argv[i])+1);
- }
- if(argc<=1)
-  usage();
- if(access(argv[1],F_OK))
-  cwexit(1,"cannot find definition file.");
- ifarg=ifarga=false;
- ifos=ifosa=false;
- ptys_on=false;
  color_name=getenv("CW_INVERT")?color_name_real_invert:color_name_real;
- setcolors((ptr=getenv("CW_COLORS"))?ptr:default_colormap);
+ char *ptr=getenv("CW_COLORS");
+ setcolors(ptr?ptr:default_colormap);
  /* Set PATH for child processes; may be overridden by definition file. */
- newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
+ char *newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
- if(getenv("NOCOLOR"))nocolor=true;
- c_read(scrname,argc);
+ nocolor=getenv("NOCOLOR")!=NULL;
  nocolor_stdout=!isatty(STDOUT_FILENO);
  nocolor_stderr=!isatty(STDERR_FILENO);
+ c_read(scrname,argc);
  execcw(argc,argv);
 }
