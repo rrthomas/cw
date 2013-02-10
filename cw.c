@@ -89,19 +89,18 @@ static void initsetproctitle(int argc,char **argv,char **envp){
 
 /* Pseudo setproctitle. */
 static void setproctitle(const char *fmt,...){
- size_t i;
  char buf[BUFSIZE+1];
- char *p;
  va_list param;
  va_start(param,fmt);
  vsnprintf(buf,sizeof(buf),fmt,param);
  va_end(param);
+ size_t i;
  if((i=strlen(buf))>(size_t)(proct.largv-proct.argv[0]-2)){
   i=proct.largv-proct.argv[0]-2;
   buf[i]='\0';
  }
  strcpy(proct.argv[0],buf);
- p=&proct.argv[0][i];
+ char *p=&proct.argv[0][i];
  while(p<proct.largv)*p++=0;
  proct.argv[1]=0;
 }
@@ -167,11 +166,10 @@ void xalloc_die(void) {
 
 /* Check for a regex match of a string. */
 static bool regxcmp(char *str,char *pattern){
- int r;
  regex_t re;
  if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
   return(1);
- r=regexec(&re,str,0,0,0);
+ int r=regexec(&re,str,0,0,0);
  regfree(&re);
  return r==REG_NOMATCH;
 }
@@ -228,20 +226,18 @@ static void usage(void){
 /* Convert a logical color string to a physical color array index. (0..colors - 1).
    Returns -1 if color type undefined and no base color defined. */
 static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
- colormap_t *c=XZALLOC(colormap_t),*ent;
+ colormap_t *c=XZALLOC(colormap_t);
  assert(color);
  c->log=color;
- ent=hash_lookup(colormap,c);
+ colormap_t *ent=hash_lookup(colormap,c);
  if(!ent){ /* Use "base" if the color type is undefined. */
   c->log="base";
   ent=hash_lookup(colormap,c);
  }
  free(c);
- if(ent){
-  signed char i;
-  for(i=0;i<colors;i++)
+ if(ent)
+  for(signed char i=0;i<colors;i++)
    if(!strcmp(color_name[i],ent->phys))return(i);
- }
  return(-1);
 }
 
@@ -258,8 +254,7 @@ static bool colormap_cmp (const void *c1, const void *c2){
 /* Set user color map. */
 static void setcolors(const char *str){
  char *ass,*tmp=xstrdup(str);
- size_t i;
- for(i=0;(ass=parameter(tmp,":",i));i++){
+ for(size_t i=0;(ass=parameter(tmp,":",i));i++){
   char *tmp2=strtok(ass,"=");
   if(tmp2&&strlen(tmp2)){
    char *log=xstrdup(tmp2);
@@ -285,17 +280,15 @@ static void setcolors(const char *str){
 
 /* Create a coloring array for a string. */
 static unsigned char *make_colors(const char *string){
- gl_list_iterator_t i;
- const match *m;
- regex_t re;
- regmatch_t pm;
  size_t s=strlen(string);
  char *buf=xzalloc(s);
  memset(buf,base_color,s); /* Fill color array with base color. */
- for(i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
+ const match *m;
+ for(gl_list_iterator_t i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
+  regex_t re;
   if(!regcomp(&re,m->data,REG_EXTENDED)){
-   size_t j;
-   for(j=0;j<s&&!regexec(&re,string+j,1,&pm,j?REG_NOTBOL:0);j+=pm.rm_eo){
+   regmatch_t pm;
+   for(size_t j=0;j<s&&!regexec(&re,string+j,1,&pm,j?REG_NOTBOL:0);j+=pm.rm_eo){
     memset(buf+j+pm.rm_so,m->col,pm.rm_eo-pm.rm_so);
     if(pm.rm_eo==0)j++; /* Make sure we advance at least one character. */
    }
@@ -307,10 +300,10 @@ static unsigned char *make_colors(const char *string){
 
 /* Color a string given a coloring array. */
 static char *apply_colors(const char *string, const unsigned char *colors){
- unsigned char col=255; /* Invalid value to guarantee immediate change of color. */
- size_t i,j=0,s=strlen(string);
+ size_t j=0,s=strlen(string);
  char *tbuf=xzalloc((s+1)*(8+1)); /* longest escape sequence is 8 characters, +1 for the text. */
- for(i=0;i<s;i++){
+ unsigned char col=255; /* Invalid value to guarantee immediate change of color. */
+ for(size_t i=0;i<s;i++){
   if(col!=colors[i]){
    const char *esc=color_code[colors[i]];
    col=colors[i];
@@ -365,15 +358,7 @@ static void sig_catch(int sig, void (*handler)(int))
 
 /* Execute and color a program. */
 noreturn void execcw(int argc,char **argv){
- bool on=false,son=false;
- ssize_t i=0,j=0,k=0,s=0;
- signed char re=0;
- int fds[2],fde[2],fdm=0,fd=0,e=0;
- char *buf,*tmp;
- fd_set rfds;
-#ifdef SIGCHLD
- struct sigaction sa;
-#endif
+ int fds[2],fde[2];
  if(!matches)
   nocolor=true;
  if(!nocolor){
@@ -382,6 +367,7 @@ noreturn void execcw(int argc,char **argv){
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
  }
 #ifdef SIGCHLD
+ struct sigaction sa;
  sa.sa_handler=sighandler;
  sigemptyset(&sa.sa_mask);
  sa.sa_flags=SA_NOCLDSTOP;
@@ -427,7 +413,7 @@ noreturn void execcw(int argc,char **argv){
 #endif
    setproctitle("cw: wrapping [%s] {pid=%u}",base_scrname,pid_c);
 #endif
-   buf=(char *)xzalloc(BUFSIZE+1);
+   char *buf=(char *)xzalloc(BUFSIZE+1);
    if(ptys_on){
     close(fds[0]);
     close(fde[0]);
@@ -436,8 +422,10 @@ noreturn void execcw(int argc,char **argv){
    }
    fcntl(fds[0],F_SETFL,O_NONBLOCK);
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
-   fdm=MAX(fds[0],fde[0])+1;
-   while(s>0||!ext){
+   int fdm=MAX(fds[0],fde[0])+1,fd=0,e=0;
+   char *tmp=NULL;
+   fd_set rfds;
+   for(ssize_t s=0;s>0||!ext;){
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
     FD_SET(fde[0],&rfds);
@@ -446,18 +434,19 @@ noreturn void execcw(int argc,char **argv){
      else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
      else continue;
      memset(buf,0,BUFSIZE);
+     ssize_t j=0;
      while((s=read(fd,buf,BUFSIZE))>0){
-      if(!on){
+      if(!tmp){
        j=0;
        tmp=(char *)xzalloc(s+1);
-       on=true;
       }
       else
        tmp=(char *)xrealloc(tmp,s+j+1);
-      for(i=0;s>i;i++){
+      bool son=false;
+      for(ssize_t i=0;s>i;i++){
        if(buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
         son=false;
-        for(k=i+2;!son&&s>k;k++){
+        for(size_t k=i+2;!son&&s>k;k++){
          if(buf[k]=='m'){
           if(k-i>2)i+=k-i;
           son=true;
@@ -475,11 +464,9 @@ noreturn void execcw(int argc,char **argv){
         free(aptr);
         fflush(fd==fds[0]?stdout:stderr);
         free(tmp);
-        on=false;
-        if(s>i){
+        tmp=NULL;
+        if(s>i)
          tmp=(char *)xzalloc(s-i+1);
-         on=true;
-        }
         j=0;
        }
        else if(buf[i]!='\r')tmp[j++]=buf[i];
@@ -488,8 +475,9 @@ noreturn void execcw(int argc,char **argv){
     }
    }
    free(buf);
-   if(on)free(tmp);
+   free(tmp);
    rexit=1;
+   signed char re=0;
    if(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e))
     re=WEXITSTATUS(e);
    else re=0;
