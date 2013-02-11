@@ -1,2 +1,0 @@
-ifnarg --h
-match bright [^=]+

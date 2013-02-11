@@ -1,9 +1,0 @@
-match bright [[:digit:]]
-match neutral :
-match bright /
-match bright \[
-match bright \]
-match bright |
-match bright -
-match bright \+
-match bright total

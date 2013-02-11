@@ -38,8 +38,10 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/utsname.h>
 #include <sys/wait.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 #include "progname.h"
 #include "dirname.h"
 #include "gl_xlist.h"
@@ -127,11 +129,9 @@ static Hash_table *colormap;
 static unsigned char base_color;
 static pid_t pid_c;
 extern char **environ;
-static bool ifarg=false, ifarga=false;
-static bool ifos=false, ifosa=false;
 static bool eint;
 static bool nocolor, nocolor_stdout, nocolor_stderr;
-static char *cmd, *cmdargs;
+static char *cmd;
 static gl_list_t matches;
 static int master[2];
 static int slave[2];
@@ -162,23 +162,6 @@ noreturn void cwexit(signed char level,const char *reason){
 
 void xalloc_die(void) {
  cwexit(1,"malloc() failed.");
-}
-
-/* Check for a regex match of a string. */
-static bool regxcmp(char *str,char *pattern){
- regex_t re;
- if(regcomp(&re,pattern,REG_EXTENDED|REG_NOSUB))
-  return(1);
- int r=regexec(&re,str,0,0,0);
- regfree(&re);
- return r==REG_NOMATCH;
-}
-
-/* scans for a system name match. */
-static bool struncmp(char *cmp){
- struct utsname un;
- if(uname(&un)<0||!strlen(un.sysname))return(1);
- return regxcmp(un.sysname,cmp);
 }
 
 /* Parse the n-th delim-delimited token out of a string. */
@@ -486,134 +469,24 @@ noreturn void execcw(int argc,char **argv){
  }
 }
 
-/* Definition error message. */
-void c_error(size_t l,const char *text){
- fprintf(stdout,"cw:definition error:%zu: %s\n",l,text);
+static int add_match(lua_State *L) {
+ match *m=(match *)XZALLOC(match);
+ m->col=color_atoi(luaL_checkstring(L,1));
+ m->data=xstrdup(luaL_checkstring(L,2));
+ gl_list_add_last(matches,m);
+ return 0;
 }
 
-/* Process a definition file line. */
-static void c_handler(char *line,size_t l,int argc){
- bool o=false,on=false;
- size_t i=0,j=0,k=0;
- char *tmp,*ptr,*ins=parameter(line," ",0);
- if(!strcmp(ins,"ifos-else")){
-  o=true;
-  if(ifosa)ifos=!ifos;
-  else c_error(l,"'ifos-else' used before any previous comparison.");
+/* Adapted from Lua 5.2's lua.c */
+static void getargs (lua_State *L,int argc,char **argv,int n) {
+ lua_createtable(L,argc-(n+1),0);
+ for (int i=n+1;i<argc;i++) {
+  lua_pushstring(L,argv[i]);
+  lua_pushvalue(L,-1);
+  lua_rawseti(L,-3,i-n);
+  lua_pushboolean(L,1);
+  lua_rawset(L,-3);
  }
- else if(!strcmp(ins,"ifos")||!strcmp(ins,"ifnos")){
-  ifosa=o=true;
-  tmp=parameter(line," ",1);
-  if(!tmp)c_error(l,"'ifos'/'ifnos' syntax error. (not enough arguments?)");
-  else{
-   for(j=i=0;!j&&(ptr=parameter(tmp,":",i));i++){
-    if(!strcmp(ptr,"<any>"))j=1;
-    else j=!struncmp(ptr);
-    free(ptr);
-   }
-   free(tmp);
-   ifos=j;
-   if(!strcmp(ins,"ifos"))
-    ifos=!ifos;
-  }
- }
- else if(!ifos&&(!strcmp(ins,"ifarg-else"))){
-  o=true;
-  if(ifarga)ifarg=!ifarg;
-  else c_error(l,"'ifarg-else' used before any previous comparison.");
- }
- else if(!ifos&&(!strcmp(ins,"ifarg")||!strcmp(ins,"ifnarg"))){
-  ifarga=o=true;
-  tmp=parameter(line," ",1);
-  if(!tmp)c_error(l,"'ifarg'/'ifnarg' syntax error. (not enough arguments?)");
-  else{
-   for(j=i=0;!j&&(ptr=parameter(tmp,":",i));i++){
-    if(!strcmp(ptr,"<any>")||(!strcmp(ptr,"<none>")&&argc<3))j=1;
-    else j=!regxcmp(cmdargs,ptr);
-    free(ptr);
-   }
-   free(tmp);
-   ifarg=j;
-   if(!strcmp(ins,"ifarg"))
-    ifarg=!ifarg;
-  }
- }
- if(ifos||ifarg)
-  return;
- if(line[0]=='#')return;
- else if(line[0]=='$'){
-  line=strtok(line+1,"=");
-  if(line&&strlen(line)){
-   tmp=xstrdup(line);
-   line=strtok(0,"");
-   if(line&&strlen(line))
-    setenv(tmp,line,1);
-   else c_error(l,"environment variable value missing.");
-   free(tmp);
-  }
-  else c_error(l,"environment variable name missing.");
- }
- else if(!strcmp(ins,"command")){
-  ptr=strtok(line," ");
-  ptr=strtok(0,"");
-  if((k=strlen(ptr))){
-   if(cmd)free(cmd);
-   cmd=(char *)xzalloc(k+strlen(cmdargs)+1);
-   for(on=false,j=i=0;k>i;i++){
-    if(!on&&!strncmp(ptr+i,"{}",2)){
-     strcpy(cmd+j,cmdargs);
-     j+=strlen(cmdargs);
-     i++;
-     on=true;
-    }
-    else{
-     cmd[j]=ptr[i];
-     j++;
-    }
-   }
-   cmd[j]=0;
-  }
-  else c_error(l,"'command' instruction missing command.");
- }
- else if(!strcmp(ins,"match")){
-  if((tmp=parameter(line," ",1))){
-   match *m=(match *)XZALLOC(match);
-   m->col=color_atoi(tmp);
-   free(tmp);
-   if((ptr=parameter(line," ",2))){
-    free(ptr);
-    ptr=tmp=xstrdup(line);
-    tmp=strtok(tmp," ");
-    tmp=strtok(0," ");
-    tmp=strtok(0,"");
-    m->data=xstrdup(tmp);
-    gl_list_add_last(matches,m);
-    free(ptr);
-   }
-   else c_error(l,"'match' syntax error: cannot find color argument)");
-  }
-  else c_error(l,"'match' syntax error: cannot find regex argument");
- }
- else if(!o)c_error(l,"invalid definition instruction.");
- free(ins);
-}
-
-/* Read the config file, passing the lines to c_handler(). */
-void c_read(char *file,int argc){
- char buf[BUFSIZE+1];
- FILE *fs=fopen(file,"r");
- if(!fs)cwexit(1,"failed opening config file.");
- size_t l=0;
- while(fgets(buf,BUFSIZE,fs)){
-  size_t i=strlen(buf);
-  if(i>2){
-   /* remove excess characters read, ex. \r\n. */
-   if(!isprint((unsigned char)buf[i-1]))buf[i-1]=0;
-   if(!isprint((unsigned char)buf[i-2]))buf[i-2]=0;
-   c_handler(buf,l++,argc);
-  }
- }
- fclose(fs);
 }
 
 int main(int argc,char **argv){
@@ -622,16 +495,7 @@ int main(int argc,char **argv){
   usage();
  else if(!strcmp("--version",argv[1]))
   cwexit(1,"cw (color wrapper) v"VERSION);
- if(access(argv[1],F_OK))
-  cwexit(1,"cannot find definition file.");
  scrname=xstrdup(argv[1]);
- size_t j=0;
- for(int i=2;argc>i;i++)j+=(strlen(argv[i])+1);
- cmdargs=(char *)xzalloc(j+1);
- for(int i=2;argc>i;i++){
-  strcat(cmdargs,argv[i]);
-  strcat(cmdargs," ");
- }
  base_scrname=base_name(scrname?scrname:program_name);
  matches=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
@@ -645,6 +509,16 @@ int main(int argc,char **argv){
  nocolor=getenv("NOCOLOR")!=NULL;
  nocolor_stdout=!isatty(STDOUT_FILENO);
  nocolor_stderr=!isatty(STDERR_FILENO);
- c_read(scrname,argc);
+ lua_State *L=luaL_newstate();
+ assert(L);
+ luaL_openlibs(L);
+ lua_register(L,"match",add_match);
+ getargs(L,argc,argv,1);
+ lua_setglobal(L,"arg");
+ if(luaL_dofile(L,scrname))
+  cwexit(1,"definition file cannot be read or contains an error.");
+ lua_getglobal(L,"command");
+ if(lua_isstring(L,-1))
+  cmd=xstrdup(lua_tostring(L,-1));
  execcw(argc,argv);
 }

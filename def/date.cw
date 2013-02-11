@@ -1,9 +1,0 @@
-match bright [[:digit:]]
-match punctuation :
-match punctuation /
-match punctuation \.
-match bright -
-match bright _
-match bright =
-match highlight \[[^]]*\]
-match warning %.

@@ -38,7 +38,6 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wc++-compat"       # Don't care.
   nw="$nw -Woverlength-strings" # Don't care.
   nw="$nw -Wmissing-format-attribute" # Don't care.
-  nw="$nw -Wunreachable-code" # Seems buggy.
 
   gl_MANYWARN_ALL_GCC([warnings])
 
@@ -66,6 +65,9 @@ dnl Checks for functions and headers
 AC_HEADER_STDC
 AC_CHECK_FUNCS(setproctitle setsid)
 AC_CHECK_HEADERS(stropts.h)
+AX_PROG_LUA
+AX_LUA_HEADERS
+AX_LUA_LIBS
 gl_INIT
 
 dnl Generate output

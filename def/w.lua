@@ -1,0 +1,17 @@
+match("bright", "[[:digit:]]")
+match("bright", "\\(")
+match("bright", "\\)")
+match("bright", "\\[")
+match("bright", "\\]")
+match("bright", "\\{")
+match("bright", "\\}")
+match("bright", ":")
+match("bright", "\\.")
+match("bright", ",")
+match("bright", "-")
+match("bright", "=")
+match("bright", "/")
+match("default", "USER")
+if not arg["--help"] then
+  match("bright", "[^ ]+")
+end
