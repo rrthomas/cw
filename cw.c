@@ -383,7 +383,6 @@ static int add_match(lua_State *L) {
  return 0;
 }
 
-/* Adapted from Lua 5.2's lua.c */
 static void getargs (lua_State *L,int argc,char **argv,int n) {
  lua_createtable(L,argc-(n+1),0);
  for (int i=n+1;i<argc;i++) {
@@ -408,7 +407,6 @@ int main(int argc,char **argv){
  color_name=getenv("CW_INVERT")?color_name_real_invert:color_name_real;
  char *ptr=getenv("CW_COLORS");
  setcolors(ptr?ptr:default_colormap);
- /* Set PATH for child processes; may be overridden by definition file. */
  char *newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
