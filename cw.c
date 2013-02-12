@@ -60,15 +60,13 @@ typedef struct{
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 static bool ext=false;
-static unsigned char rexit=0;
 static char *scrname,*base_scrname;
 static Hash_table *colormap;
 static signed char base_color;
 static pid_t pid_c;
 extern char **environ;
 static bool eint;
-static bool nocolor, nocolor_stdout, nocolor_stderr;
-static char *cmd;
+static bool nocolor_stdout, nocolor_stderr;
 static gl_list_t matches;
 static int master[2];
 static int slave[2];
@@ -91,10 +89,11 @@ static const char *color_code[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m"};
 
 /* Exit with or without a reason. */
-noreturn void cwexit(signed char level,const char *reason){
- if(!rexit&&level)fprintf(stdout,"cw:exit: %s\n",reason);
+noreturn void cwexit(signed char code,const char *reason){
+ if(reason)fprintf(stdout,"cw:exit: %s\n",reason);
  fflush(stdout);
- exit(level);
+ fflush(stderr);
+ exit(code);
 }
 
 void xalloc_die(void) {
@@ -262,7 +261,6 @@ static void sighandler(int sig){
 #endif
  if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"%s",color_code[default_color]);
-  fflush(stderr);
   cwexit(0,0);
  }
 }
@@ -276,44 +274,34 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
   assert(sigaction(sig, &sa, 0)==0);
 }
 
-/* Execute and color a program. */
-noreturn void execcw(char **argv){
+/* Set up coloring harness for a program. */
+void set_up_harness(void){
  int fds[2],fde[2];
- if(gl_list_size(matches)==0)
-  nocolor=true;
- if(!nocolor){
-  ptys_on=make_ptypair(0)&&make_ptypair(1);
-  if(pipe(fds)<0)cwexit(1,"pipe() failed.");
-  if(pipe(fde)<0)cwexit(1,"pipe() failed.");
- }
+ ptys_on=make_ptypair(0)&&make_ptypair(1);
+ if(pipe(fds)<0)cwexit(1,"pipe() failed.");
+ if(pipe(fde)<0)cwexit(1,"pipe() failed.");
 #ifdef SIGCHLD
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler);
 #endif
  sig_catch(SIGPIPE,0,sighandler);
- switch(nocolor?0:(pid_c=fork())){
+ switch((pid_c=fork())){
   case -1:
    cwexit(1,"fork() error.");
    break;
   case 0:
    /* child process to execute the program. */
-   if(!nocolor){
-    if(dup2((ptys_on?slave[0]:fds[1]),STDOUT_FILENO)<0)
-     cwexit(1,"dup2() failed.");
-    close(fds[0]);
-    close(fds[1]);
-    if(dup2((ptys_on?slave[1]:fde[1]),STDERR_FILENO)<0)
-     cwexit(1,"dup2() failed.");
-    close(fde[0]);
-    close(fde[1]);
+   if(dup2((ptys_on?slave[0]:fds[1]),STDOUT_FILENO)<0)
+    cwexit(1,"dup2() failed.");
+   close(fds[0]);
+   close(fds[1]);
+   if(dup2((ptys_on?slave[1]:fde[1]),STDERR_FILENO)<0)
+    cwexit(1,"dup2() failed.");
+   close(fde[0]);
+   close(fde[1]);
 #ifdef HAVE_SETSID
-    setsid();
+   setsid();
 #endif
-   }
-   if(cmd)
-    execle("/bin/sh",base_name(scrname),"-c",cmd,(char *)0,environ);
-   argv[1]=base_scrname;
-   execvpe(argv[1],&argv[1],environ);
-   abort(); /* We never get here. */
+   return;
   default:
    /* parent process to read the program's output. (forwards SIGINT to child) */
    eint=true;
@@ -380,12 +368,9 @@ noreturn void execcw(char **argv){
     }
    }
    free(tmp);
-   rexit=1;
-   signed char re=0;
-   if(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e))
-    re=WEXITSTATUS(e);
-   else re=0;
-   cwexit(re,0);
+   fflush(stdout);
+   fflush(stderr);
+   cwexit(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0,0);
    break;
  }
 }
@@ -427,7 +412,6 @@ int main(int argc,char **argv){
  char *newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
- nocolor=getenv("NOCOLOR")!=NULL;
  nocolor_stdout=!isatty(STDOUT_FILENO);
  nocolor_stderr=!isatty(STDERR_FILENO);
  lua_State *L=luaL_newstate();
@@ -438,8 +422,20 @@ int main(int argc,char **argv){
  lua_setglobal(L,"arg");
  if(luaL_dofile(L,scrname))
   cwexit(1,"definition file cannot be read or contains an error.");
+ const char *cmd=base_scrname;
  lua_getglobal(L,"command");
- if(lua_isstring(L,-1))
-  cmd=xstrdup(lua_tostring(L,-1));
- execcw(argv);
+ if(lua_isstring(L,-1)){
+  char *cmdline=xstrdup(lua_tostring(L,-1));
+  if(!cmdline)
+   cwexit(1,"invalid command given.");
+  cmd="/bin/sh";
+  argv=xzalloc(sizeof(char*)*(3+1)); /* argv needs a trailing NULL. */
+  argv[0]=base_scrname;
+  argv[1]=xstrdup("-c");
+  argv[2]=cmdline;
+ }
+ else argv++;
+ if(!getenv("NOCOLOR"))
+  set_up_harness();
+ execvpe(cmd,argv,environ);
 }
