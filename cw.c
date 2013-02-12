@@ -408,6 +408,7 @@ noreturn void execcw(int argc,char **argv){
    int fdm=MAX(fds[0],fde[0])+1,fd=0,e=0;
    char *tmp=NULL;
    fd_set rfds;
+   ssize_t j=0;
    for(ssize_t s=0;s>0||!ext;){
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
@@ -417,7 +418,6 @@ noreturn void execcw(int argc,char **argv){
      else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
      else continue;
      memset(buf,0,BUFSIZE);
-     ssize_t j=0;
      while((s=read(fd,buf,BUFSIZE))>0){
       if(!tmp){
        j=0;
