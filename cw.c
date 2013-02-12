@@ -267,13 +267,13 @@ static void sighandler(int sig){
  }
 }
 
-static void sig_catch(int sig, void (*handler)(int))
+static void sig_catch(int sig, int flags, void (*handler)(int))
 {
   struct sigaction sa;
   sa.sa_handler = handler;
-  sa.sa_flags = 0;
+  sa.sa_flags = flags;
   sigemptyset(&sa.sa_mask);
-  sigaction(sig, &sa, 0);         /* XXX ignores errors */
+  assert(sigaction(sig, &sa, 0)==0);
 }
 
 /* Execute and color a program. */
@@ -287,18 +287,9 @@ noreturn void execcw(char **argv){
   if(pipe(fde)<0)cwexit(1,"pipe() failed.");
  }
 #ifdef SIGCHLD
- struct sigaction sa;
- sa.sa_handler=sighandler;
- sigemptyset(&sa.sa_mask);
- sa.sa_flags=SA_NOCLDSTOP;
- if(sigaction(SIGCHLD,&sa,0)<0){
+ sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler);
 #endif
-  sig_catch(SIGTSTP,SIG_IGN);
-#ifdef SIGCHLD
-  sig_catch(SIGCHLD,sighandler);
- }
-#endif
- sig_catch(SIGPIPE,sighandler);
+ sig_catch(SIGPIPE,0,sighandler);
  switch(nocolor?0:(pid_c=fork())){
   case -1:
    cwexit(1,"fork() error.");
@@ -326,7 +317,7 @@ noreturn void execcw(char **argv){
   default:
    /* parent process to read the program's output. (forwards SIGINT to child) */
    eint=true;
-   sig_catch(SIGINT,sighandler);
+   sig_catch(SIGINT,0,sighandler);
    char buf[BUFSIZ+1];
    if(ptys_on){
     close(fds[0]);
