@@ -45,8 +45,6 @@
 #include "xalloc.h"
 #include "minmax.h"
 
-#define BUFSIZE 1024
-
 /* Match instruction. */
 typedef struct{
   char *data;
@@ -329,7 +327,7 @@ noreturn void execcw(char **argv){
    /* parent process to read the program's output. (forwards SIGINT to child) */
    eint=true;
    sig_catch(SIGINT,sighandler);
-   char *buf=(char *)xzalloc(BUFSIZE+1);
+   char buf[BUFSIZ+1];
    if(ptys_on){
     close(fds[0]);
     close(fde[0]);
@@ -350,8 +348,8 @@ noreturn void execcw(char **argv){
      if(FD_ISSET(fds[0],&rfds))fd=fds[0];
      else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
      else continue;
-     memset(buf,0,BUFSIZE);
-     while((s=read(fd,buf,BUFSIZE))>0){
+     memset(buf,0,BUFSIZ);
+     while((s=read(fd,buf,BUFSIZ))>0){
       if(!tmp){
        j=0;
        tmp=(char *)xzalloc(s+1);
@@ -390,7 +388,6 @@ noreturn void execcw(char **argv){
      }
     }
    }
-   free(buf);
    free(tmp);
    rexit=1;
    signed char re=0;
