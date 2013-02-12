@@ -279,7 +279,7 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
 /* Execute and color a program. */
 noreturn void execcw(char **argv){
  int fds[2],fde[2];
- if(!matches)
+ if(gl_list_size(matches)==0)
   nocolor=true;
  if(!nocolor){
   ptys_on=make_ptypair(0)&&make_ptypair(1);
