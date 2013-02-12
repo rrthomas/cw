@@ -64,7 +64,6 @@ AC_SUBST([ISYSTEM])
 dnl Checks for functions and headers
 AC_HEADER_STDC
 AC_CHECK_FUNCS(setsid)
-AC_CHECK_HEADERS(stropts.h)
 AX_PROG_LUA
 AX_LUA_HEADERS
 AX_LUA_LIBS

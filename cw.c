@@ -27,14 +27,10 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-#ifdef HAVE_STROPTS_H
-#include <stropts.h>
-#endif
 #include <fcntl.h>
 #include <pty.h>
 #include <ctype.h>
 #include <regex.h>
-#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
