@@ -60,17 +60,11 @@ typedef struct{
 char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
 
 static bool ext=false;
-static char *scrname,*base_scrname;
 static Hash_table *colormap;
 static signed char base_color;
 static pid_t pid_c;
-extern char **environ;
 static bool eint;
-static bool nocolor_stdout, nocolor_stderr;
 static gl_list_t matches;
-static int master[2];
-static int slave[2];
-static bool ptys_on=false;
 
 static const char **color_name;
 static const char *color_name_real[]={"black","blue","green","cyan","red","purple","brown",
@@ -244,11 +238,6 @@ static char *convert_string(const char *string){
  return(colored_line);
 }
 
-/* Create a master-slave pty pair. */
-static bool make_ptypair(unsigned char v){
- return openpty(&master[v],&slave[v],0,0,0)==0;
-}
-
 static void sighandler(int sig){
  if(sig==SIGINT&&eint){
   if(pid_c){
@@ -276,10 +265,14 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
 
 /* Set up coloring harness for a program. */
 void set_up_harness(void){
+ bool nocolor_stdout=!isatty(STDOUT_FILENO);
+ bool nocolor_stderr=!isatty(STDERR_FILENO);
  int fds[2],fde[2];
- ptys_on=make_ptypair(0)&&make_ptypair(1);
  if(pipe(fds)<0)cwexit(1,"pipe() failed.");
  if(pipe(fde)<0)cwexit(1,"pipe() failed.");
+ int master[2],slave[2];
+ bool ptys_on=(openpty(&master[0],&slave[0],0,0,0)==0)&&
+  (openpty(&master[1],&slave[1],0,0,0)==0);
 #ifdef SIGCHLD
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler);
 #endif
@@ -394,14 +387,14 @@ static void getargs (lua_State *L,int argc,char **argv,int n) {
  }
 }
 
-int main(int argc,char **argv){
+int main(int argc,char **argv,char **envp){
  set_program_name(argv[0]);
  if(argc<=1||!strcmp("--help",argv[1]))
   usage();
  else if(!strcmp("--version",argv[1]))
   cwexit(1,"cw (color wrapper) v"VERSION);
- scrname=xstrdup(argv[1]);
- base_scrname=base_name(scrname?scrname:program_name);
+ char *scrname=xstrdup(argv[1]);
+ char *base_scrname=base_name(scrname?scrname:program_name);
  matches=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
  colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
  color_name=getenv("CW_INVERT")?color_name_real_invert:color_name_real;
@@ -410,8 +403,6 @@ int main(int argc,char **argv){
  char *newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
  free(newpath);
- nocolor_stdout=!isatty(STDOUT_FILENO);
- nocolor_stderr=!isatty(STDERR_FILENO);
  lua_State *L=luaL_newstate();
  assert(L);
  luaL_openlibs(L);
@@ -435,5 +426,5 @@ int main(int argc,char **argv){
  else argv++;
  if(!getenv("NOCOLOR"))
   set_up_harness();
- execvpe(cmd,argv,environ);
+ execvpe(cmd,argv,envp);
 }
