@@ -65,7 +65,7 @@ static bool ext=false;
 static unsigned char rexit=0;
 static char *scrname,*base_scrname;
 static Hash_table *colormap;
-static unsigned char base_color;
+static signed char base_color;
 static pid_t pid_c;
 extern char **environ;
 static bool eint;
@@ -158,7 +158,7 @@ static _GL_ATTRIBUTE_PURE signed char color_atoi(const char *color){
  }
  free(c);
  if(ent)
-  for(signed char i=0;i<colors;i++)
+  for(signed char i=0;i<(signed)colors;i++)
    if(!strcmp(color_name[i],ent->phys))return(i);
  return(-1);
 }
@@ -203,7 +203,7 @@ static void setcolors(const char *str){
 /* Create a coloring array for a string. */
 static unsigned char *make_colors(const char *string){
  size_t s=strlen(string);
- char *buf=xzalloc(s);
+ unsigned char *buf=xzalloc(s);
  memset(buf,base_color,s); /* Fill color array with base color. */
  const match *m;
  for(gl_list_iterator_t i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
@@ -221,14 +221,14 @@ static unsigned char *make_colors(const char *string){
 }
 
 /* Color a string given a coloring array. */
-static char *apply_colors(const char *string, const unsigned char *colors){
+static char *apply_colors(const char *string, const unsigned char *color){
  size_t j=0,s=strlen(string);
  char *tbuf=xzalloc((s+1)*(8+1)); /* longest escape sequence is 8 characters, +1 for the text. */
  unsigned char col=255; /* Invalid value to guarantee immediate change of color. */
  for(size_t i=0;i<s;i++){
-  if(col!=colors[i]){
-   const char *esc=color_code[colors[i]];
-   col=colors[i];
+  if(col!=color[i]){
+   const char *esc=color_code[color[i]];
+   col=color[i];
    strcpy(tbuf+j,esc);
    j+=strlen(esc);
   }
@@ -241,9 +241,9 @@ static char *apply_colors(const char *string, const unsigned char *colors){
 
 /* Color a string based on the definition file. */
 static char *convert_string(const char *string){
- char *colors=make_colors(string);
- char *colored_line=apply_colors(string,colors);
- free(colors);
+ unsigned char *color=make_colors(string);
+ char *colored_line=apply_colors(string,color);
+ free(color);
  return(colored_line);
 }
 
@@ -279,7 +279,7 @@ static void sig_catch(int sig, void (*handler)(int))
 }
 
 /* Execute and color a program. */
-noreturn void execcw(int argc,char **argv){
+noreturn void execcw(char **argv){
  int fds[2],fde[2];
  if(!matches)
   nocolor=true;
@@ -362,7 +362,7 @@ noreturn void execcw(int argc,char **argv){
       for(ssize_t i=0;s>i;i++){
        if(buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
         son=false;
-        for(size_t k=i+2;!son&&s>k;k++){
+        for(ssize_t k=i+2;!son&&s>k;k++){
          if(buf[k]=='m'){
           if(k-i>2)i+=k-i;
           son=true;
@@ -453,5 +453,5 @@ int main(int argc,char **argv){
  lua_getglobal(L,"command");
  if(lua_isstring(L,-1))
   cmd=xstrdup(lua_tostring(L,-1));
- execcw(argc,argv);
+ execcw(argv);
 }
