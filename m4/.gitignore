@@ -82,8 +82,6 @@
 /stdint_h.m4
 /stdio_h.m4
 /vasnprintf.m4
-/vsnprintf-posix.m4
-/vsnprintf.m4
 /xsize.m4
 /environ.m4
 /malloca.m4

@@ -24,7 +24,6 @@
 #include <stdnoreturn.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdarg.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
@@ -51,62 +50,6 @@
 #include "minmax.h"
 
 #define BUFSIZE 1024
-
-#if !defined(HAVE_SETPROCTITLE) && (defined(__APPLE_CC__) || defined(__linux__))
-#define INT_SETPROCTITLE
-#define HAVE_SETPROCTITLE
-
-struct{
- char **argv;
- char *largv;
- char *name;
-}proct;
-
-/* Initialize pseudo setproctitle. */
-static void initsetproctitle(int argc,char **argv,char **envp){
- int i=0;
- size_t envpsize=0;
- char *s;
- for(i=0;envp[i]!=0;i++)
-  envpsize+=(strlen(envp[i])+1);
- environ=(char **)xzalloc((sizeof(char *)*(i+1))+envpsize+1);
- s=((char *)environ)+((sizeof(char *)*(i+1)));
- for(i=0;envp[i]!=0;i++){
-  strcpy(s,envp[i]);
-  environ[i]=s;
-  s+=(strlen(s)+1);
- }
- environ[i]=0;
- proct.name=xstrdup(argv[0]);
- proct.argv=argv;
- for(i=0;i<argc;i++){
-  if(i==0||proct.largv+1==argv[i])
-   proct.largv=(argv[i]+strlen(argv[i]));
- }
- for(i=0;envp[i]!=0;i++){
-  if(proct.largv+1==envp[i])
-   proct.largv=(envp[i]+strlen(envp[i]));
- }
-}
-
-/* Pseudo setproctitle. */
-static void setproctitle(const char *fmt,...){
- char buf[BUFSIZE+1];
- va_list param;
- va_start(param,fmt);
- vsnprintf(buf,sizeof(buf),fmt,param);
- va_end(param);
- size_t i;
- if((i=strlen(buf))>(size_t)(proct.largv-proct.argv[0]-2)){
-  i=proct.largv-proct.argv[0]-2;
-  buf[i]='\0';
- }
- strcpy(proct.argv[0],buf);
- char *p=&proct.argv[0][i];
- while(p<proct.largv)*p++=0;
- proct.argv[1]=0;
-}
-#endif
 
 /* Match instruction. */
 typedef struct{
@@ -390,12 +333,6 @@ noreturn void execcw(int argc,char **argv){
    /* parent process to read the program's output. (forwards SIGINT to child) */
    eint=true;
    sig_catch(SIGINT,sighandler);
-#ifdef HAVE_SETPROCTITLE
-#ifdef INT_SETPROCTITLE
-   initsetproctitle(argc,argv,environ);
-#endif
-   setproctitle("cw: wrapping [%s] {pid=%u}",base_scrname,pid_c);
-#endif
    char *buf=(char *)xzalloc(BUFSIZE+1);
    if(ptys_on){
     close(fds[0]);
