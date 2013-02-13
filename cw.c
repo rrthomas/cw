@@ -262,6 +262,8 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
 void set_up_harness(void){
  bool nocolor_stdout=!isatty(STDOUT_FILENO);
  bool nocolor_stderr=!isatty(STDERR_FILENO);
+ if(getenv("NOCOLOR")||(nocolor_stdout&&nocolor_stderr))
+  return;
  int fds[2],fde[2];
  if(pipe(fds)<0)cwexit(1,"pipe() failed.");
  if(pipe(fde)<0)cwexit(1,"pipe() failed.");
@@ -410,7 +412,6 @@ int main(int argc,char **argv,char **envp){
   argv[2]=cmdline;
  }
  else argv++;
- if(!getenv("NOCOLOR"))
-  set_up_harness();
+ set_up_harness();
  execvpe(cmd,argv,envp);
 }
