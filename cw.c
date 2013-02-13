@@ -63,7 +63,6 @@ static bool ext=false;
 static Hash_table *colormap;
 static signed char base_color;
 static pid_t pid_c;
-static bool eint;
 static gl_list_t matches;
 
 static const char **color_name;
@@ -239,12 +238,8 @@ static char *convert_string(const char *string){
 }
 
 static void sighandler(int sig){
- if(sig==SIGINT&&eint){
-  if(pid_c){
-   kill(pid_c,SIGINT);
-   eint=false;
-  }
- }
+ if(sig==SIGINT&&pid_c)
+  kill(pid_c,SIGINT);
 #ifdef SIGCHLD
  else if(sig==SIGCHLD)ext=true;
 #endif
@@ -296,8 +291,7 @@ void set_up_harness(void){
 #endif
    return;
   default:
-   /* parent process to read the program's output. (forwards SIGINT to child) */
-   eint=true;
+   /* parent process to filter the program's output. (forwards SIGINT to child) */
    sig_catch(SIGINT,0,sighandler);
    char buf[BUFSIZ+1];
    if(ptys_on){
@@ -310,9 +304,9 @@ void set_up_harness(void){
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
    int fdm=MAX(fds[0],fde[0])+1,fd=0,e=0;
    char *tmp=NULL;
-   fd_set rfds;
    ssize_t j=0;
    for(ssize_t s=0;s>0||!ext;){
+    fd_set rfds;
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
     FD_SET(fde[0],&rfds);
@@ -320,42 +314,34 @@ void set_up_harness(void){
      if(FD_ISSET(fds[0],&rfds))fd=fds[0];
      else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
      else continue;
-     memset(buf,0,BUFSIZ);
      while((s=read(fd,buf,BUFSIZ))>0){
-      if(!tmp){
-       j=0;
-       tmp=(char *)xzalloc(s+1);
-      }
-      else
-       tmp=(char *)xrealloc(tmp,s+j+1);
-      bool son=false;
+      tmp=(char *)xrealloc(tmp,s+j+1);
       for(ssize_t i=0;s>i;i++){
-       if(buf[i]==0x1b&&s>i+3&&buf[i+1]=='['){
-        son=false;
-        for(ssize_t k=i+2;!son&&s>k;k++){
-         if(buf[k]=='m'){
-          if(k-i>2)i+=k-i;
-          son=true;
+       switch(buf[i]){
+        case '\n':
+         {
+          char *aptr=NULL;
+          tmp[j]=0;
+          if(fd==fds[0])
+           fprintf(stdout,"%s\n",nocolor_stdout?tmp:(aptr=convert_string(tmp)));
+          else
+           fprintf(stderr,"%s\n",nocolor_stderr?tmp:(aptr=convert_string(tmp)));
+          free(aptr);
+          fflush(fd==fds[0]?stdout:stderr);
+          free(tmp);
+          tmp=NULL;
+          j=0;
+          if(s>i)
+           tmp=(char *)xzalloc(s-i+1);
+          j=0;
          }
-         else if(buf[k]!=';'&&!isdigit((unsigned char)buf[k]))son=true;
-        }
+         break;
+        case '\r':
+         break;
+        default:
+         tmp[j++]=buf[i];
+         break;
        }
-       else if(buf[i]=='\n'){
-        char *aptr=NULL;
-        tmp[j]=0;
-        if(fd==fds[0])
-         fprintf(stdout,"%s\n",nocolor_stdout?tmp:(aptr=convert_string(tmp)));
-        else
-         fprintf(stderr,"%s\n",nocolor_stderr?tmp:(aptr=convert_string(tmp)));
-        free(aptr);
-        fflush(fd==fds[0]?stdout:stderr);
-        free(tmp);
-        tmp=NULL;
-        if(s>i)
-         tmp=(char *)xzalloc(s-i+1);
-        j=0;
-       }
-       else if(buf[i]!='\r')tmp[j++]=buf[i];
       }
      }
     }
