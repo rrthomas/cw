@@ -86,16 +86,11 @@
 /environ.m4
 /malloca.m4
 /setenv.m4
-/gethostname.m4
-/socketlib.m4
-/sockets.m4
 /socklen.m4
 /sockpfaf.m4
 /stdalign.m4
 /sys_socket_h.m4
 /sys_uio_h.m4
-/sys_utsname_h.m4
-/uname.m4
 /sys_wait_h.m4
 /waitpid.m4
 /sys_ioctl_h.m4
