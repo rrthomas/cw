@@ -259,11 +259,7 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
 }
 
 /* Set up coloring harness for a program. */
-void set_up_harness(void){
- bool nocolor_stdout=!isatty(STDOUT_FILENO);
- bool nocolor_stderr=!isatty(STDERR_FILENO);
- if(getenv("NOCOLOR")||(nocolor_stdout&&nocolor_stderr))
-  return;
+void set_up_harness(bool nocolor_stdout, bool nocolor_stderr){
  int fds[2],fde[2];
  if(pipe(fds)<0)cwexit(1,"pipe() failed.");
  if(pipe(fde)<0)cwexit(1,"pipe() failed.");
@@ -387,6 +383,7 @@ int main(int argc,char **argv,char **envp){
  colormap=hash_initialize(16,NULL,colormap_hash,colormap_cmp,NULL);
  color_name=getenv("CW_INVERT")?color_name_real_invert:color_name_real;
  char *ptr=getenv("CW_COLORS");
+ bool nocolor=getenv("NOCOLOR");
  setcolors(ptr?ptr:default_colormap);
  char *newpath=remove_dir_from_path(getenv("PATH"),SCRIPTSDIR);
  setenv("PATH",newpath,1);
@@ -412,6 +409,9 @@ int main(int argc,char **argv,char **envp){
   argv[2]=cmdline;
  }
  else argv++;
- set_up_harness();
+ bool nocolor_stdout=!isatty(STDOUT_FILENO);
+ bool nocolor_stderr=!isatty(STDERR_FILENO);
+ if(!nocolor&&!(nocolor_stdout&&nocolor_stderr))
+  set_up_harness(nocolor_stdout,nocolor_stderr);
  execvpe(cmd,argv,envp);
 }
