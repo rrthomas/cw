@@ -44,6 +44,7 @@
 #include "hash.h"
 #include "xalloc.h"
 #include "minmax.h"
+#include "xstrndup.h"
 
 /* Match instruction. */
 typedef struct{
@@ -81,16 +82,14 @@ static const char *color_code[]={"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
  "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
  "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m"};
 
-/* Exit with or without a reason. */
-noreturn void cwexit(signed char code,const char *reason){
- if(reason)fprintf(stdout,"cw:exit: %s\n",reason);
- fflush(stdout);
- fflush(stderr);
- exit(code);
+/* Exit with an error. */
+noreturn void die(const char *error){
+ fprintf(stdout,"cw:exit: %s\n",error);
+ exit(1);
 }
 
 void xalloc_die(void) {
- cwexit(1,"malloc() failed.");
+ die("malloc() failed.");
 }
 
 /* Parse the n-th delim-delimited token out of a string. */
@@ -101,38 +100,6 @@ static char *parameter(const char *string,const char *delim,size_t n){
  arg=arg?xstrdup(arg):NULL;
  free(fptr);
  return arg;
-}
-
-/* Filter a directory out of a PATH-like colon-separated path list. */
-static char *remove_dir_from_path(const char *path, const char *dir){
- if(path){
-  char *canon_dir=canonicalize_file_name(dir);
-  if(!canon_dir)return(xstrdup(path));
-  size_t s=strlen(path),i=0;
-  char *newpath=(char *)xzalloc(s+1);
-  char *tmp=xstrdup(path),*ptr;
-  while((ptr=parameter(tmp,":",i++))){
-   char *canon_pptr=canonicalize_file_name(ptr);
-   if(strcmp(canon_pptr,canon_dir)){
-    if(*newpath)
-     strcat(newpath,":");
-    strcat(newpath,ptr);
-   }
-   free(canon_pptr);
-   free(ptr);
-  }
-  free(tmp);
-  free(canon_dir);
-  return newpath;
- }
- return 0;
-}
-
-static void usage(void){
- fprintf(stdout,"Usage: not for direct use; use via definition files (see cw(1)):\n"
-         "  --version             display version information and exit\n"
-         "  --help                display this help and exit\n");
- cwexit(0,0);
 }
 
 /* Convert a logical color string to a physical color array index. (0..colors - 1).
@@ -178,10 +145,10 @@ static void setcolors(const char *str){
     hash_delete(colormap,c); /* Later entries override earlier ones. */
     assert(hash_insert(colormap,c));
    }
-   else cwexit(1,"physical color missing or invalid.");
+   else die("physical color missing or invalid.");
    free(log);
   }
-  else cwexit(1,"logical color missing or invalid.");
+  else die("logical color missing or invalid.");
   free(ass);
  }
  free(tmp);
@@ -239,6 +206,13 @@ static char *convert_string(const char *string, size_t *len){
  return(colored_line);
 }
 
+static bool nocolor_stdout, nocolor_stderr;
+
+static char *filter(int fileno, char *p, size_t *len){
+  return (fileno==STDOUT_FILENO?nocolor_stdout:nocolor_stderr)?xstrndup(p,*len):convert_string(p,len);
+}
+
+
 static void sighandler(int sig){
  if(sig==SIGINT&&pid_c)
   kill(pid_c,SIGINT);
@@ -247,7 +221,7 @@ static void sighandler(int sig){
 #endif
  if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"%s",color_code[default_color]);
-  cwexit(0,0);
+  exit(0);
  }
 }
 
@@ -260,11 +234,11 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
   assert(sigaction(sig, &sa, 0)==0);
 }
 
-/* Set up coloring harness for a program. */
-void set_up_harness(int nocolor_stdout,int nocolor_stderr){
+/* Wrap the given command. */
+void wrap_command(void){
  int fds[2],fde[2];
- if(pipe(fds)<0)cwexit(1,"pipe() failed.");
- if(pipe(fde)<0)cwexit(1,"pipe() failed.");
+ if(pipe(fds)<0)die("pipe() failed.");
+ if(pipe(fde)<0)die("pipe() failed.");
  int master[2],slave[2];
  bool ptys_on=(openpty(&master[0],&slave[0],0,0,0)==0)&&
   (openpty(&master[1],&slave[1],0,0,0)==0);
@@ -274,16 +248,16 @@ void set_up_harness(int nocolor_stdout,int nocolor_stderr){
  sig_catch(SIGPIPE,0,sighandler);
  switch((pid_c=fork())){
   case -1:
-   cwexit(1,"fork() error.");
+   die("fork() error.");
    break;
   case 0:
    /* child process to execute the program. */
    if(dup2((ptys_on?slave[0]:fds[1]),STDOUT_FILENO)<0)
-    cwexit(1,"dup2() failed.");
+    die("dup2() failed.");
    close(fds[0]);
    close(fds[1]);
    if(dup2((ptys_on?slave[1]:fde[1]),STDERR_FILENO)<0)
-    cwexit(1,"dup2() failed.");
+    die("dup2() failed.");
    close(fde[0]);
    close(fde[1]);
 #ifdef HAVE_SETSID
@@ -323,11 +297,11 @@ void set_up_harness(int nocolor_stdout,int nocolor_stderr){
       memcpy(linebuf+size,tmp,s);
       size+=s;
       while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
-       char *aptr=NULL;
        size_t len=q-p;
-       char *text=(fd==fds[0]?nocolor_stdout:nocolor_stderr)?p:(aptr=convert_string(p,&len));
-       dprintf(fd==fds[0]?STDOUT_FILENO:STDERR_FILENO,"%.*s\r\n",(int)len,text);
-       free(aptr);
+       int n=fd==fds[0]?STDOUT_FILENO:STDERR_FILENO;
+       char *text=filter(n,p,&len);
+       dprintf(n,"%.*s\r\n",(int)len,text);
+       free(text);
        p=q+2;
        if(p-linebuf>=size){
         /* Whenever we completely empty the buffer, free it, to try to avoid
@@ -345,7 +319,7 @@ void set_up_harness(int nocolor_stdout,int nocolor_stderr){
    fflush(stdout);
    fflush(stderr);
    int e=0;
-   cwexit(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0,0);
+   exit(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
    break;
  }
 }
@@ -369,12 +343,44 @@ static void getargs (lua_State *L,int argc,char **argv,int n) {
  }
 }
 
-int main(int argc,char **argv,char **envp){
+/* Filter a directory out of a PATH-like colon-separated path list. */
+static char *remove_dir_from_path(const char *path, const char *dir){
+ if(path){
+  char *canon_dir=canonicalize_file_name(dir);
+  if(!canon_dir)return(xstrdup(path));
+  size_t s=strlen(path),i=0;
+  char *newpath=(char *)xzalloc(s+1);
+  char *tmp=xstrdup(path),*ptr;
+  while((ptr=parameter(tmp,":",i++))){
+   char *canon_pptr=canonicalize_file_name(ptr);
+   if(strcmp(canon_pptr,canon_dir)){
+    if(*newpath)
+     strcat(newpath,":");
+    strcat(newpath,ptr);
+   }
+   free(canon_pptr);
+   free(ptr);
+  }
+  free(tmp);
+  free(canon_dir);
+  return newpath;
+ }
+ return 0;
+}
+
+static void usage(void){
+ fprintf(stdout,"Usage: not for direct use; use via definition files (see cw(1)):\n"
+         "  --version             display version information and exit\n"
+         "  --help                display this help and exit\n");
+ exit(0);
+}
+
+int main(int argc,char **argv){
  set_program_name(argv[0]);
  if(argc<=1||!strcmp("--help",argv[1]))
   usage();
  else if(!strcmp("--version",argv[1]))
-  cwexit(1,"cw (color wrapper) v"VERSION);
+  die("cw (color wrapper) v"VERSION);
  char *scrname=xstrdup(argv[1]);
  char *base_scrname=base_name(scrname?scrname:program_name);
  matches=gl_list_create_empty(GL_LINKED_LIST,NULL,NULL,NULL,1);
@@ -393,13 +399,13 @@ int main(int argc,char **argv,char **envp){
  getargs(L,argc,argv,1);
  lua_setglobal(L,"arg");
  if(luaL_dofile(L,scrname))
-  cwexit(1,"definition file cannot be read or contains an error.");
+  die("definition file cannot be read or contains an error.");
  const char *cmd=base_scrname;
  lua_getglobal(L,"command");
  if(lua_isstring(L,-1)){
   char *cmdline=xstrdup(lua_tostring(L,-1));
   if(!cmdline)
-   cwexit(1,"invalid command given.");
+   die("invalid command given.");
   cmd="/bin/sh";
   argv=xzalloc(sizeof(char*)*(3+1)); /* argv is NULL-terminated. */
   argv[0]=base_scrname;
@@ -407,9 +413,9 @@ int main(int argc,char **argv,char **envp){
   argv[2]=cmdline;
  }
  else argv++;
- bool nocolor_stdout=!isatty(STDOUT_FILENO);
- bool nocolor_stderr=!isatty(STDERR_FILENO);
+ nocolor_stdout=!isatty(STDOUT_FILENO);
+ nocolor_stderr=!isatty(STDERR_FILENO);
  if(!nocolor&&!(nocolor_stdout&&nocolor_stderr))
-  set_up_harness(nocolor_stdout,nocolor_stderr);
- execvpe(cmd,argv,envp);
+  wrap_command();
+ execvp(cmd,argv);
 }

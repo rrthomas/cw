@@ -124,3 +124,4 @@
 /safe-read.m4
 /safe-write.m4
 /write.m4
+/memmem.m4
