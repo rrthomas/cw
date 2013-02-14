@@ -12,6 +12,8 @@ EXTRA_DIST = $(srcdir)/def/*.lua m4/gnulib-cache.m4 $(PACKAGE).1.in
 DISTCLEANFILES = $(PACKAGE).1
 pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
 
+$(pkglibexec_SCRIPTS): config.status
+
 %: %.lua
 	printf "#!$(bindir)/cw\n" > $@
 	cat $< >> $@
