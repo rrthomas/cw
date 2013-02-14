@@ -191,18 +191,17 @@ static void setcolors(const char *str){
 }
 
 /* Create a coloring array for a string. */
-static unsigned char *make_colors(const char *string){
- size_t s=strlen(string);
- unsigned char *buf=xzalloc(s);
- memset(buf,base_color,s); /* Fill color array with base color. */
+static unsigned char *make_colors(const char *string, size_t len){
+ unsigned char *buf=xzalloc(len);
+ memset(buf,base_color,len); /* Fill color array with base color. */
  const match *m;
  for(gl_list_iterator_t i=gl_list_iterator(matches);gl_list_iterator_next(&i,(const void **)&m,NULL);){
   regex_t re;
   if(!regcomp(&re,m->data,REG_EXTENDED)){
    regmatch_t pm;
-   for(size_t j=0;j<s&&!regexec(&re,string+j,1,&pm,j?REG_NOTBOL:0);j+=pm.rm_eo){
-    memset(buf+j+pm.rm_so,m->col,pm.rm_eo-pm.rm_so);
-    if(pm.rm_eo==0)j++; /* Make sure we advance at least one character. */
+   for(size_t j=0;(pm.rm_so=j,pm.rm_eo=len,j<len)&&!regexec(&re,string,1,&pm,(j?REG_NOTBOL:0)|REG_STARTEND);j=pm.rm_eo){
+    memset(buf+pm.rm_so,m->col,pm.rm_eo-pm.rm_so);
+    if(pm.rm_eo==pm.rm_so)pm.rm_eo++; /* Make sure we advance at least one character. */
    }
    regfree(&re);
   }
@@ -211,11 +210,11 @@ static unsigned char *make_colors(const char *string){
 }
 
 /* Color a string given a coloring array. */
-static char *apply_colors(const char *string, const unsigned char *color){
- size_t j=0,s=strlen(string);
- char *tbuf=xzalloc((s+1)*(8+1)); /* longest escape sequence is 8 characters, +1 for the text. */
+static char *apply_colors(const char *string, size_t *len, const unsigned char *color){
+ size_t j=0;
+ char *tbuf=xzalloc((*len+1)*(8+1)); /* longest escape sequence is 8 characters, +1 for the text. */
  unsigned char col=255; /* Invalid value to guarantee immediate change of color. */
- for(size_t i=0;i<s;i++){
+ for(size_t i=0;i<*len;i++){
   if(col!=color[i]){
    const char *esc=color_code[color[i]];
    col=color[i];
@@ -224,15 +223,18 @@ static char *apply_colors(const char *string, const unsigned char *color){
   }
   tbuf[j++]=string[i];
  }
- if(col!=default_color)
+ if(col!=default_color){
   strcpy(tbuf+j,color_code[default_color]);
+  j+=strlen(color_code[default_color]);
+ }
+ *len=j;
  return(tbuf);
 }
 
 /* Color a string based on the definition file. */
-static char *convert_string(const char *string){
- unsigned char *color=make_colors(string);
- char *colored_line=apply_colors(string,color);
+static char *convert_string(const char *string, size_t *len){
+ unsigned char *color=make_colors(string,*len);
+ char *colored_line=apply_colors(string,len,color);
  free(color);
  return(colored_line);
 }
@@ -259,7 +261,7 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
 }
 
 /* Set up coloring harness for a program. */
-void set_up_harness(bool nocolor_stdout, bool nocolor_stderr){
+void set_up_harness(int nocolor_stdout,int nocolor_stderr){
  int fds[2],fde[2];
  if(pipe(fds)<0)cwexit(1,"pipe() failed.");
  if(pipe(fde)<0)cwexit(1,"pipe() failed.");
@@ -291,7 +293,6 @@ void set_up_harness(bool nocolor_stdout, bool nocolor_stderr){
   default:
    /* parent process to filter the program's output. (forwards SIGINT to child) */
    sig_catch(SIGINT,0,sighandler);
-   char buf[BUFSIZ+1];
    if(ptys_on){
     close(fds[0]);
     close(fde[0]);
@@ -300,53 +301,50 @@ void set_up_harness(bool nocolor_stdout, bool nocolor_stderr){
    }
    fcntl(fds[0],F_SETFL,O_NONBLOCK);
    fcntl(fde[0],F_SETFL,O_NONBLOCK);
-   int fdm=MAX(fds[0],fde[0])+1,fd=0,e=0;
-   char *tmp=NULL;
-   ssize_t j=0;
+   int fdm=MAX(fds[0],fde[0])+1;
+   char *linebuf=NULL,*p=NULL;
+   ssize_t size=0;
    for(ssize_t s=0;s>0||!ext;){
     fd_set rfds;
     FD_ZERO(&rfds);
     FD_SET(fds[0],&rfds);
     FD_SET(fde[0],&rfds);
     if(select(fdm,&rfds,0,0,0)>=0){
+     int fd;
      if(FD_ISSET(fds[0],&rfds))fd=fds[0];
      else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
      else continue;
-     while((s=read(fd,buf,BUFSIZ))>0){
-      tmp=(char *)xrealloc(tmp,s+j+1);
-      for(ssize_t i=0;s>i;i++){
-       switch(buf[i]){
-        case '\n':
-         {
-          char *aptr=NULL;
-          tmp[j]=0;
-          if(fd==fds[0])
-           fprintf(stdout,"%s\n",nocolor_stdout?tmp:(aptr=convert_string(tmp)));
-          else
-           fprintf(stderr,"%s\n",nocolor_stderr?tmp:(aptr=convert_string(tmp)));
-          free(aptr);
-          fflush(fd==fds[0]?stdout:stderr);
-          free(tmp);
-          tmp=NULL;
-          j=0;
-          if(s>i)
-           tmp=(char *)xzalloc(s-i+1);
-          j=0;
-         }
-         break;
-        case '\r':
-         break;
-        default:
-         tmp[j++]=buf[i];
-         break;
+     char tmp[BUFSIZ];
+     while((s=read(fd,tmp,BUFSIZ))>0){
+      char *q;
+      size_t off=p-linebuf;
+      linebuf=xrealloc(linebuf,size+s);
+      p=linebuf+off;
+      memcpy(linebuf+size,tmp,s);
+      size+=s;
+      while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
+       char *aptr=NULL;
+       size_t len=q-p;
+       char *text=(fd==fds[0]?nocolor_stdout:nocolor_stderr)?p:(aptr=convert_string(p,&len));
+       dprintf(fd==fds[0]?STDOUT_FILENO:STDERR_FILENO,"%.*s\r\n",(int)len,text);
+       free(aptr);
+       p=q+2;
+       if(p-linebuf>=size){
+        /* Whenever we completely empty the buffer, free it, to try to avoid
+           using too much memory. */
+        free(linebuf);
+        p=linebuf=NULL;
+        size=0;
+        break;
        }
       }
      }
     }
    }
-   free(tmp);
+   free(linebuf);
    fflush(stdout);
    fflush(stderr);
+   int e=0;
    cwexit(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0,0);
    break;
  }
@@ -403,7 +401,7 @@ int main(int argc,char **argv,char **envp){
   if(!cmdline)
    cwexit(1,"invalid command given.");
   cmd="/bin/sh";
-  argv=xzalloc(sizeof(char*)*(3+1)); /* argv needs a trailing NULL. */
+  argv=xzalloc(sizeof(char*)*(3+1)); /* argv is NULL-terminated. */
   argv[0]=base_scrname;
   argv[1]=xstrdup("-c");
   argv[2]=cmdline;

@@ -120,3 +120,7 @@
 /printf-posix-rpl.m4
 /vfprintf-posix.m4
 /minmax.m4
+/dprintf.m4
+/safe-read.m4
+/safe-write.m4
+/write.m4
