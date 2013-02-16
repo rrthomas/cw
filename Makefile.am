@@ -17,6 +17,10 @@ pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
 
 $(pkglibexec_SCRIPTS): config.status
 
+cw: cw.lua
+	printf "#!$(LUA)\n" > $@
+	cat $< >> $@
+
 %: %.lua
 	printf "#!$(bindir)/cw\n" > $@
 	cat $< >> $@
