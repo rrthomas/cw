@@ -1,5 +1,3 @@
--- FIXME: use list.elems instead of ipairs with dummy loop var
-
 require "std"
 local posix = require "posix"
 local rex = require "rex_posix"
@@ -66,7 +64,7 @@ local default_colormap = "base=cyan:bright=cyan+:highlight=green+:lowlight=green
 -- Set user color map.
 local function setcolors (str)
   local tmp = str
-  for _, ass in ipairs (str:split (":")) do
+  for ass in list.elems (str:split (":")) do
     local t = ass:split ("=")
     local log, phys = t[1], t[2]
     if log and #log > 0 then
@@ -98,7 +96,7 @@ local rex_flags = rex.flags ()
 local function make_colors (s)
   local buf = string.rep (string.char (base_color), #s) -- Fill color array with base color.
   local m
-  for _, m in ipairs (matches) do
+  for m in list.elems (matches) do
     local r = rex.new (m.regex)
     if r then
       local j = 1
