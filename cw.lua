@@ -141,8 +141,8 @@ end
 dofile (scrname) -- FIXME: catch errors
 
 local nocolor = os.getenv("NOCOLOR")
-local nocolor_stdout = false -- FIXME not posix.isatty (posix.STDOUT_FILENO)
-local nocolor_stderr = false -- FIXME not posix.isatty (posix.STDERR_FILENO)
+local nocolor_stdout = not posix.isatty (posix.STDOUT_FILENO)
+local nocolor_stderr = not posix.isatty (posix.STDERR_FILENO)
 if not nocolor and not (nocolor_stdout and nocolor_stderr) then
   cw.wrap_child(convert_string)
 end
