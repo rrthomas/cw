@@ -1,8 +1,11 @@
 /build-aux
 *~
 *.o
+*.la
+*.lo
 Makefile
 /.deps
+/.libs
 /aclocal.m4
 /autom4te.cache
 /compile
@@ -16,6 +19,7 @@ Makefile
 /cw-*.tar.gz
 /depcomp
 /INSTALL
+/libtool
 /missing
 /Makefile.in
 /stamp-h1

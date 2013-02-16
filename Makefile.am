@@ -1,11 +1,14 @@
 SUBDIRS = lib
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
-AM_CPPFLAGS = $(ISYSTEM)$(srcdir)/lib $(LUA_INCLUDE) -DSCRIPTSDIR=\"$(pkglibexecdir)\"
 
-bin_PROGRAMS = cw
-cw_SOURCES = cw.c
-cw_LDADD = lib/lib$(PACKAGE).a $(LIBINTL) $(PTY_LIB) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LUA_LIB)
+lib_LTLIBRARIES = consolewrap.la
+
+consolewrap_la_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
+consolewrap_la_CPPFLAGS = $(ISYSTEM)$(srcdir)/lib $(LUA_INCLUDE) -DSCRIPTSDIR=\"$(pkglibexecdir)\"
+consolewrap_la_SOURCES = lcw.c
+consolewrap_la_LDFLAGS = -module -avoid-version $(LIBINTL) $(PTY_LIB) $(GETHOSTNAME_LIB) $(LIBSOCKET) lib/libgnu.la
+
+bin_SCRIPTS = cw
 
 man_MANS = cw.1
 EXTRA_DIST = $(srcdir)/def/*.lua m4/gnulib-cache.m4 $(PACKAGE).1.in
