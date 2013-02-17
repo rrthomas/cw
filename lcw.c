@@ -34,7 +34,6 @@
 #include <sys/wait.h>
 #include <lua.h>
 #include <lauxlib.h>
-#include <lualib.h>
 #include "lua52compat.h"
 #include "dirname.h"
 #include "xalloc.h"
