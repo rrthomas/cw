@@ -188,7 +188,5 @@ static const luaL_Reg R[] =
 LUALIB_API int luaopen_consolewrap(lua_State *L)
 {
  luaL_register(L, "consolewrap", R);
- lua_pushstring(L, SCRIPTSDIR); /* FIXME: remove when interpolated in script */
- lua_setglobal(L, "SCRIPTSDIR");
  return 1;
 }

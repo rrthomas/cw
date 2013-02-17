@@ -15,6 +15,7 @@ Makefile
 /config.log
 /config.status
 /cw
+/cw.lua
 /cw.1
 /cw-*.tar.gz
 /depcomp

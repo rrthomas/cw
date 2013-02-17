@@ -65,6 +65,8 @@ dnl libtool
 LT_PREREQ([2.2.6])
 LT_INIT([disable-static])
 module=yes eval shrext=$shrext_cmds
+AC_SUBST([objdir])
+AC_SUBST([shrext])
 
 dnl Checks for functions and headers
 AC_HEADER_STDC
@@ -76,5 +78,5 @@ gl_INIT
 
 dnl Generate output
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile lib/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile cw.lua])
 AC_OUTPUT

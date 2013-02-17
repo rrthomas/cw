@@ -1,9 +1,19 @@
+#!/bin/sh
+A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
+
+-- Remove current directory from package.path
+package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
+
+-- Fudge package.cpath when running in-tree
+local IN_TREE_LUA_PATH = "@in_tree_lua_path@"
+if IN_TREE_LUA_PATH ~= "" then
+  package.cpath = IN_TREE_LUA_PATH .. ";" .. package.cpath
+end
+
 require "std"
 local posix = require "posix"
 local rex = require "rex_posix"
 local cw = require "consolewrap"
-
-print (arg)
 
 local scrname = arg[1]
 local base_scrname = posix.basename(scrname or arg[0])
@@ -25,7 +35,7 @@ local function remove_dir_from_path(path, dir)
                                     path:split (":")), ":")
 end
 
-posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), SCRIPTSDIR)) -- FIXME: interpolate by configure
+posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkgdatadir@"))
 
 local color_name
 local color_name_real = {"black","blue","green","cyan","red","purple","brown",
