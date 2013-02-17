@@ -32,7 +32,6 @@
 /wint_t.m4
 /manywarnings.m4
 /warnings.m4
-/stdnoreturn.m4
 /msvc-inval.m4
 /raise.m4
 /sigaction.m4
