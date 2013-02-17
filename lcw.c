@@ -39,8 +39,6 @@
 #include "xalloc.h"
 #include "minmax.h"
 
-char id[]="$Id: cw.c,v "VERSION" v9/fakehalo Exp $";
-
 static bool ext=false;
 static pid_t pid_c;
 
