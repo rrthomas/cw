@@ -23,7 +23,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdnoreturn.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <signal.h>
@@ -43,12 +42,6 @@
 
 static bool ext=false;
 static pid_t pid_c;
-
-/* Exit with an error. */
-noreturn void die(const char *error){
- fprintf(stdout,"cw:exit: %s\n",error);
- exit(1);
-}
 
 static void sighandler(int sig){
  if(sig==SIGINT&&pid_c)
@@ -75,8 +68,8 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
 int wrap_child(lua_State *L){
  luaL_checktype(L, 1, LUA_TFUNCTION);
  int fds[2],fde[2];
- if(pipe(fds)<0)die("pipe() failed.");
- if(pipe(fde)<0)die("pipe() failed.");
+ if(pipe(fds)<0)luaL_error(L,"pipe() failed.");
+ if(pipe(fde)<0)luaL_error(L,"pipe() failed.");
  int master[2],slave[2];
  bool ptys_on=(openpty(&master[0],&slave[0],0,0,0)==0)&&
   (openpty(&master[1],&slave[1],0,0,0)==0);
@@ -86,16 +79,16 @@ int wrap_child(lua_State *L){
  sig_catch(SIGPIPE,0,sighandler);
  switch((pid_c=fork())){
   case -1:
-   die("fork() error.");
+   luaL_error(L,"fork() error.");
    break;
   case 0:
    /* child process to execute the program. */
    if(dup2((ptys_on?slave[0]:fds[1]),STDOUT_FILENO)<0)
-    die("dup2() failed.");
+    luaL_error(L,"dup2() failed.");
    close(fds[0]);
    close(fds[1]);
    if(dup2((ptys_on?slave[1]:fde[1]),STDERR_FILENO)<0)
-    die("dup2() failed.");
+    luaL_error(L,"dup2() failed.");
    close(fde[0]);
    close(fde[1]);
 #ifdef HAVE_SETSID
