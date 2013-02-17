@@ -24,7 +24,7 @@ if #arg < 1 or arg[1] == "--help" then
                    "  --help                display this help and exit\n")
   os.exit ()
 elseif arg[1] == "--version" then
-  die ("cw (color wrapper) v") -- FIXME .. version)
+  die ("cw (color wrapper) v@VERSION@")
 end
 
 -- Filter a directory out of a PATH-like colon-separated path list.
