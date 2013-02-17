@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -37,7 +38,6 @@
 #include <lauxlib.h>
 #include "lua52compat.h"
 #include "dirname.h"
-#include "xalloc.h"
 #include "minmax.h"
 
 static bool ext=false;
@@ -64,8 +64,21 @@ static void sig_catch(int sig, int flags, void (*handler)(int))
   assert(sigaction(sig, &sa, 0)==0);
 }
 
+static int pusherror(lua_State *L, const char *info)
+{
+ lua_pushnil(L);
+ if (info==NULL)
+  lua_pushstring(L, strerror(errno));
+ else
+  lua_pushfstring(L, "%s: %s", info, strerror(errno));
+ lua_pushinteger(L, errno);
+ return 3;
+}
+
 /* Wrap a child process's I/O line by line. */
 int wrap_child(lua_State *L){
+ void *ud;
+ lua_Alloc lalloc=lua_getallocf(L,&ud);
  luaL_checktype(L, 1, LUA_TFUNCTION);
  int fds[2],fde[2];
  if(pipe(fds)<0)luaL_error(L,"pipe() failed.");
@@ -123,7 +136,8 @@ int wrap_child(lua_State *L){
      while((s=read(fd,tmp,BUFSIZ))>0){
       char *q;
       size_t off=p-linebuf;
-      linebuf=xrealloc(linebuf,size+s);
+      if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
+       return pusherror(L,"lalloc");
       p=linebuf+off;
       memcpy(linebuf+size,tmp,s);
       size+=s;
@@ -140,7 +154,7 @@ int wrap_child(lua_State *L){
        if(p-linebuf>=size){
         /* Whenever we completely empty the buffer, free it, to try to avoid
            using too much memory. */
-        free(linebuf);
+        lalloc(L,linebuf,size,0);
         p=linebuf=NULL;
         size=0;
         break;
@@ -149,7 +163,7 @@ int wrap_child(lua_State *L){
      }
     }
    }
-   free(linebuf);
+   lalloc(L,linebuf,size,0);
    fflush(stdout);
    fflush(stderr);
    int e=0;
