@@ -28,6 +28,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <string.h>
+#include <setjmp.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <pty.h>
@@ -42,6 +43,7 @@
 
 static bool ext=false;
 static pid_t pid_c;
+static jmp_buf exitbuf;
 
 static void sighandler(int sig){
  if(sig==SIGINT&&pid_c)
@@ -51,17 +53,17 @@ static void sighandler(int sig){
 #endif
  if(sig==SIGPIPE||sig==SIGINT){
   fprintf(stderr,"\x1b[00m");
-  exit(0);
+  longjmp(exitbuf, 1);
  }
 }
 
-static void sig_catch(int sig, int flags, void (*handler)(int))
+static void sig_catch(int sig, int flags, void (*handler)(int), struct sigaction *oldact)
 {
   struct sigaction sa;
   sa.sa_handler = handler;
   sa.sa_flags = flags;
   sigemptyset(&sa.sa_mask);
-  assert(sigaction(sig, &sa, 0)==0);
+  assert(sigaction(sig, &sa, oldact)==0);
 }
 
 static int pusherror(lua_State *L, const char *info)
@@ -75,7 +77,8 @@ static int pusherror(lua_State *L, const char *info)
  return 3;
 }
 
-/* Wrap a child process's I/O line by line. */
+/* Wrap a child process's I/O line by line.
+   Returns nil from child process, and exit code from parent process. */
 int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
@@ -86,10 +89,14 @@ int wrap_child(lua_State *L){
  int master[2],slave[2];
  bool ptys_on=(openpty(&master[0],&slave[0],0,0,0)==0)&&
   (openpty(&master[1],&slave[1],0,0,0)==0);
+ if(setjmp(exitbuf))goto quit;
 #ifdef SIGCHLD
- sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler);
+ struct sigaction oldchldact;
+ sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
 #endif
- sig_catch(SIGPIPE,0,sighandler);
+ struct sigaction oldpipeact,oldintact;
+ sig_catch(SIGPIPE,0,sighandler,&oldpipeact);
+ sigaction(SIGINT,NULL,&oldintact);
  switch((pid_c=fork())){
   case -1:
    luaL_error(L,"fork() error.");
@@ -107,10 +114,11 @@ int wrap_child(lua_State *L){
 #ifdef HAVE_SETSID
    setsid();
 #endif
+   lua_pushnil(L);
    break;
   default:
    /* parent process to filter the program's output. (forwards SIGINT to child) */
-   sig_catch(SIGINT,0,sighandler);
+   sig_catch(SIGINT,0,sighandler,NULL);
    if(ptys_on){
     close(fds[0]);
     close(fde[0]);
@@ -146,7 +154,7 @@ int wrap_child(lua_State *L){
        int n=fd==fds[0]?STDOUT_FILENO:STDERR_FILENO;
        lua_pushvalue(L,1);
        lua_pushlstring(L,p,len);
-       lua_call(L,1,1);
+       lua_pcall(L,1,1,0); /* Ignore errors. */
        const char *text=lua_tolstring(L,-1,&len);
        if(text)dprintf(n,"%.*s\r\n",(int)len,text);
        lua_pop(L,1);
@@ -167,10 +175,15 @@ int wrap_child(lua_State *L){
    fflush(stdout);
    fflush(stderr);
    int e=0;
-   exit(waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
-   break;
+   lua_pushinteger(L,waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
+ quit:
+#ifdef SIGCHLD
+   sigaction(SIGCHLD,&oldchldact,NULL);
+#endif
+   sigaction(SIGPIPE,&oldpipeact,NULL);
+   sigaction(SIGINT,&oldintact,NULL);
  }
- return 0;
+ return 1;
 }
 
 static int Gcanonicalize_file_name (lua_State *L)
