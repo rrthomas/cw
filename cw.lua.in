@@ -16,6 +16,7 @@ require "std"
 local posix = require "posix"
 local rex = require "rex_posix"
 local cw = require "consolewrap"
+local colors = require "ansicolors"
 
 local scrname = arg[1]
 local base_scrname = posix.basename(scrname or arg[0])
@@ -40,17 +41,8 @@ end
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkgdatadir@"))
 
 local color_name
-local color_name_real = {"black","blue","green","cyan","red","purple","brown",
-                         "grey+","grey","blue+","green+","cyan+","red+","purple+","yellow","white",
-                         "default"}
-local color_name_real_invert = {"white","blue+","green+","cyan+","red+","purple+",
-                                "yellow","grey","grey+","blue","green","cyan","red","purple","brown","black",
-                                "default"}
-local colors = #color_name_real
-local color_code = {"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
-                    "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
-                    "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
-                    "\x1b[01;35m","\x1b[01;33m","\x1b[01;37m","\x1b[00m"}
+local color_name_real = {"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "default"}
+local color_name_real_invert = {"white","cyan", "magenta", "blue", "yellow", "green", "red", "black", "default"}
 
 color_name = os.getenv ("CW_INVERT") and color_name_real_invert or color_name_real
 
@@ -61,7 +53,7 @@ local function type_to_color (color)
   return colormap[color] or colormap["base"]
 end
 
-local default_colormap = "base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white:warning=yellow:error=red+:punctuation=blue+"
+local default_colormap = "base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white+:warning=yellow+:error=red+:punctuation=blue+"
 
 -- Set user color map.
 local function setcolors (str)
@@ -71,6 +63,11 @@ local function setcolors (str)
     local log, phys = t[1], t[2]
     if log and #log > 0 then
       if phys and #phys > 0 then
+        if phys[-1] == "+" then
+          phys = "bright " .. phys:sub (1, -2)
+        else
+          phys = "reset " .. phys
+        end
         colormap[log] = phys
       else
         die ("physical color missing or invalid.")
@@ -113,19 +110,18 @@ local function make_colors (s)
 end
 
 -- Color a string given a coloring array.
-local color_name_to_n = table.invert (color_name)
 local function apply_colors (s, color)
   local tbuf = ""
   local col -- nil guarantees immediate change of color
   for i = 1, #s do
     if col ~= color[i] then
       col = color[i]
-      tbuf = tbuf .. color_code[color_name_to_n[col]]
+      tbuf = tbuf .. colors.replaceCodes ("%{" .. col .. "}")
     end
     tbuf = tbuf .. s[i]
   end
   if col ~= "default" then
-    tbuf = tbuf .. color_code[color_name_to_n["default"]]
+    tbuf = tbuf .. colors.replaceCodes ("%{reset}")
   end
   return tbuf
 end

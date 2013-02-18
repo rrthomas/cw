@@ -25,7 +25,7 @@ Colors are referenced by types denoting their function.  The standard list of co
 \fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The mapping of color types to physical names can be changed by the \fBCW_COLORS\fR environment variable (see below).
 .PP
 The available colors are:
-\fBblack, blue, green, cyan, red, purple, brown, grey+, grey, blue+, green+, cyan+, red+, purple+, yellow, white, default\fR. Colors with a \fB+\fR designate a brighter color.
+\fBblack, red, green, yellow, blue, magenta, cyan, white, default\fR. A color may be suffixed \fB+\fR to denote a brighter color.
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
