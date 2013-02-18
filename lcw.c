@@ -78,7 +78,7 @@ static int pusherror(lua_State *L, const char *info)
 }
 
 /* Wrap a child process's I/O line by line.
-   Returns nil from child process, and exit code from parent process. */
+   Returns nil from child process, and exit code from parent process, which is -1 if it was interrupted. */
 int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
@@ -89,7 +89,10 @@ int wrap_child(lua_State *L){
  int master[2],slave[2];
  bool ptys_on=(openpty(&master[0],&slave[0],0,0,0)==0)&&
   (openpty(&master[1],&slave[1],0,0,0)==0);
- if(setjmp(exitbuf))goto quit;
+ if(setjmp(exitbuf)){
+   lua_pushinteger(L,-1);
+   goto quit;
+ }
 #ifdef SIGCHLD
  struct sigaction oldchldact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
