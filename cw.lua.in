@@ -47,7 +47,6 @@ local color_name_real_invert = {"white","blue+","green+","cyan+","red+","purple+
                                 "yellow","grey","grey+","blue","green","cyan","red","purple","brown","black",
                                 "default"}
 local colors = #color_name_real
-local default_color = colors
 local color_code = {"\x1b[00;30m","\x1b[00;34m","\x1b[00;32m",
                     "\x1b[00;36m","\x1b[00;31m","\x1b[00;35m","\x1b[00;33m","\x1b[00;37m",
                     "\x1b[01;30m","\x1b[01;34m","\x1b[01;32m","\x1b[01;36m","\x1b[01;31m",
@@ -57,18 +56,9 @@ color_name = os.getenv ("CW_INVERT") and color_name_real_invert or color_name_re
 
 local colormap = {}
 
--- Convert a logical color string to a physical color array index. (1..colors).
--- Returns -1 if color type undefined and no base color defined.
-local function color_atoi (color)
-  local phys = colormap[color] or colormap["base"]
-  if phys then
-    for i = 1, colors do
-      if color_name[i] == phys then
-        return i
-      end
-    end
-  end
-  return -1
+-- Convert a color type to a physical color, defaulting to the base color.
+local function type_to_color (color)
+  return colormap[color] or colormap["base"]
 end
 
 local default_colormap = "base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white:warning=yellow:error=red+:punctuation=blue+"
@@ -89,25 +79,21 @@ local function setcolors (str)
       die ("logical color missing or invalid.")
     end
   end
-  base_color = color_atoi ("base")
-  if base_color == -1 then
-    setcolors ("base=default")
-  end
 end
 
+setcolors ("base=default") -- Ensure there is a "base" type
 setcolors (os.getenv ("CW_COLORS") or default_colormap)
 
 local matches = {}
 
 function match (col, regex)
-  table.insert (matches, {col = color_atoi (col), regex = regex})
+  table.insert (matches, {col = type_to_color (col), regex = regex})
 end
 
 -- Create a coloring array for a string.
 local rex_flags = rex.flags ()
 local function make_colors (s)
-  local buf = string.rep (string.char (base_color), #s) -- Fill color array with base color.
-  local m
+  local cols = list.rep ({type_to_color ("base")}, #s) -- Fill color array with base color.
   for m in list.elems (matches) do
     local r = rex.new (m.regex)
     if r then
@@ -115,7 +101,7 @@ local function make_colors (s)
       while j < #s do
         local from, to = r:find (s, j, j > 1 and rex_flags.NOTBOL or 0)
         if not from then break end
-        buf = buf:sub (1, from - 1) .. string.rep (string.char (m.col), to - from + 1) .. buf:sub (to + 1)
+        cols = cols:slice (1, from - 1) .. list.rep ({m.col}, to - from + 1) .. cols:slice (to + 1)
         if to == from then
           to = to + 1 -- Make sure we advance at least one character.
         end
@@ -123,22 +109,23 @@ local function make_colors (s)
       end
     end
   end
- return buf
+ return cols
 end
 
 -- Color a string given a coloring array.
+local color_name_to_n = table.invert (color_name)
 local function apply_colors (s, color)
   local tbuf = ""
-  local col = 255 -- Invalid value to guarantee immediate change of color.
+  local col -- nil guarantees immediate change of color
   for i = 1, #s do
     if col ~= color[i] then
       col = color[i]
-      tbuf = tbuf .. color_code[string.byte (col)]
+      tbuf = tbuf .. color_code[color_name_to_n[col]]
     end
     tbuf = tbuf .. s[i]
   end
-  if string.byte (col) ~= default_color then
-    tbuf = tbuf .. color_code[default_color]
+  if col ~= "default" then
+    tbuf = tbuf .. color_code[color_name_to_n["default"]]
   end
   return tbuf
 end
