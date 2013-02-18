@@ -16,7 +16,6 @@
 /fcntl-o.m4
 /include_next.m4
 /longlong.m4
-/malloc.m4
 /multiarch.m4
 /off_t.m4
 /ssize_t.m4
@@ -67,9 +66,7 @@
 /stdio_h.m4
 /vasnprintf.m4
 /xsize.m4
-/environ.m4
 /malloca.m4
-/setenv.m4
 /socklen.m4
 /sockpfaf.m4
 /stdalign.m4
@@ -85,14 +82,7 @@
 /posix_openpt.m4
 /pty.m4
 /pty_h.m4
-/dirname.m4
 /double-slash-root.m4
-/error.m4
-/strerror.m4
-/strndup.m4
-/strnlen.m4
-/xalloc.m4
-/xstrndup.m4
 /canonicalize.m4
 /largefile.m4
 /lstat.m4

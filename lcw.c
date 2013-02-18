@@ -38,7 +38,6 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include "lua52compat.h"
-#include "dirname.h"
 #include "minmax.h"
 
 static bool ext=false;
