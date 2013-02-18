@@ -1,6 +1,8 @@
 #!/bin/sh
 A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 
+prog = { name = "@PACKAGE@" }
+
 -- Remove current directory from package.path
 package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
 
@@ -146,7 +148,10 @@ local function convert_string (s)
   return apply_colors (s, make_colors (s))
 end
 
-dofile (scrname) -- FIXME: catch errors
+local ok, msg = pcall (dofile, scrname)
+if ok == false then
+  die ("error in definition file: " .. msg)
+end
 
 local nocolor = os.getenv("NOCOLOR")
 local nocolor_stdout = not posix.isatty (posix.STDOUT_FILENO)
