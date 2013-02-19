@@ -1,4 +1,8 @@
 .\" color wrapper manual page.
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
 .TH "CW" "1" "February 2013" "v9/fakehalo" "Text Manipulation"
 .SH "NAME"
 cw \- colorer for command-line programs
@@ -11,8 +15,9 @@ cw \- colorer for command-line programs
 .SH "DEFINITION SCRIPTS"
 Definition scripts are written in the Lua scripting language (see lua(1)). There is no need to know Lua to write a simple definition file. As well as the usual Lua libraries, the \fBposix\fR library is recommended for tasks such as checking the system type and setting environment variables. cw provides the following extra features:
 .TP
-\fBmatch(\fIcolor-type\fR, \fIregex\fB)\fR
-This function adds a rule for that  matching \fBregex\fR should be colored as type \fBcolor-type\fR.  Matches are applied in order of definition.  See below for an explanation of color types, and regex(7) for the syntax of regular expressions (note that these are POSIX Extended Regular expressions, not Lua regular expressions).
+\fBmatch(\fIcolor-type\fR, \fIpattern\fB)\fR
+This function adds a rule for that  matching \fBpattern\fR should be colored as type \fBcolor-type\fR.  Matches are applied in order of definition.  See below for an explanation of color types, and
+.URL "http://www.lua.org/manual/5.1/manual.html#5.4.1" "the Lua manual" " for the syntax of patterns."
 .TP
 \fBarg\fR
 As for a standalone Lua script, the \fBarg\fR table gives a list of command-line arguments to the program being wrapped. For convenience, each argument is also a key in the table, so it is easy to test whether a certain argument has been given, in any position, with code such as \fBif arg["\-\-help"] then...\fR

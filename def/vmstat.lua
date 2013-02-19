@@ -1,6 +1,6 @@
 if arg["-m"] then
   match("lowlight", "_")
-  match("lowlight", "-")
+  match("lowlight", "%-")
   match("neutral", "Cache")
   match("neutral", "Num")
   match("neutral", "Total")
@@ -8,9 +8,9 @@ if arg["-m"] then
   match("neutral", "Pages")
   match("punctuation", " .*")
 else
-  match("punctuation", "[[:digit:]]")
-  match("neutral", "-")
-  match("neutral", "\\[")
-  match("neutral", "\\]")
+  match("punctuation", "%d")
+  match("neutral", "%-")
+  match("neutral", "%[")
+  match("neutral", "%]")
 end
-match("bright", "\\([^)]*\\)")
+match("bright", "%b()")

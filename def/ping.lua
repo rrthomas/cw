@@ -1,4 +1,3 @@
-require "posix"
 if posix.uname("%s") == "SunOS" then
   match("bright", "----")
   match("neutral", "is alive")
@@ -9,8 +8,8 @@ if not arg["--help"] then
   match("highlight", "=")
 else
   match("neutral", ":")
-  match("highlight", "\\([^)]*\\)")
-  match("highlight", "\\[[^]]*\\]")
+  match("highlight", "%b()")
+  match("highlight", "%b[]")
   match("bright", ",")
   match("highlight", " ms")
   match("default", " from ")

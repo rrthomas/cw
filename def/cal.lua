@@ -1,3 +1,3 @@
-match("bright", "[[:upper:]]")
-match("bright", "[[:digit:]]")
-match("neutral", "\\[[^]]*\\]")
+match("bright", "%u")
+match("bright", "%d")
+match("neutral", "%b[]")

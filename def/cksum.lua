@@ -1,6 +1,6 @@
 match("bright", "/")
 if arg["--help"] then
-  match("bright", "-")
+  match("bright", "%-")
 else
   match("bright", "[^ ]+ [^ ]+")
 end

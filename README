@@ -5,13 +5,14 @@
                 (c) 2013 Reuben Thomas <rrt@sc3d.org>
 
 
-cw is a colorer for command-line programs.  It is designed to
-simulate the environment of the commands being executed, so that when
-you type 'du', 'df', 'ping', etc. in your shell the output is
-automatically colored according to a definition file.  Named colors
-can be matched to regexs, and according to the arguments to the
-original program and the OS under which it is running.  cw includes
-over 70 definition files, and it's easy to write more.
+cw is a colorer for command-line programs.  It is designed to simulate
+the environment of the commands being executed, so that when you type
+'du', 'df', 'ping', etc. in your shell the output is automatically
+colored according to a definition file.  Text patterns are assigned to
+lexical classes, which themselves are given colors.  The arguments to
+the original program and OS under which it is running can also be
+taken into account.  cw includes over 70 definition files, and it's
+easy to write more.
 
 
 Installation

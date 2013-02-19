@@ -1,5 +1,5 @@
 if arg["--help"] then
-  match("neutral", "-")
+  match("neutral", "%-")
 else
   match("punctuation", "%")
   match("punctuation", "K ")
@@ -11,14 +11,14 @@ else
   match("default", "-blocks")
   match("bright", "Mounted on")
 end
-match("neutral", "[[:digit:]]")
+match("neutral", "%d")
 match("punctuation", "/")
-match("punctuation", "\\.")
+match("punctuation", "%.")
 match("punctuation", ":")
 match("punctuation", "<")
 match("punctuation", ">")
-match("punctuation", "\\(")
-match("punctuation", "\\)")
-match("punctuation", "\\[")
-match("punctuation", "\\]")
+match("punctuation", "%(")
+match("punctuation", "%)")
+match("punctuation", "%[")
+match("punctuation", "%]")
 match("punctuation", "`[^']*'")

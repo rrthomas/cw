@@ -3,9 +3,9 @@ if not arg["-g"] and not arg["-G"] and not arg["-n"] and not arg["-r"] and not a
   match("bright", ":")
   match("bright", "=")
   match("bright", "/")
-  match("bright", "\\[[^]]*\\]")
-  match("bright", "\\([^)]*\\)")
+  match("bright", "%b[]")
+  match("bright", "%b()")
 end
 if arg["--help"] then
-  match("bright", "-")
+  match("bright", "%-")
 end

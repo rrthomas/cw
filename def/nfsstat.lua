@@ -1,4 +1,4 @@
-match("highlight", "[[:digit:]]")
+match("highlight", "%d")
 match("neutral", ":")
 match("neutral", "%")
 match("neutral", "%")

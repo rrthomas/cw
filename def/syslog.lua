@@ -1,5 +1,5 @@
 command = "tail -f /var/log/syslog"
-match("bright", "\\([^)]*\\)")
-match("bright", "\\[[^]]*\\]")
-match("highlight", "^[[:alpha:]]+ +[[:digit:]]+ +[[:digit:]:]+ [^ ]+")
-match("neutral", "^[[:alpha:]]+ +[[:digit:]]+ +[[:digit:]:]+")
+match("bright", "%b()")
+match("bright", "%b[]")
+match("highlight", "^%a+ +%d+ +[%d:]+ [^ ]+")
+match("neutral", "^%a+ +%d+ +[%d:]+")

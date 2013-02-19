@@ -14,7 +14,6 @@ end
 
 require "std"
 local posix = require "posix"
-local rex = require "rex_posix"
 local cw = require "consolewrap"
 local colors = require "ansicolors"
 
@@ -88,22 +87,11 @@ function match (col, regex)
 end
 
 -- Create a coloring array for a string.
-local rex_flags = rex.flags ()
 local function make_colors (s)
   local cols = list.rep ({type_to_color ("base")}, #s) -- Fill color array with base color.
   for m in list.elems (matches) do
-    local r = rex.new (m.regex)
-    if r then
-      local j = 1
-      while j < #s do
-        local from, to = r:find (s, j, j > 1 and rex_flags.NOTBOL or 0)
-        if not from then break end
-        cols = cols:slice (1, from - 1) .. list.rep ({m.col}, to - from + 1) .. cols:slice (to + 1)
-        if to == from then
-          to = to + 1 -- Make sure we advance at least one character.
-        end
-        j = to
-      end
+    for from, to in s:gmatch ("()" .. m.regex .. "()") do
+      cols = cols:slice (1, from - 1) .. list.rep ({m.col}, to - from) .. cols:slice (to)
     end
   end
  return cols

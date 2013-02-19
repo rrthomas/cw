@@ -1,5 +1,5 @@
-match("bright", "[[:digit:]]")
-match("highlight", "\\.")
+match("bright", "%d")
+match("highlight", "%.")
 match("highlight", "/")
 match("highlight", "broadcast")
 match("warning", "target")
