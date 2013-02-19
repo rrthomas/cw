@@ -146,4 +146,4 @@ if command then
 else
   table.remove (arg, 1)
 end
-posix.execp (cmd, unpack (arg))
+posix.execp (cmd, unpack (table.merge (arg, table.invert (arg))))
