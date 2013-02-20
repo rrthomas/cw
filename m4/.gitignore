@@ -37,7 +37,6 @@
 /signal_h.m4
 /signalblocking.m4
 /string_h.m4
-/isatty.m4
 /msvc-nothrow.m4
 /errno_h.m4
 /exponentd.m4
