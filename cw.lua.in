@@ -80,7 +80,7 @@ end
 setcolors ("base=default") -- Ensure there is a "base" type
 setcolors (os.getenv ("CW_COLORS") or default_colormap)
 
-local matches = {}
+local matches = list.new ()
 
 function match (col, regex)
   table.insert (matches, {col = type_to_color (col), regex = regex})
@@ -89,9 +89,9 @@ end
 -- Create a coloring array for a string.
 local function make_colors (s)
   local cols = list.rep ({type_to_color ("base")}, #s) -- Fill color array with base color.
-  for m in list.elems (matches) do
+  for m in matches:elems () do
     for from, to in s:gmatch ("()" .. m.regex .. "()") do
-      cols = cols:slice (1, from - 1) .. list.rep ({m.col}, to - from) .. cols:slice (to)
+      cols = cols:sub (1, from - 1) .. list.rep ({m.col}, to - from) .. cols:sub (to)
     end
   end
  return cols
