@@ -119,6 +119,7 @@ local function convert_string (s)
   return apply_colors (s, make_colors (s))
 end
 
+table.merge (arg, table.invert (arg)) -- add arguments as keys
 local ok, msg = pcall (dofile, scrname)
 if ok == false then
   die ("error in definition file: " .. msg)
@@ -137,13 +138,13 @@ end
 -- Child process
 local cmd = base_scrname
 if command then
-  local cmdline = tostring (command)
-  if not cmdline then
+  command = tostring (command)
+  if not command then
     die ("invalid command given.")
   end
   cmd = "/bin/sh"
-  arg = {[0] = base_scrname, "-c", cmdline} -- FIXME: needs argv[0]-setting support in luaposix to work
+  arg = {[0] = base_scrname, "-c", command}
 else
   table.remove (arg, 1)
 end
-posix.execp (cmd, unpack (table.merge (arg, table.invert (arg))))
+posix.execp (cmd, arg)
