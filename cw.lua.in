@@ -15,7 +15,7 @@ end
 require "std"
 local posix = require "posix"
 local cw = require "consolewrap"
-local colors = require "ansicolors"
+local colors = require "term.colors"
 
 local scrname = arg[1]
 local base_scrname = posix.basename(scrname or arg[0])
@@ -39,56 +39,56 @@ end
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkgdatadir@"))
 
-local color_name
-local color_name_real = {"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "default"}
-local color_name_real_invert = {"white","cyan", "magenta", "blue", "yellow", "green", "red", "black", "default"}
-
-color_name = os.getenv ("CW_INVERT") and color_name_real_invert or color_name_real
-
 local colormap = {}
 
--- Convert a color type to a physical color, defaulting to the base color.
-local function type_to_color (color)
-  return colormap[color] or colormap["base"]
+-- Convert a lexical class to a color, defaulting to the color of the base class.
+local function class_to_color (class)
+  return colormap[class] or colormap["base"]
 end
-
-local default_colormap = "base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white+:warning=yellow+:error=red+:punctuation=blue+"
 
 -- Set user color map.
 local function setcolors (str)
   local tmp = str
   for ass in list.elems (str:split (":")) do
     local t = ass:split ("=")
-    local log, phys = t[1], t[2]
-    if log and #log > 0 then
-      if phys and #phys > 0 then
-        if phys[-1] == "+" then
-          phys = "bright " .. phys:sub (1, -2)
-        else
-          phys = "reset " .. phys
+    local class, col = t[1], t[2]
+    if class and #class > 0 then
+      if col and #col > 0 then
+        local modifier = "reset"
+        if col[-1] == "+" then
+          col = col:sub (1, -2)
+          modifier = "bright"
         end
-        colormap[log] = phys
+        if col == "default" then col = "reset" end -- FIXME: lua-term issue #3
+        if colors[col] then
+          -- FIXME: _tostring used here and elsewhere with colors owing to lua-term issue #4
+          colormap[class] = _tostring (colors[modifier]) .. _tostring (colors[col])
+        else
+          die ("color invalid.")
+        end
       else
-        die ("physical color missing or invalid.")
+        die ("color missing.")
       end
     else
-      die ("logical color missing or invalid.")
+      die ("class missing or invalid.")
     end
   end
 end
 
-setcolors ("base=default") -- Ensure there is a "base" type
-setcolors (os.getenv ("CW_COLORS") or default_colormap)
+setcolors ("base=default") -- Ensure there is a "base" class
+setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
+  "base=yellow:bright=yellow+:highlight=magenta+:lowlight=magenta:neutral=black+:warning=blue+:error=red+:punctuation=green+" or
+  "base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white+:warning=yellow+:error=red+:punctuation=blue+"))
 
 local matches = list.new ()
 
-function match (col, regex)
-  table.insert (matches, {col = type_to_color (col), regex = regex})
+function match (class, regex)
+  table.insert (matches, {col = class_to_color (class), regex = regex})
 end
 
 -- Create a coloring array for a string.
 local function make_colors (s)
-  local cols = list.rep ({type_to_color ("base")}, #s) -- Fill color array with base color.
+  local cols = list.rep ({class_to_color ("base")}, #s) -- Fill color array with base color.
   for m in matches:elems () do
     for from, to in s:gmatch ("()" .. m.regex .. "()") do
       cols = cols:sub (1, from - 1) .. list.rep ({m.col}, to - from) .. cols:sub (to)
@@ -104,12 +104,12 @@ local function apply_colors (s, color)
   for i = 1, #s do
     if col ~= color[i] then
       col = color[i]
-      tbuf = tbuf .. colors.replaceCodes ("%{" .. col .. "}")
+      tbuf = tbuf .. col
     end
     tbuf = tbuf .. s[i]
   end
-  if col ~= "default" then
-    tbuf = tbuf .. colors.replaceCodes ("%{reset}")
+  if col ~= "reset" then
+    tbuf = tbuf .. _tostring (colors.reset)
   end
   return tbuf
 end

@@ -15,8 +15,8 @@ cw \- colorer for command-line programs
 .SH "DEFINITION SCRIPTS"
 Definition scripts are written in the Lua scripting language (see lua(1)). There is no need to know Lua to write a simple definition file. As well as the usual Lua libraries, the \fBposix\fR library is recommended for tasks such as checking the system type and setting environment variables. cw provides the following extra features:
 .TP
-\fBmatch(\fIcolor-type\fR, \fIpattern\fB)\fR
-This function adds a rule for that  matching \fBpattern\fR should be colored as type \fBcolor-type\fR.  Matches are applied in order of definition.  See below for an explanation of color types, and
+\fBmatch(\fIclass\fR, \fIpattern\fB)\fR
+This function adds a rule for that  matching \fBpattern\fR should be colored as class \fBclass\fR.  Matches are applied in order of definition.  See below for an explanation of classes, and
 .URL "http://www.lua.org/manual/5.1/manual.html#5.4.1" "the Lua manual" " for the syntax of patterns."
 .TP
 \fBarg\fR
@@ -26,8 +26,7 @@ As for a standalone Lua script, the \fBarg\fR table gives a list of command-line
 If this global variable is set to a string by the definition script, it is used as the command to run.
 .SH COLORS
 .PP
-Colors are referenced by types denoting their function.  The standard list of color types is:
-\fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The mapping of color types to physical names can be changed by the \fBCW_COLORS\fR environment variable (see below).
+The default list of classes is: \fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The mapping of classes to colors can be changed by the \fBCW_COLORS\fR environment variable (see below).
 .PP
 The available colors are:
 \fBblack, red, green, yellow, blue, magenta, cyan, white, default\fR. A color may be suffixed \fB+\fR to denote a brighter color.
@@ -40,7 +39,7 @@ Disables color wrapping when set to any value. Note that cw does not color unles
 Redefines the internal colormap to the opposite colors.  This is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
 .TP
 \fBCW_COLORS\fR
-Defines a mapping from color names to colors.  The format is \fBCW_COLORS=name=color\fR[\fB:name=color...\fR].
+Defines a mapping from classes to colors.  The format is \fBCW_COLORS=class=color\fR[\fB:class=color...\fR].
 .SH "AUTHOR"
 Written by v9/fakehalo <v9@fakehalo.us> and Reuben Thomas <rrt@sc3d.org>
 .SH "BUGS"
