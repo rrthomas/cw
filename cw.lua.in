@@ -105,6 +105,8 @@ local function convert_string (s)
   return apply_colors (s, make_colors (s))
 end
 
+-- Run definition script
+table.remove (arg, 1)
 table.merge (arg, table.invert (arg)) -- add arguments as keys
 local ok, msg = pcall (dofile, scrname)
 if ok == false then
@@ -130,7 +132,6 @@ if command then
   cmd = "/bin/sh"
   arg = {[0] = base_scrname, "-c", command}
 else
-  table.remove (arg, 1)
   arg[0] = nil
 end
 posix.execp (cmd, arg)
