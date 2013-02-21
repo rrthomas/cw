@@ -64,6 +64,7 @@ setcolors ("base=reset") -- Ensure there is a "base" class
 setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
   "base=yellow:bright=bright yellow:highlight=bright magenta:lowlight=magenta:neutral=bright black:warning=bright blue:error=bright red:punctuation=bright green" or
   "base=cyan:bright=bright cyan:highlight=bright green:lowlight=green:neutral=bright white:warning=bright yellow:error=bright red:punctuation=bright blue"))
+local nocolor = os.getenv("NOCOLOR") -- read environment variable before definition script
 
 local matches = list.new ()
 
@@ -113,7 +114,6 @@ if ok == false then
   die ("error in definition file: " .. msg)
 end
 
-local nocolor = os.getenv("NOCOLOR")
 local nocolor_stdout = not posix.isatty (posix.STDOUT_FILENO)
 local nocolor_stderr = not posix.isatty (posix.STDERR_FILENO)
 if not nocolor and not (nocolor_stdout and nocolor_stderr) then
