@@ -122,8 +122,7 @@ end
 -- Child process
 local cmd = base_scrname
 if command then
-  command = tostring (command)
-  if not command then
+  if not type (command) == "string" then
     die ("invalid command given.")
   end
   cmd = "/bin/sh"
