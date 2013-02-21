@@ -74,8 +74,9 @@ end
 local function make_colors (s)
   local cols = list.rep ({class_to_color ("base")}, #s) -- Fill color array with base color.
   for m in matches:elems () do
-    for from, to in s:gmatch ("()" .. m.regex .. "()") do
-      cols = cols:sub (1, from - 1) .. list.rep ({m.col}, to - from) .. cols:sub (to)
+    for c in list.elems (s:finds (m.regex)) do
+      local from, to = unpack (c)
+      cols = cols:sub (1, from - 1) .. list.rep ({m.col}, to - from + 1) .. cols:sub (to + 1)
     end
   end
  return cols
