@@ -131,5 +131,6 @@ if command then
   arg = {[0] = base_scrname, "-c", command}
 else
   table.remove (arg, 1)
+  arg[0] = nil
 end
 posix.execp (cmd, arg)
