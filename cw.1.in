@@ -29,7 +29,7 @@ If this global variable is set to a string by the definition script, it is used 
 The default list of classes is: \fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The mapping of classes to colors can be changed by the \fBCW_COLORS\fR environment variable (see below).
 .PP
 The available colors are:
-\fBblack, red, green, yellow, blue, magenta, cyan, white, default\fR. A color may be suffixed \fB+\fR to denote a brighter color.
+\fBblack, red, green, yellow, blue, magenta, cyan, white\fR. A color may be prefixed \fBbright\fR to denote a brighter color, e.g. \fBbright red\fR (note the space).
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR

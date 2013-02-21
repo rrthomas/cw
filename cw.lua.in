@@ -15,7 +15,7 @@ end
 require "std"
 local posix = require "posix"
 local cw = require "consolewrap"
-local colors = require "term.colors"
+local colors = require "ansicolors"
 
 local scrname = arg[1]
 local base_scrname = posix.basename(scrname or arg[0])
@@ -54,18 +54,7 @@ local function setcolors (str)
     local class, col = t[1], t[2]
     if class and #class > 0 then
       if col and #col > 0 then
-        local modifier = "reset"
-        if col[-1] == "+" then
-          col = col:sub (1, -2)
-          modifier = "bright"
-        end
-        if col == "default" then col = "reset" end -- FIXME: lua-term issue #3
-        if colors[col] then
-          -- FIXME: _tostring used here and elsewhere with colors owing to lua-term issue #4
-          colormap[class] = _tostring (colors[modifier]) .. _tostring (colors[col])
-        else
-          die ("color invalid.")
-        end
+        colormap[class] = colors.noReset ("%{reset " .. col .. "}")
       else
         die ("color missing.")
       end
@@ -75,10 +64,10 @@ local function setcolors (str)
   end
 end
 
-setcolors ("base=default") -- Ensure there is a "base" class
+setcolors ("base=reset") -- Ensure there is a "base" class
 setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
-  "base=yellow:bright=yellow+:highlight=magenta+:lowlight=magenta:neutral=black+:warning=blue+:error=red+:punctuation=green+" or
-  "base=cyan:bright=cyan+:highlight=green+:lowlight=green:neutral=white+:warning=yellow+:error=red+:punctuation=blue+"))
+  "base=yellow:bright=bright yellow:highlight=bright magenta:lowlight=magenta:neutral=bright black:warning=bright blue:error=bright red:punctuation=bright green" or
+  "base=cyan:bright=bright cyan:highlight=bright green:lowlight=green:neutral=bright white:warning=bright yellow:error=bright red:punctuation=bright blue"))
 
 local matches = list.new ()
 
@@ -109,7 +98,7 @@ local function apply_colors (s, color)
     tbuf = tbuf .. s[i]
   end
   if col ~= "reset" then
-    tbuf = tbuf .. _tostring (colors.reset)
+    tbuf = tbuf .. colors.noReset ("%{reset}")
   end
   return tbuf
 end
