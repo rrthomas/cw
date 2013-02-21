@@ -64,7 +64,7 @@ setcolors ("base=reset") -- Ensure there is a "base" class
 setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
   "base=yellow:bright=bright yellow:highlight=bright magenta:lowlight=magenta:neutral=bright black:warning=bright blue:error=bright red:punctuation=bright green" or
   "base=cyan:bright=bright cyan:highlight=bright green:lowlight=green:neutral=bright white:warning=bright yellow:error=bright red:punctuation=bright blue"))
-local nocolor = os.getenv("NOCOLOR") -- read environment variable before definition script
+local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 local matches = list.new ()
 
