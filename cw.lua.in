@@ -37,7 +37,7 @@ local function remove_dir_from_path(path, dir)
                                     path:split (":")), ":")
 end
 
-posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkgdatadir@"))
+posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
 local colormap = {}
 

@@ -18,7 +18,7 @@ pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
 $(pkglibexec_SCRIPTS): config.status
 
 exec_edit = sed \
-	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \
+	-e 's|@pkglibexecdir[@]|$(pkglibexecdir)|g' \
 	-e 's|@in_tree_lua_path[@]|$(abs_builddir)/$(objdir)/?$(shrext)|g'
 
 $(top_builddir)/cw: cw.lua Makefile
