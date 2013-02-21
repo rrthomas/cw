@@ -26,7 +26,8 @@ if #arg < 1 or arg[1] == "--help" then
                    "  --help                display this help and exit\n")
   os.exit ()
 elseif arg[1] == "--version" then
-  die ("cw (color wrapper) v@VERSION@")
+  io.stderr:write ("cw (color wrapper) v@VERSION@\n")
+  os.exit ()
 end
 
 -- Filter a directory out of a PATH-like colon-separated path list.
