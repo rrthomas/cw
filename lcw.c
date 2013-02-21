@@ -51,6 +51,7 @@ static void sighandler(int sig){
  else if(sig==SIGCHLD)ext=true;
 #endif
  if(sig==SIGPIPE||sig==SIGINT){
+  fprintf(stdout,"\x1b[00m");
   fprintf(stderr,"\x1b[00m");
   longjmp(exitbuf, 1);
  }
@@ -78,7 +79,7 @@ static int pusherror(lua_State *L, const char *info)
 
 /* Wrap a child process's I/O line by line.
    Returns nil from child process, and exit code from parent process, which is -1 if it was interrupted. */
-int wrap_child(lua_State *L){
+static int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
  luaL_checktype(L, 1, LUA_TFUNCTION);
@@ -88,10 +89,6 @@ int wrap_child(lua_State *L){
  int master[2],slave[2];
  bool ptys_on=(openpty(&master[0],&slave[0],0,0,0)==0)&&
   (openpty(&master[1],&slave[1],0,0,0)==0);
- if(setjmp(exitbuf)){
-   lua_pushinteger(L,-1);
-   goto quit;
- }
 #ifdef SIGCHLD
  struct sigaction oldchldact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
@@ -99,6 +96,10 @@ int wrap_child(lua_State *L){
  struct sigaction oldpipeact,oldintact;
  sig_catch(SIGPIPE,0,sighandler,&oldpipeact);
  sigaction(SIGINT,NULL,&oldintact);
+ if(setjmp(exitbuf)){
+   lua_pushinteger(L,-1);
+   goto quit;
+ }
  switch((pid_c=fork())){
   case -1:
    luaL_error(L,"fork() error.");
@@ -119,65 +120,67 @@ int wrap_child(lua_State *L){
    lua_pushnil(L);
    break;
   default:
-   /* parent process to filter the program's output. (forwards SIGINT to child) */
-   sig_catch(SIGINT,0,sighandler,NULL);
-   if(ptys_on){
-    close(fds[0]);
-    close(fde[0]);
-    fds[0]=master[0];
-    fde[0]=master[1];
-   }
-   fcntl(fds[0],F_SETFL,O_NONBLOCK);
-   fcntl(fde[0],F_SETFL,O_NONBLOCK);
-   int fdm=MAX(fds[0],fde[0])+1;
-   char *linebuf=NULL,*p=NULL;
-   ssize_t size=0;
-   for(ssize_t s=0;s>0||!ext;){
-    fd_set rfds;
-    FD_ZERO(&rfds);
-    FD_SET(fds[0],&rfds);
-    FD_SET(fde[0],&rfds);
-    if(select(fdm,&rfds,0,0,0)>=0){
-     int fd;
-     if(FD_ISSET(fds[0],&rfds))fd=fds[0];
-     else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
-     else continue;
-     char tmp[BUFSIZ];
-     while((s=read(fd,tmp,BUFSIZ))>0){
-      char *q;
-      size_t off=p-linebuf;
-      if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
-       return pusherror(L,"lalloc");
-      p=linebuf+off;
-      memcpy(linebuf+size,tmp,s);
-      size+=s;
-      while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
-       size_t len=q-p;
-       int n=fd==fds[0]?STDOUT_FILENO:STDERR_FILENO;
-       lua_pushvalue(L,1);
-       lua_pushlstring(L,p,len);
-       lua_pcall(L,1,1,0); /* Ignore errors. */
-       const char *text=lua_tolstring(L,-1,&len);
-       if(text)dprintf(n,"%.*s\r\n",(int)len,text);
-       lua_pop(L,1);
-       p=q+2;
-       if(p-linebuf>=size){
-        /* Whenever we completely empty the buffer, free it, to try to avoid
-           using too much memory. */
-        lalloc(L,linebuf,size,0);
-        p=linebuf=NULL;
-        size=0;
-        break;
+   {
+    /* parent process to filter the program's output. (forwards SIGINT to child) */
+    sig_catch(SIGINT,0,sighandler,NULL);
+    if(ptys_on){
+     close(fds[0]);
+     close(fde[0]);
+     fds[0]=master[0];
+     fde[0]=master[1];
+    }
+    fcntl(fds[0],F_SETFL,O_NONBLOCK);
+    fcntl(fde[0],F_SETFL,O_NONBLOCK);
+    int fdm=MAX(fds[0],fde[0])+1;
+    char *linebuf=NULL,*p=NULL;
+    ssize_t size=0;
+    for(ssize_t s=0;s>0||!ext;){
+     fd_set rfds;
+     FD_ZERO(&rfds);
+     FD_SET(fds[0],&rfds);
+     FD_SET(fde[0],&rfds);
+     if(select(fdm,&rfds,0,0,0)>=0){
+      int fd;
+      if(FD_ISSET(fds[0],&rfds))fd=fds[0];
+      else if(FD_ISSET(fde[0],&rfds))fd=fde[0];
+      else continue;
+      char tmp[BUFSIZ];
+      while((s=read(fd,tmp,BUFSIZ))>0){
+       char *q;
+       size_t off=p-linebuf;
+       if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
+        return pusherror(L,"lalloc");
+       p=linebuf+off;
+       memcpy(linebuf+size,tmp,s);
+       size+=s;
+       while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
+        size_t len=q-p;
+        int n=fd==fds[0]?STDOUT_FILENO:STDERR_FILENO;
+        lua_pushvalue(L,1);
+        lua_pushlstring(L,p,len);
+        lua_pcall(L,1,1,0); /* Ignore errors. */
+        const char *text=lua_tolstring(L,-1,&len);
+        if(text)dprintf(n,"%.*s\r\n",(int)len,text);
+        lua_pop(L,1);
+        p=q+2;
+        if(p-linebuf>=size){
+         /* Whenever we completely empty the buffer, free it, to try to avoid
+            using too much memory. */
+         lalloc(L,linebuf,size,0);
+         p=linebuf=NULL;
+         size=0;
+         break;
+        }
        }
       }
      }
     }
+    lalloc(L,linebuf,size,0);
+    fflush(stdout);
+    fflush(stderr);
+    int e=0;
+    lua_pushinteger(L,waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
    }
-   lalloc(L,linebuf,size,0);
-   fflush(stdout);
-   fflush(stderr);
-   int e=0;
-   lua_pushinteger(L,waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
  quit:
 #ifdef SIGCHLD
    sigaction(SIGCHLD,&oldchldact,NULL);
@@ -205,6 +208,8 @@ static const luaL_Reg R[] =
  {"wrap_child",             wrap_child},
  {NULL,	NULL}
 };
+
+LUALIB_API int luaopen_consolewrap(lua_State *L);
 
 LUALIB_API int luaopen_consolewrap(lua_State *L)
 {
