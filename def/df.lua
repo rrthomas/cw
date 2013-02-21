@@ -1,7 +1,7 @@
 if arg["--help"] then
   match("neutral", "%-")
 else
-  match("punctuation", "%")
+  match("punctuation", "%%")
   match("punctuation", "K ")
   match("punctuation", "M ")
   match("punctuation", "G ")
