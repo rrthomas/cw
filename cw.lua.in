@@ -32,7 +32,6 @@ end
 -- Filter a directory out of a PATH-like colon-separated path list.
 local function remove_dir_from_path(path, dir)
   local canon_dir = cw.canonicalize_file_name (dir)
-  if not canon_dir then return path end
   return table.concat (list.filter (function (s) return cw.canonicalize_file_name (s) ~= canon_dir end,
                                     path:split (":")), ":")
 end
