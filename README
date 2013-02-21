@@ -8,11 +8,11 @@
 cw is a colorer for command-line programs.  It is designed to simulate
 the environment of the commands being executed, so that when you type
 'du', 'df', 'ping', etc. in your shell the output is automatically
-colored according to a definition file.  Text patterns are assigned to
-lexical classes, which themselves are given colors.  The arguments to
-the original program and OS under which it is running can also be
-taken into account.  cw includes over 70 definition files, and it's
-easy to write more.
+colored according to a definition script.  Text patterns are assigned
+to lexical classes, which themselves are given colors.  The arguments
+to the original program and OS under which it is running can also be
+tested.  cw includes over 70 definition scripts, and it's easy to
+write more.
 
 
 Installation
@@ -20,7 +20,7 @@ Installation
 
 First build the program with
 
-  ./configure && make && make install
+  ./configure && make install
 
 or, to install it in your home directory, for example, change the first
 part of the command to
@@ -42,26 +42,10 @@ Use
 ---
 
 Start a new shell and try some commands, which should now be colored!
-
-cw is set up for a black background by default.  Set CW_INVERT=1 in
-your environment to invert cw's colors: this will swap black with
-white and the lighter colors with the darker.
-
 Set NOCOLOR=1 in the environment to turn cw off.
 
+cw is set up for a black background by default.  Set CW_INVERT=1 in
+the environment to invert cw's default color scheme.
 
-Creating your own color definition files
-----------------------------------------
-
-Read cw(1) (the cw man page) for a description of coloring definition
-files.  Try starting by modifying an existing file; you can find the
-directory they are in by asking your shell where it finds a color
-wrapper, e.g.:
-
-  which ps
-
-Open or create the desired definition file in that directory, and edit
-it as desired.  If you create a new definition, remember to make the
-file executable:
-
-  chmod +x /path/to/foo
+See cw(1) (the cw man page) for more information, including details of
+definition scripts.

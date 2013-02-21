@@ -13,7 +13,7 @@ cw \- colorer for command-line programs
 .PP
 \fBcw\fR colors the output of command-line programs.  The colors to use are defined by a definition script.  These definition files have the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
 .SH "DEFINITION SCRIPTS"
-Definition scripts are written in the Lua scripting language (see lua(1)). There is no need to know Lua to write a simple definition file. As well as the usual Lua libraries, the \fBposix\fR library is recommended for tasks such as checking the system type and setting environment variables. cw provides the following extra features:
+Definition scripts are written in the Lua scripting language (see lua(1)).  Try starting by modifying an existing script.  If you create a new definition script, remember to make it executable, and please consider submitting it to the cw maintainer for inclusion in future releases.  There is no need to know Lua to write a simple definition file. The \fBluaposix\fR library is recommended for tasks such as checking the system type and setting environment variables; you can find examples in the included scripts.  cw provides the following extra features:
 .TP
 \fBmatch(\fIclass\fR, \fIpattern\fB)\fR
 This function adds a rule for that  matching \fBpattern\fR should be colored as class \fBclass\fR.  Matches are applied in order of definition.  See below for an explanation of classes, and
