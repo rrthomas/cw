@@ -48,19 +48,15 @@ end
 
 -- Set user color map.
 local function setcolors (str)
-  local tmp = str
   for ass in list.elems (str:split (":")) do
-    local t = ass:split ("=")
-    local class, col = t[1], t[2]
-    if class and #class > 0 then
-      if col and #col > 0 then
-        colormap[class] = colors.noReset ("%{reset " .. col .. "}")
-      else
-        die ("color missing.")
-      end
-    else
-      die ("class missing or invalid.")
+    local class, col = unpack (ass:split ("="))
+    if not class or #class == 0 then
+      die ("class missing.")
     end
+    if not col or #col == 0 then
+      die ("color missing.")
+    end
+    colormap[class] = colors.noReset ("%{reset " .. col .. "}")
   end
 end
 
