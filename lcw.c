@@ -51,8 +51,8 @@ static void sighandler(int sig){
  else if(sig==SIGCHLD)ext=true;
 #endif
  if(sig==SIGPIPE||sig==SIGINT){
-  fprintf(stdout,"\x1b[00m");
-  fprintf(stderr,"\x1b[00m");
+  dprintf(STDOUT_FILENO,"\x1b[00m");
+  dprintf(STDERR_FILENO,"\x1b[00m");
   longjmp(exitbuf, 1);
  }
 }
@@ -176,8 +176,6 @@ static int wrap_child(lua_State *L){
      }
     }
     lalloc(L,linebuf,size,0);
-    fflush(stdout);
-    fflush(stderr);
     int e=0;
     lua_pushinteger(L,waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
    }
