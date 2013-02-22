@@ -82,7 +82,11 @@ static int pusherror(lua_State *L, const char *info)
 static int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
- luaL_checktype(L, 1, LUA_TFUNCTION);
+ luaL_checktype(L,1,LUA_TFUNCTION);
+ luaL_checktype(L,2,LUA_TBOOLEAN);
+ luaL_checktype(L,3,LUA_TBOOLEAN);
+ bool color_stdout=lua_toboolean(L,2);
+ bool color_stderr=lua_toboolean(L,3);
  int fds[2],fde[2];
  if(pipe(fds)<0)luaL_error(L,"pipe() failed.");
  if(pipe(fde)<0)luaL_error(L,"pipe() failed.");
@@ -146,32 +150,36 @@ static int wrap_child(lua_State *L){
       else continue;
       char tmp[BUFSIZ];
       while((s=read(fd,tmp,BUFSIZ))>0){
-       char *q;
-       size_t off=p-linebuf;
-       if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
-        return pusherror(L,"lalloc");
-       p=linebuf+off;
-       memcpy(linebuf+size,tmp,s);
-       size+=s;
-       while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
-        size_t len=q-p;
-        int n=fd==fds[0]?STDOUT_FILENO:STDERR_FILENO;
-        lua_pushvalue(L,1);
-        lua_pushlstring(L,p,len);
-        lua_pcall(L,1,1,0); /* Ignore errors. */
-        const char *text=lua_tolstring(L,-1,&len);
-        if(text)dprintf(n,"%.*s\r\n",(int)len,text);
-        lua_pop(L,1);
-        p=q+2;
-        if(p-linebuf>=size){
-         /* Whenever we completely empty the buffer, free it, to try to avoid
-            using too much memory. */
-         lalloc(L,linebuf,size,0);
-         p=linebuf=NULL;
-         size=0;
-         break;
+       int n=fd==fds[0]?STDOUT_FILENO:STDERR_FILENO;
+       if(n==STDOUT_FILENO?color_stdout:color_stderr){
+        char *q;
+        size_t off=p-linebuf;
+        if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
+         return pusherror(L,"lalloc");
+        p=linebuf+off;
+        memcpy(linebuf+size,tmp,s);
+        size+=s;
+        while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
+         size_t len=q-p;
+         lua_pushvalue(L,1);
+         lua_pushlstring(L,p,len);
+         lua_pcall(L,1,1,0); /* Ignore errors. */
+         const char *text=lua_tolstring(L,-1,&len);
+         if(text)dprintf(n,"%.*s\r\n",(int)len,text);
+         lua_pop(L,1);
+         p=q+2;
+         if(p-linebuf>=size){
+          /* Whenever we completely empty the buffer, free it, to try to avoid
+             using too much memory. */
+          lalloc(L,linebuf,size,0);
+          p=linebuf=NULL;
+          size=0;
+          break;
+         }
         }
        }
+       else
+        s=write(n,tmp,s); /* FIXME: check return value? */
       }
      }
     }

@@ -114,10 +114,10 @@ if ok == false then
   die ("error in definition file: " .. msg)
 end
 
-local nocolor_stdout = not posix.isatty (posix.STDOUT_FILENO)
-local nocolor_stderr = not posix.isatty (posix.STDERR_FILENO)
-if not nocolor and not (nocolor_stdout and nocolor_stderr) then
-  local ret = cw.wrap_child (convert_string)
+local color_stdout = posix.isatty (posix.STDOUT_FILENO) == 1
+local color_stderr = posix.isatty (posix.STDERR_FILENO) == 1
+if not nocolor and (color_stdout or color_stderr) then
+  local ret = cw.wrap_child (convert_string, color_stdout, color_stderr)
   if ret then -- Non-nil, so in parent process, or fork failed
     os.exit (ret)
   end
