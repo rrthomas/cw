@@ -15,6 +15,17 @@ tested.  cw includes over 70 definition scripts, and it's easy to
 write more.
 
 
+Dedicated colorers
+------------------
+
+cw doesn't try to replace some dedicated coloring wrappers and
+programs, such as:
+
+ccal: for colored calendars
+colorgcc: to color the output of gcc
+colordiff: to color the output of diff
+
+
 Installation
 ------------
 
