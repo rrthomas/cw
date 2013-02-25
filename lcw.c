@@ -51,7 +51,7 @@ static void sighandler(int sig){
 #ifdef SIGCHLD
  else if(sig==SIGCHLD)ext=true;
 #endif
- if(sig==SIGPIPE||sig==SIGINT){
+ if(sig==SIGINT){
   dprintf(STDOUT_FILENO,"\x1b[00mSIGINT");
   if(pid_c)
    exit(0);
@@ -86,10 +86,9 @@ static int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
  luaL_checktype(L,1,LUA_TFUNCTION);
- int fds[2];
- if(pipe(fds)<0)luaL_error(L,"pipe() failed.");
  int master,slave;
- bool ptys_on=openpty(&master,&slave,0,0,0)==0;
+ if(openpty(&master,&slave,0,0,0))
+  luaL_error(L,"openpty error.");
 #ifdef SIGCHLD
  struct sigaction oldchldact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
@@ -107,10 +106,8 @@ static int wrap_child(lua_State *L){
    break;
   case 0:
    /* child process to execute the program. */
-   if(dup2((ptys_on?slave:fds[1]),STDOUT_FILENO)<0)
+   if(dup2(slave,STDOUT_FILENO)<0)
     luaL_error(L,"dup2() failed.");
-   close(fds[0]);
-   close(fds[1]);
 #ifdef HAVE_SETSID
    setsid();
 #endif
@@ -120,16 +117,12 @@ static int wrap_child(lua_State *L){
    {
     /* parent process to filter the program's output. (forwards SIGINT to child) */
     sig_catch(SIGINT,0,sighandler,NULL);
-    if(ptys_on){
-     close(fds[0]);
-     fds[0]=master;
-    }
-    fcntl(fds[0],F_SETFL,O_NONBLOCK);
+    fcntl(master,F_SETFL,O_NONBLOCK);
     char *linebuf=NULL,*p=NULL;
     ssize_t size=0;
     for(ssize_t s=0;s>0||!ext;){
      char tmp[BUFSIZ];
-     while((s=read(fds[0],tmp,BUFSIZ))>0){
+     while((s=read(master,tmp,BUFSIZ))>0){
       char *q;
       size_t off=p-linebuf;
       if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
