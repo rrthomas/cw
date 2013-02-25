@@ -115,9 +115,8 @@ if ok == false then
 end
 
 local color_stdout = posix.isatty (posix.STDOUT_FILENO) == 1
-local color_stderr = posix.isatty (posix.STDERR_FILENO) == 1
-if not nocolor and (color_stdout or color_stderr) then
-  local ret = cw.wrap_child (convert_string, color_stdout, color_stderr)
+if not nocolor and color_stdout then
+  local ret = cw.wrap_child (convert_string)
   if ret then -- Non-nil, so in parent process, or fork failed
     os.exit (ret)
   end

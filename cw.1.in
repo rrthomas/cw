@@ -33,7 +33,7 @@ The available colors are:
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
-Disables color wrapping when set to any value. Note that cw disables coloring if it is not connected to a terminal (it detects this separately for standard output and standard error), or if the terminal type \fBTERM\fR is \fBdumb\fR.
+Disables color wrapping when set to any value. Note that cw disables coloring if standard output is not connected to a terminal, or if the terminal type \fBTERM\fR is \fBdumb\fR.
 .TP
 \fBCW_INVERT\fR
 Redefines the internal colormap to the opposite colors.  This is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
