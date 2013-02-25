@@ -86,7 +86,7 @@ static int wrap_child(lua_State *L){
  luaL_checktype(L,1,LUA_TFUNCTION);
  int master,slave;
  if(openpty(&master,&slave,0,0,0))
-  luaL_error(L,"openpty error.");
+  pusherror(L,"openpty error.");
  struct sigaction oldchldact,oldintact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
  sigaction(SIGINT,NULL,&oldintact);
@@ -96,12 +96,12 @@ static int wrap_child(lua_State *L){
  }
  switch((pid_c=fork())){
   case -1:
-   luaL_error(L,"fork() error.");
+   pusherror(L,"fork() error.");
    break;
   case 0:
    /* child process to execute the program. */
    if(dup2(slave,STDOUT_FILENO)<0)
-    luaL_error(L,"dup2() failed.");
+    pusherror(L,"dup2() failed.");
 #ifdef HAVE_SETSID
    setsid();
 #endif

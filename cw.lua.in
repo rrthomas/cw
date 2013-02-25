@@ -117,7 +117,7 @@ end
 local color_stdout = posix.isatty (posix.STDOUT_FILENO) == 1
 if not nocolor and color_stdout then
   local ret = cw.wrap_child (convert_string)
-  if ret then -- Non-nil, so in parent process, or fork failed
+  if ret then -- Non-nil, so in parent process, or setup failed
     os.exit (ret)
   end
 end
