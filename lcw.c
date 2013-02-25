@@ -42,11 +42,15 @@
 static bool ext=false;
 static pid_t pid_c;
 static jmp_buf exitbuf;
+static int master,slave;
 
 static void sighandler(int sig){
  if(sig==SIGINT&&pid_c)
   kill(pid_c,SIGINT);
- else if(sig==SIGCHLD)ext=true;
+ else if(sig==SIGCHLD){
+  fcntl(master,F_SETFL,O_NONBLOCK);
+  ext=true;
+ }
  if(sig==SIGINT){
   write(STDOUT_FILENO,"\x1b[00mSIGINT",11);
   if(pid_c)
@@ -82,7 +86,6 @@ static int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
  luaL_checktype(L,1,LUA_TFUNCTION);
- int master,slave;
  if(openpty(&master,&slave,0,0,0))
   return pusherror(L,"openpty error.");
  struct sigaction oldchldact,oldintact;
@@ -107,7 +110,6 @@ static int wrap_child(lua_State *L){
    {
     /* parent process to filter the program's output. (forwards SIGINT to child) */
     sig_catch(SIGINT,0,sighandler,NULL);
-    fcntl(master,F_SETFL,O_NONBLOCK);
     char *linebuf=NULL,*p=NULL;
     ssize_t size=0;
     for(ssize_t s=0;s>0||!ext;){
