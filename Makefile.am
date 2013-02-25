@@ -6,7 +6,7 @@ lib_LTLIBRARIES = consolewrap.la
 consolewrap_la_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
 consolewrap_la_CPPFLAGS = $(ISYSTEM)$(srcdir)/lib $(LUA_INCLUDE)
 consolewrap_la_SOURCES = lcw.c
-consolewrap_la_LDFLAGS = -module -avoid-version $(LIBINTL) $(PTY_LIB) $(GETHOSTNAME_LIB) $(LIBSOCKET) lib/libgnu.la
+consolewrap_la_LDFLAGS = -module -avoid-version $(PTY_LIB) lib/libgnu.la
 
 bin_SCRIPTS = cw
 
