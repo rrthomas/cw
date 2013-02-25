@@ -40,6 +40,10 @@ Redefines the internal colormap to the opposite colors.  This is intended to hel
 .TP
 \fBCW_COLORS\fR
 Defines a mapping from classes to colors.  The format is \fBCW_COLORS=class=color\fR[\fB:class=color...\fR].
+.SH "SEE ALSO"
+.BR ccal (1),
+.BR colordiff (1),
+.BR colorgcc (1)
 .SH "AUTHOR"
 Written by v9/fakehalo <v9@fakehalo.us> and Reuben Thomas <rrt@sc3d.org>
 .SH "BUGS"
