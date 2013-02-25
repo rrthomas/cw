@@ -70,10 +70,7 @@ static void sig_catch(int sig, int flags, void (*handler)(int), struct sigaction
 static int pusherror(lua_State *L, const char *info)
 {
  lua_pushnil(L);
- if (info==NULL)
-  lua_pushstring(L, strerror(errno));
- else
-  lua_pushfstring(L, "%s: %s", info, strerror(errno));
+ lua_pushfstring(L, "%s: %s", info, strerror(errno));
  lua_pushinteger(L, errno);
  return 3;
 }
