@@ -44,13 +44,11 @@ static pid_t pid_c;
 static jmp_buf exitbuf;
 
 static void sighandler(int sig){
- if(sig==SIGINT&&pid_c){
-  dprintf(STDOUT_FILENO,"kill child %d\n",pid_c);
+ if(sig==SIGINT&&pid_c)
   kill(pid_c,SIGINT);
- }
  else if(sig==SIGCHLD)ext=true;
  if(sig==SIGINT){
-  dprintf(STDOUT_FILENO,"\x1b[00mSIGINT");
+  write(STDOUT_FILENO,"\x1b[00mSIGINT",11);
   if(pid_c)
    exit(0);
   else
@@ -113,6 +111,7 @@ static int wrap_child(lua_State *L){
     sig_catch(SIGINT,0,sighandler,NULL);
     fcntl(master,F_SETFL,O_NONBLOCK);
     char *linebuf=NULL,*p=NULL;
+    const char *nl="\n";
     ssize_t size=0;
     for(ssize_t s=0;s>0||!ext;){
      char tmp[BUFSIZ];
@@ -130,7 +129,10 @@ static int wrap_child(lua_State *L){
        lua_pushlstring(L,p,len);
        lua_pcall(L,1,1,0); /* Ignore errors. */
        const char *text=lua_tolstring(L,-1,&len);
-       if(text)dprintf(STDOUT_FILENO,"%.*s\n",(int)len,text);
+       if(text){
+        write(STDOUT_FILENO,text,len);
+        write(STDOUT_FILENO,nl,1);
+       }
        lua_pop(L,1);
        p=q+2;
        if(p-linebuf>=size){
