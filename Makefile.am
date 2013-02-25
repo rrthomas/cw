@@ -26,9 +26,7 @@ $(top_builddir)/cw: cw.lua Makefile
 	$(exec_edit) '$@.lua' >$@.tmp
 	mv $@.tmp $@
 	chmod +x $@
-
-# FIXME
-#	$(LUA) $(top_builddir)/cw --version >/dev/null || ( cat $@ && rm $@ )
+	$(LUA) $(top_builddir)/cw --version >/dev/null || ( cat $@ && rm $@ )
 
 %: %.lua
 	printf "#!$(bindir)/cw\n" > $@
