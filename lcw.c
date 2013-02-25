@@ -48,9 +48,7 @@ static void sighandler(int sig){
   dprintf(STDOUT_FILENO,"kill child %d\n",pid_c);
   kill(pid_c,SIGINT);
  }
-#ifdef SIGCHLD
  else if(sig==SIGCHLD)ext=true;
-#endif
  if(sig==SIGINT){
   dprintf(STDOUT_FILENO,"\x1b[00mSIGINT");
   if(pid_c)
@@ -89,11 +87,8 @@ static int wrap_child(lua_State *L){
  int master,slave;
  if(openpty(&master,&slave,0,0,0))
   luaL_error(L,"openpty error.");
-#ifdef SIGCHLD
- struct sigaction oldchldact;
+ struct sigaction oldchldact,oldintact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
-#endif
- struct sigaction oldintact;
  sigaction(SIGINT,NULL,&oldintact);
  if(setjmp(exitbuf)){
    lua_pushinteger(L,-1);
@@ -155,9 +150,7 @@ static int wrap_child(lua_State *L){
    }
  }
  quit:
-#ifdef SIGCHLD
  sigaction(SIGCHLD,&oldchldact,NULL);
-#endif
  sigaction(SIGINT,&oldintact,NULL);
  return 1;
 }
