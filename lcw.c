@@ -84,7 +84,7 @@ static int wrap_child(lua_State *L){
  luaL_checktype(L,1,LUA_TFUNCTION);
  int master,slave;
  if(openpty(&master,&slave,0,0,0))
-  pusherror(L,"openpty error.");
+  return pusherror(L,"openpty error.");
  struct sigaction oldchldact,oldintact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
  sigaction(SIGINT,NULL,&oldintact);
@@ -94,12 +94,11 @@ static int wrap_child(lua_State *L){
  }
  switch((pid_c=fork())){
   case -1:
-   pusherror(L,"fork() error.");
-   break;
+   return pusherror(L,"fork() error.");
   case 0:
    /* child process to execute the program. */
    if(dup2(slave,STDOUT_FILENO)<0)
-    pusherror(L,"dup2() failed.");
+    return pusherror(L,"dup2() failed.");
 #ifdef HAVE_SETSID
    setsid();
 #endif
@@ -111,18 +110,17 @@ static int wrap_child(lua_State *L){
     sig_catch(SIGINT,0,sighandler,NULL);
     fcntl(master,F_SETFL,O_NONBLOCK);
     char *linebuf=NULL,*p=NULL;
-    const char *nl="\n";
     ssize_t size=0;
     for(ssize_t s=0;s>0||!ext;){
      char tmp[BUFSIZ];
      while((s=read(master,tmp,BUFSIZ))>0){
-      char *q;
       size_t off=p-linebuf;
       if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
        return pusherror(L,"lalloc");
       p=linebuf+off;
       memcpy(linebuf+size,tmp,s);
       size+=s;
+      char *q;
       while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
        size_t len=q-p;
        lua_pushvalue(L,1);
@@ -131,7 +129,7 @@ static int wrap_child(lua_State *L){
        const char *text=lua_tolstring(L,-1,&len);
        if(text){
         write(STDOUT_FILENO,text,len);
-        write(STDOUT_FILENO,nl,1);
+        write(STDOUT_FILENO,"\n",1);
        }
        lua_pop(L,1);
        p=q+2;
