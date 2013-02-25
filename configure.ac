@@ -73,7 +73,6 @@ AC_HEADER_STDC
 AC_CHECK_FUNCS(setsid)
 AX_PROG_LUA
 AX_LUA_HEADERS
-AX_LUA_LIBS
 gl_INIT
 
 dnl Generate output
