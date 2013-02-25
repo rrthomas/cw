@@ -38,26 +38,24 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include "lua52compat.h"
+#include "unused-parameter.h"
 
 static bool ext=false;
 static pid_t pid_c;
 static jmp_buf exitbuf;
 static int master,slave;
 
-static void sighandler(int sig){
- if(sig==SIGINT&&pid_c)
-  kill(pid_c,SIGINT);
- else if(sig==SIGCHLD){
+static void int_handler(int sig _GL_UNUSED_PARAMETER){
+ write(STDOUT_FILENO,"\x1b[00m",5);
+ if(pid_c==0)
+  longjmp(exitbuf, 1);
+ kill(pid_c,SIGINT);
+ exit(0);
+}
+
+static void chld_handler(int sig _GL_UNUSED_PARAMETER){
   fcntl(master,F_SETFL,O_NONBLOCK);
   ext=true;
- }
- if(sig==SIGINT){
-  write(STDOUT_FILENO,"\x1b[00m",5);
-  if(pid_c)
-   exit(0);
-  else
-   longjmp(exitbuf, 1);
- }
 }
 
 static void sig_catch(int sig, int flags, void (*handler)(int), struct sigaction *oldact)
@@ -89,7 +87,7 @@ static int wrap_child(lua_State *L){
  if(openpty(&master,&slave,0,0,0))
   return pusherror(L,"openpty error.");
  struct sigaction oldchldact,oldintact;
- sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
+ sig_catch(SIGCHLD,SA_NOCLDSTOP,chld_handler,&oldchldact);
  sigaction(SIGINT,NULL,&oldintact);
  if(setjmp(exitbuf))
    lua_pushinteger(L,-1);
@@ -109,7 +107,7 @@ static int wrap_child(lua_State *L){
   default:
    {
     /* parent process to filter the program's output. (forwards SIGINT to child) */
-    sig_catch(SIGINT,0,sighandler,NULL);
+    sig_catch(SIGINT,0,int_handler,NULL);
     char *linebuf=NULL,*p=NULL;
     ssize_t size=0;
     for(ssize_t s=0;s>0||!ext;){
