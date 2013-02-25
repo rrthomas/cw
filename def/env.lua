@@ -1,3 +1,3 @@
-if not arg["--h"] then
+if not arg["--help"] then
   match("bright", "[^=]+")
 end
