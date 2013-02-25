@@ -54,17 +54,17 @@ static void int_handler(int sig _GL_UNUSED_PARAMETER){
 }
 
 static void chld_handler(int sig _GL_UNUSED_PARAMETER){
-  fcntl(master,F_SETFL,O_NONBLOCK);
-  ext=true;
+ fcntl(master,F_SETFL,O_NONBLOCK);
+ ext=true;
 }
 
 static void sig_catch(int sig, int flags, void (*handler)(int), struct sigaction *oldact)
 {
-  struct sigaction sa;
-  sa.sa_handler = handler;
-  sa.sa_flags = flags;
-  sigemptyset(&sa.sa_mask);
-  assert(sigaction(sig, &sa, oldact)==0);
+ struct sigaction sa;
+ sa.sa_handler = handler;
+ sa.sa_flags = flags;
+ sigemptyset(&sa.sa_mask);
+ assert(sigaction(sig, &sa, oldact)==0);
 }
 
 static int pusherror(lua_State *L, const char *info)
