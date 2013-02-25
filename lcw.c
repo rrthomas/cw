@@ -52,7 +52,7 @@ static void sighandler(int sig){
   ext=true;
  }
  if(sig==SIGINT){
-  write(STDOUT_FILENO,"\x1b[00mSIGINT",11);
+  write(STDOUT_FILENO,"\x1b[00m",5);
   if(pid_c)
    exit(0);
   else
