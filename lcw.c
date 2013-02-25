@@ -93,8 +93,7 @@ static int wrap_child(lua_State *L){
  struct sigaction oldchldact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
 #endif
- struct sigaction oldpipeact,oldintact;
- sig_catch(SIGPIPE,0,sighandler,&oldpipeact);
+ struct sigaction oldintact;
  sigaction(SIGINT,NULL,&oldintact);
  if(setjmp(exitbuf)){
    lua_pushinteger(L,-1);
@@ -159,7 +158,6 @@ static int wrap_child(lua_State *L){
 #ifdef SIGCHLD
  sigaction(SIGCHLD,&oldchldact,NULL);
 #endif
- sigaction(SIGPIPE,&oldpipeact,NULL);
  sigaction(SIGINT,&oldintact,NULL);
  return 1;
 }
