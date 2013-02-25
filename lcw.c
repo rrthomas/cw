@@ -88,11 +88,10 @@ static int wrap_child(lua_State *L){
  struct sigaction oldchldact,oldintact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,sighandler,&oldchldact);
  sigaction(SIGINT,NULL,&oldintact);
- if(setjmp(exitbuf)){
+ if(setjmp(exitbuf))
    lua_pushinteger(L,-1);
-   goto quit;
- }
- switch((pid_c=fork())){
+ else {
+  switch((pid_c=fork())){
   case -1:
    return pusherror(L,"fork() error.");
   case 0:
@@ -148,8 +147,8 @@ static int wrap_child(lua_State *L){
     int e=0;
     lua_pushinteger(L,waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
    }
+  }
  }
- quit:
  sigaction(SIGCHLD,&oldchldact,NULL);
  sigaction(SIGINT,&oldintact,NULL);
  return 1;
