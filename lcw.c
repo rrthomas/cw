@@ -1,23 +1,23 @@
-/* console wrapper: Lua library to wrap the console output of a child process
-** Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
-**
-** Based on cw (color wrapper)
-** Copyright (C) 2004 v9/fakehalo [v9@fakehalo.us]
-**
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-**/
+/* cw (color wrapper) Lua extensions
+
+   Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
+   Copyright (C) 2004 v9/fakehalo [v9@fakehalo.us]
+
+   This file is part of cw.
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3, or (at
+   your option) any later version.
+
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; see the file COPYING.  If not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include "config.h"
 
