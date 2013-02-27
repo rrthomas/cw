@@ -70,7 +70,7 @@ AC_SUBST([shrext])
 
 dnl Checks for functions and headers
 AC_HEADER_STDC
-AC_CHECK_FUNCS(setsid)
+AC_CHECK_FUNCS(setsid killpg)
 AX_PROG_LUA
 AX_LUA_HEADERS
 gl_INIT

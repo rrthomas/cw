@@ -47,10 +47,15 @@ static int master,slave;
 
 static void int_handler(int sig _GL_UNUSED_PARAMETER){
  write(STDOUT_FILENO,"\x1b[00m",5);
- if(pid_c==0)
-  longjmp(exitbuf, 1);
- kill(pid_c,SIGINT);
- exit(0);
+ if(pid_c)
+#if defined(HAVE_SETSID) && defined(HAVE_KILLPG)
+  killpg(pid_c,SIGINT);
+#else
+ kill(pid_c,SIGTERM); /* SIGINT does not work; SIGTERM leaves any
+                         sub-shells orphaned, but it's the best we can
+                         do simply without process groups. */
+#endif
+ longjmp(exitbuf, 1);
 }
 
 static void chld_handler(int sig _GL_UNUSED_PARAMETER){
@@ -103,7 +108,7 @@ static int wrap_child(lua_State *L){
    break;
   default:
    {
-    /* parent process to filter the program's output. (forwards SIGINT to child) */
+    /* parent process to filter the program's output; kills children if interrupted. */
     sig_catch(SIGINT,0,int_handler,NULL);
     char *linebuf=NULL,*p=NULL;
     ssize_t size=0;
@@ -141,10 +146,12 @@ static int wrap_child(lua_State *L){
      }
     }
     lalloc(L,linebuf,size,0);
-    int e=0;
-    lua_pushinteger(L,waitpid(pid_c,&e,WNOHANG)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
    }
   }
+ }
+ if(pid_c){
+  int e=0;
+  lua_pushinteger(L,waitpid(pid_c,&e,0)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
  }
  sigaction(SIGCHLD,&oldchldact,NULL);
  sigaction(SIGINT,&oldintact,NULL);
