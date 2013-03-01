@@ -112,36 +112,34 @@ static int wrap_child(lua_State *L){
     sig_catch(SIGINT,0,int_handler,NULL);
     char *linebuf=NULL,*p=NULL;
     ssize_t size=0;
-    for(ssize_t s=0;s>0||!ext;){
-     char tmp[BUFSIZ];
-     while((s=read(master,tmp,BUFSIZ))>0){
-      size_t off=p-linebuf;
-      if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
-       return pusherror(L,"lalloc");
-      p=linebuf+off;
-      memcpy(linebuf+size,tmp,s);
-      size+=s;
-      char *q;
-      while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
-       size_t len=q-p;
-       lua_pushvalue(L,1);
-       lua_pushlstring(L,p,len);
-       lua_pcall(L,1,1,0); /* Ignore errors. */
-       const char *text=lua_tolstring(L,-1,&len);
-       if(text){
-        write(STDOUT_FILENO,text,len);
-        write(STDOUT_FILENO,"\n",1);
-       }
-       lua_pop(L,1);
-       p=q+2;
-       if(p-linebuf>=size){
-        /* Whenever we completely empty the buffer, free it, to try to avoid
-           using too much memory. */
-        lalloc(L,linebuf,size,0);
-        p=linebuf=NULL;
-        size=0;
-        break;
-       }
+    char tmp[BUFSIZ];
+    for(ssize_t s=0;(s=read(master,tmp,BUFSIZ))>0||!ext;){
+     size_t off=p-linebuf;
+     if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
+      return pusherror(L,"lalloc");
+     p=linebuf+off;
+     memcpy(linebuf+size,tmp,s);
+     size+=s;
+     char *q;
+     while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
+      size_t len=q-p;
+      lua_pushvalue(L,1);
+      lua_pushlstring(L,p,len);
+      lua_pcall(L,1,1,0); /* Ignore errors. */
+      const char *text=lua_tolstring(L,-1,&len);
+      if(text){
+       write(STDOUT_FILENO,text,len);
+       write(STDOUT_FILENO,"\n",1);
+      }
+      lua_pop(L,1);
+      p=q+2;
+      if(p-linebuf>=size){
+       /* Whenever we completely empty the buffer, free it, to try to avoid
+          using too much memory. */
+       lalloc(L,linebuf,size,0);
+       p=linebuf=NULL;
+       size=0;
+       break;
       }
      }
     }
