@@ -132,14 +132,6 @@ static int wrap_child(lua_State *L){
       }
       lua_pop(L,1);
       p=q+2;
-      if(p-linebuf>=size){
-       /* Whenever we completely empty the buffer, free it, to try to avoid
-          using too much memory. */
-       lalloc(L,linebuf,size,0);
-       p=linebuf=NULL;
-       size=0;
-       break;
-      }
      }
     }
     lalloc(L,linebuf,size,0);
