@@ -123,12 +123,19 @@ local function apply_colors (s, color)
   return tbuf
 end
 
--- Color a string based on the definition file.
-local function convert_and_write_string (s)
-  s = apply_colors (s, make_colors (s))
-  if s then
-    posix.write (posix.STDOUT_FILENO, s .. "\n")
+-- Take chunks of input, color it line by line, and write the result.
+local buf = ""
+local function convert_and_write_string (chunk)
+  buf = buf .. chunk
+  local lines = buf:split ("\r\n")
+  buf = lines[#lines]
+  for i = 1, #lines - 1 do
+    local s = apply_colors (lines[i], make_colors (lines[i]))
+    if s then
+      posix.write (posix.STDOUT_FILENO, s .. "\n")
+    end
   end
+  -- FIXME: print anything after last line ending
 end
 
 -- Run definition script

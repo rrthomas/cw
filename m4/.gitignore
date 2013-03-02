@@ -36,8 +36,6 @@
 /signalblocking.m4
 /string_h.m4
 /errno_h.m4
-/memchr.m4
-/mmap-anon.m4
 /nocrash.m4
 /malloca.m4
 /sys_wait_h.m4
@@ -52,4 +50,3 @@
 /pathmax.m4
 /readlink.m4
 /stat.m4
-/memmem.m4

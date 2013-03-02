@@ -109,26 +109,12 @@ static int wrap_child(lua_State *L){
    {
     /* parent process to filter the program's output; kills children if interrupted. */
     sig_catch(SIGINT,0,int_handler,NULL);
-    char *linebuf=NULL,*p=NULL;
-    ssize_t size=0;
     char tmp[BUFSIZ];
     for(ssize_t s=0;(s=read(master,tmp,BUFSIZ))>0||!ext;){
-     size_t off=p-linebuf;
-     if((linebuf=lalloc(ud,linebuf,size,size+s))==NULL)
-      return pusherror(L,"lalloc");
-     p=linebuf+off;
-     memcpy(linebuf+size,tmp,s);
-     size+=s;
-     char *q;
-     while((q=memmem(p,size-(p-linebuf),"\r\n",2))){
-      size_t len=q-p;
-      lua_pushvalue(L,1);
-      lua_pushlstring(L,p,len);
-      lua_pcall(L,1,1,0); /* Ignore errors. */
-      p=q+2;
-     }
+     lua_pushvalue(L,1);
+     lua_pushlstring(L,tmp,s);
+     lua_pcall(L,1,0,0); /* Ignore errors. */
     }
-    lalloc(L,linebuf,size,0);
    }
   }
  }
