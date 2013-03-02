@@ -125,12 +125,6 @@ static int wrap_child(lua_State *L){
       lua_pushvalue(L,1);
       lua_pushlstring(L,p,len);
       lua_pcall(L,1,1,0); /* Ignore errors. */
-      const char *text=lua_tolstring(L,-1,&len);
-      if(text){
-       write(STDOUT_FILENO,text,len);
-       write(STDOUT_FILENO,"\n",1);
-      }
-      lua_pop(L,1);
       p=q+2;
      }
     }

@@ -124,8 +124,11 @@ local function apply_colors (s, color)
 end
 
 -- Color a string based on the definition file.
-local function convert_string (s)
-  return apply_colors (s, make_colors (s))
+local function convert_and_write_string (s)
+  s = apply_colors (s, make_colors (s))
+  if s then
+    posix.write (posix.STDOUT_FILENO, s .. "\n")
+  end
 end
 
 -- Run definition script
@@ -142,7 +145,7 @@ if not nocolor and color_stdout then
   if not master then
     die ("openpty error.")
   end
-  local ret, err = cw.wrap_child (convert_string, master, slave)
+  local ret, err = cw.wrap_child (convert_and_write_string, master, slave)
   if ret or err then -- Non-nil, so in parent process, or setup failed
     os.exit (ret)
   end
