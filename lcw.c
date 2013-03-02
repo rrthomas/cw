@@ -31,7 +31,6 @@
 #include <setjmp.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <pty.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -86,8 +85,8 @@ static int wrap_child(lua_State *L){
  void *ud;
  lua_Alloc lalloc=lua_getallocf(L,&ud);
  luaL_checktype(L,1,LUA_TFUNCTION);
- if(openpty(&master,&slave,0,0,0))
-  return pusherror(L,"openpty error.");
+ master = luaL_checkint(L, 2);
+ slave = luaL_checkint(L, 3);
  struct sigaction oldchldact,oldintact;
  sig_catch(SIGCHLD,SA_NOCLDSTOP,chld_handler,&oldchldact);
  sigaction(SIGINT,NULL,&oldintact);

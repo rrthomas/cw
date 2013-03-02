@@ -138,7 +138,11 @@ end
 
 local color_stdout = posix.isatty (posix.STDOUT_FILENO) == 1
 if not nocolor and color_stdout then
-  local ret, err = cw.wrap_child (convert_string)
+  local master, slave = posix.openpty ()
+  if not master then
+    die ("openpty error.")
+  end
+  local ret, err = cw.wrap_child (convert_string, master, slave)
   if ret or err then -- Non-nil, so in parent process, or setup failed
     os.exit (ret)
   end
