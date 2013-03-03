@@ -124,8 +124,7 @@ if ok == false then
 end
 
 -- Take chunks of input, color it line by line, and write the result.
-local color_stdout = posix.isatty (posix.STDOUT_FILENO) == 1
-if not nocolor and color_stdout then
+if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   local master, slave = posix.openpty ()
   local buf = ""
   local exit = false
