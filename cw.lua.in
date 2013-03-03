@@ -122,29 +122,13 @@ if ok == false then
   die ("error in definition file: " .. msg)
 end
 
--- Take chunks of input, color it line by line, and write the result.
 if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   local master, slave = posix.openpty ()
-  local exit = false
-  local pid_c
-
-  local function chld_handler ()
-    posix.fcntl (master, posix.F_SETFL, posix.O_NONBLOCK)
-    exit = true
-  end
-  local function int_handler ()
-    posix.write (posix.STDOUT_FILENO, "\x1b[00m")
-    if pid_c ~= 0 then
-      posix.killpg (pid_c, posix.SIGINT)
-    end
-    error ("interrupted")
-  end
-
   if not master then
     die ("openpty error.")
   end
-
-  pid_c = posix.fork ()
+  local exit = false
+  local pid_c = posix.fork ()
   if pid_c == nil then -- FIXME: Report error?
     die ("fork() error.")
   elseif pid_c == 0 then
@@ -155,9 +139,22 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     posix.setpid ('s')
   else
     -- parent process to filter the program's output; kills children if interrupted.
-    posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
-    posix.signal (posix.SIGINT, int_handler)
+    posix.signal (posix.SIGCHLD,
+                  function ()
+                    posix.fcntl (master, posix.F_SETFL, posix.O_NONBLOCK)
+                    exit = true
+                  end,
+                  posix.SA_NOCLDSTOP)
+    posix.signal (posix.SIGINT,
+                  function ()
+                    posix.write (posix.STDOUT_FILENO, "\x1b[00m")
+                    if pid_c ~= 0 then
+                      posix.killpg (pid_c, posix.SIGINT)
+                    end
+                    error ("interrupted")
+                  end)
     local buf = ""
+    -- Take chunks of input, color it line by line, and write the result.
     repeat
       local chunk = posix.read (master, posix.BUFSIZ)
       if (not chunk or #chunk == 0) and exit == true then
@@ -179,7 +176,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   end
 end
 
--- Child process
+-- Run the command, in the child process if we've forked.
 local cmd = base_scrname
 if command then
   if not type (command) == "string" then
