@@ -21,55 +21,19 @@
 
 #include "config.h"
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <signal.h>
 #include <string.h>
-#include <setjmp.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <lua.h>
 #include <lauxlib.h>
 #include "lua52compat.h"
-#include "unused-parameter.h"
 
-static bool ext=false;
 static pid_t pid_c;
-static jmp_buf exitbuf;
-static int master,slave;
-
-static void int_handler(int sig _GL_UNUSED_PARAMETER){
- write(STDOUT_FILENO,"\x1b[00m",5);
- if(pid_c)
-#if defined(HAVE_SETSID) && defined(HAVE_KILLPG)
-  killpg(pid_c,SIGINT);
-#else
- kill(pid_c,SIGTERM); /* SIGINT does not work; SIGTERM leaves any
-                         sub-shells orphaned, but it's the best we can
-                         do simply without process groups. */
-#endif
- longjmp(exitbuf, 1);
-}
-
-static void chld_handler(int sig _GL_UNUSED_PARAMETER){
- fcntl(master,F_SETFL,O_NONBLOCK);
- ext=true;
-}
-
-static void sig_catch(int sig, int flags, void (*handler)(int), struct sigaction *oldact)
-{
- struct sigaction sa;
- sa.sa_handler = handler;
- sa.sa_flags = flags;
- sigemptyset(&sa.sa_mask);
- assert(sigaction(sig, &sa, oldact)==0);
-}
+static int slave;
 
 static int pusherror(lua_State *L, const char *info)
 {
@@ -79,51 +43,37 @@ static int pusherror(lua_State *L, const char *info)
  return 3;
 }
 
+static int _pid_c(lua_State *L){
+ lua_pushinteger(L, pid_c);
+ return 1;
+}
+
 /* Wrap a child process's I/O line by line.
    Returns nil from child process, and exit code from parent process, which is -1 if it was interrupted. */
 static int wrap_child(lua_State *L){
- void *ud;
- lua_Alloc lalloc=lua_getallocf(L,&ud);
  luaL_checktype(L,1,LUA_TFUNCTION);
- master = luaL_checkint(L, 2);
- slave = luaL_checkint(L, 3);
- struct sigaction oldchldact,oldintact;
- sig_catch(SIGCHLD,SA_NOCLDSTOP,chld_handler,&oldchldact);
- sigaction(SIGINT,NULL,&oldintact);
- if(setjmp(exitbuf))
-   lua_pushinteger(L,-1);
- else {
-  switch((pid_c=fork())){
-  case -1:
-   return pusherror(L,"fork() error.");
-  case 0:
-   /* child process to execute the program. */
-   if(dup2(slave,STDOUT_FILENO)<0)
-    return pusherror(L,"dup2() failed.");
+ slave = luaL_checkint(L, 2);
+ switch((pid_c=fork())){
+ case -1:
+  return pusherror(L,"fork() error.");
+ case 0:
+  /* child process to execute the program. */
+  if(dup2(slave,STDOUT_FILENO)<0)
+   return pusherror(L,"dup2() failed.");
 #ifdef HAVE_SETSID
-   setsid();
+  setsid();
 #endif
-   lua_pushnil(L);
-   break;
-  default:
-   {
-    /* parent process to filter the program's output; kills children if interrupted. */
-    sig_catch(SIGINT,0,int_handler,NULL);
-    char tmp[BUFSIZ];
-    for(ssize_t s=0;(s=read(master,tmp,BUFSIZ))>0||!ext;){
-     lua_pushvalue(L,1);
-     lua_pushlstring(L,tmp,s);
-     lua_pcall(L,1,0,0); /* Ignore errors. */
-    }
-   }
-  }
+  lua_pushnil(L);
+  break;
+ default:
+  /* parent process to filter the program's output; kills children if interrupted. */
+  lua_pushvalue(L, 1);
+  lua_pcall(L,0,0,0); /* Ignore errors. */
  }
  if(pid_c){
   int e=0;
   lua_pushinteger(L,waitpid(pid_c,&e,0)>=0&&WIFEXITED(e)?WEXITSTATUS(e):0);
  }
- sigaction(SIGCHLD,&oldchldact,NULL);
- sigaction(SIGINT,&oldintact,NULL);
  return 1;
 }
 
@@ -142,6 +92,7 @@ static const luaL_Reg R[] =
 {
  {"canonicalize_file_name", Gcanonicalize_file_name},
  {"wrap_child",             wrap_child},
+ {"pid_c",                  _pid_c},
  {NULL,	NULL}
 };
 

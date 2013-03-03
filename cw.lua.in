@@ -123,21 +123,6 @@ local function apply_colors (s, color)
   return tbuf
 end
 
--- Take chunks of input, color it line by line, and write the result.
-local buf = ""
-local function convert_and_write_string (chunk)
-  buf = buf .. chunk
-  local lines = buf:split ("\r\n")
-  buf = lines[#lines]
-  for i = 1, #lines - 1 do
-    local s = apply_colors (lines[i], make_colors (lines[i]))
-    if s then
-      posix.write (posix.STDOUT_FILENO, s .. "\n")
-    end
-  end
-  -- FIXME: print anything after last line ending
-end
-
 -- Run definition script
 table.remove (arg, 1)
 table.merge (arg, table.invert (arg)) -- add arguments as keys
@@ -146,16 +131,53 @@ if ok == false then
   die ("error in definition file: " .. msg)
 end
 
+-- Take chunks of input, color it line by line, and write the result.
 local color_stdout = posix.isatty (posix.STDOUT_FILENO) == 1
 if not nocolor and color_stdout then
   local master, slave = posix.openpty ()
+  local buf = ""
+  local exit = false
+  local function chld_handler ()
+    posix.fcntl (master, posix.F_SETFL, posix.O_NONBLOCK)
+    exit = true
+  end
+  local function int_handler ()
+    posix.write (posix.STDOUT_FILENO, "\x1b[00m")
+    if cw.pid_c () ~= 0 then
+      posix.killpg (cw.pid_c (), posix.SIGINT)
+    end
+    error ("interrupted")
+  end
+  local function filter_input ()
+    repeat
+      local chunk = posix.read (master, posix.BUFSIZ)
+      if (not chunk or #chunk == 0) and exit == true then
+        break
+      end
+      buf = buf .. chunk
+      local lines = buf:split ("\r\n")
+      buf = lines[#lines]
+      for i = 1, #lines - 1 do
+        local s = apply_colors (lines[i], make_colors (lines[i]))
+        if s then
+          posix.write (posix.STDOUT_FILENO, s .. "\n")
+        end
+      end
+    until false
+    -- FIXME: print anything left in buf
+  end
+
   if not master then
     die ("openpty error.")
   end
-  local ret, err = cw.wrap_child (convert_and_write_string, master, slave)
+  local old_chld_handler = posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
+  local old_int_handler = posix.signal (posix.SIGINT, int_handler)
+  local ret, err = cw.wrap_child (filter_input, slave)
   if ret or err then -- Non-nil, so in parent process, or setup failed
     os.exit (ret)
   end
+  posix.signal (posix.SIGCHLD, old_chld_handler)
+  posix.signal (posix.SIGINT, old_int_handler)
 end
 
 -- Child process
