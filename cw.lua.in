@@ -137,14 +137,16 @@ if not nocolor and color_stdout then
   local master, slave = posix.openpty ()
   local buf = ""
   local exit = false
+  local pid_c
+
   local function chld_handler ()
     posix.fcntl (master, posix.F_SETFL, posix.O_NONBLOCK)
     exit = true
   end
   local function int_handler ()
     posix.write (posix.STDOUT_FILENO, "\x1b[00m")
-    if cw.pid_c () ~= 0 then
-      posix.killpg (cw.pid_c (), posix.SIGINT)
+    if pid_c ~= 0 then
+      posix.killpg (pid_c, posix.SIGINT)
     end
     error ("interrupted")
   end
@@ -166,14 +168,39 @@ if not nocolor and color_stdout then
     until false
     -- FIXME: print anything left in buf
   end
+  -- Wrap a child process's I/O line by line.
+  -- Returns nil from child process, and exit code from parent
+  -- process, which is -1 if it was interrupted.
+  local function wrap_child (f)
+    local ret
+    pid_c = posix.fork ()
+    if pid_c == nil then -- FIXME: Report error?
+      return nil, "fork() error."
+    elseif pid_c == 0 then
+      -- child process to execute the program.
+      if not posix.dup2 (slave, posix.STDOUT_FILENO) then -- FIXME: Report error?
+        return nil, "dup2() failed."
+      end
+      posix.setpid ('s')
+      return true
+    else
+      -- parent process to filter the program's output; kills children if interrupted.
+      f () --Ignore errors.
+    end
+    if pid_c ~= 0 then
+      local _
+      _, _, ret = posix.wait (pid_c)
+    end
+    return ret
+  end
 
   if not master then
     die ("openpty error.")
   end
   local old_chld_handler = posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
   local old_int_handler = posix.signal (posix.SIGINT, int_handler)
-  local ret, err = cw.wrap_child (filter_input, slave)
-  if ret or err then -- Non-nil, so in parent process, or setup failed
+  local ret, err = wrap_child (filter_input)
+  if ret ~= true then -- in parent process, or setup failed
     os.exit (ret)
   end
   posix.signal (posix.SIGCHLD, old_chld_handler)

@@ -28,12 +28,9 @@
 /wchar_t.m4
 /manywarnings.m4
 /warnings.m4
-/string_h.m4
 /errno_h.m4
 /nocrash.m4
 /malloca.m4
-/sys_wait_h.m4
-/waitpid.m4
 /sys_stat_h.m4
 /time_h.m4
 /double-slash-root.m4
