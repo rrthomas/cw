@@ -4,7 +4,6 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 -- cw (color wrapper)
 --
 -- Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
--- Copyright (C) 2004 v9/fakehalo [v9@fakehalo.us]
 --
 -- This file is part of cw.
 --
@@ -28,15 +27,8 @@ prog = { name = "@PACKAGE@" }
 -- Remove current directory from package.path
 package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
 
--- Fudge package.cpath when running in-tree
-local IN_TREE_LUA_PATH = "@in_tree_lua_path@"
-if IN_TREE_LUA_PATH ~= "" then
-  package.cpath = IN_TREE_LUA_PATH .. ";" .. package.cpath
-end
-
 require "std"
 local posix = require "posix"
-local cw = require "consolewrap"
 local colors = require "ansicolors"
 
 local scrname = arg[1]
@@ -54,8 +46,8 @@ end
 
 -- Filter a directory out of a PATH-like colon-separated path list.
 local function remove_dir_from_path(path, dir)
-  local canon_dir = cw.canonicalize_file_name (dir)
-  return table.concat (list.filter (function (s) return cw.canonicalize_file_name (s) ~= canon_dir end,
+  local canon_dir = posix.realpath (dir)
+  return table.concat (list.filter (function (s) return posix.realpath (s) ~= canon_dir end,
                                     path:split (":")), ":")
 end
 
