@@ -141,54 +141,44 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     end
     error ("interrupted")
   end
-  -- Wrap a child process's I/O line by line.
-  -- Returns nil from child process, and exit code from parent
-  -- process, which is -1 if it was interrupted.
-  local function wrap_child (f)
-    local ret
-    pid_c = posix.fork ()
-    if pid_c == nil then -- FIXME: Report error?
-      return nil, "fork() error."
-    elseif pid_c == 0 then
-      -- child process to execute the program.
-      if not posix.dup2 (slave, posix.STDOUT_FILENO) then -- FIXME: Report error?
-        return nil, "dup2() failed."
-      end
-      posix.setpid ('s')
-      return true
-    else
-      -- parent process to filter the program's output; kills children if interrupted.
-      repeat
-        local chunk = posix.read (master, posix.BUFSIZ)
-        if (not chunk or #chunk == 0) and exit == true then
-          break
-        end
-        buf = buf .. chunk
-        local lines = buf:split ("\r\n")
-        buf = lines[#lines]
-        for i = 1, #lines - 1 do
-          local s = apply_colors (lines[i], make_colors (lines[i]))
-          if s then
-            posix.write (posix.STDOUT_FILENO, s .. "\n")
-          end
-        end
-      until false
-      -- FIXME: print anything left in buf
-    end
-    if pid_c ~= 0 then
-      local _
-      _, _, ret = posix.wait (pid_c)
-    end
-    return ret
-  end
 
   if not master then
     die ("openpty error.")
   end
   local old_chld_handler = posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
   local old_int_handler = posix.signal (posix.SIGINT, int_handler)
-  local ret, err = wrap_child ()
-  if ret ~= true then -- in parent process, or setup failed
+
+  -- Wrap a child process's I/O line by line.
+  -- Returns nil from child process, and exit code from parent
+  -- process, which is -1 if it was interrupted.
+  pid_c = posix.fork ()
+  if pid_c == nil then -- FIXME: Report error?
+    die ("fork() error.")
+  elseif pid_c == 0 then
+    -- child process to execute the program.
+    if not posix.dup2 (slave, posix.STDOUT_FILENO) then -- FIXME: Report error?
+      die ("dup2() failed.")
+    end
+    posix.setpid ('s')
+  else
+    -- parent process to filter the program's output; kills children if interrupted.
+    repeat
+      local chunk = posix.read (master, posix.BUFSIZ)
+      if (not chunk or #chunk == 0) and exit == true then
+        break
+      end
+      buf = buf .. chunk
+      local lines = buf:split ("\r\n")
+      buf = lines[#lines]
+      for i = 1, #lines - 1 do
+        local s = apply_colors (lines[i], make_colors (lines[i]))
+        if s then
+          posix.write (posix.STDOUT_FILENO, s .. "\n")
+        end
+      end
+    until false
+    -- FIXME: print anything left in buf
+    local _, _, ret = posix.wait (pid_c)
     os.exit (ret)
   end
   posix.signal (posix.SIGCHLD, old_chld_handler)
