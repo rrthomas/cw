@@ -148,9 +148,6 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   local old_chld_handler = posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
   local old_int_handler = posix.signal (posix.SIGINT, int_handler)
 
-  -- Wrap a child process's I/O line by line.
-  -- Returns nil from child process, and exit code from parent
-  -- process, which is -1 if it was interrupted.
   pid_c = posix.fork ()
   if pid_c == nil then -- FIXME: Report error?
     die ("fork() error.")
