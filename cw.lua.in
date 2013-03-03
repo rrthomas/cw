@@ -142,24 +142,6 @@ if not nocolor and color_stdout then
     end
     error ("interrupted")
   end
-  local function filter_input ()
-    repeat
-      local chunk = posix.read (master, posix.BUFSIZ)
-      if (not chunk or #chunk == 0) and exit == true then
-        break
-      end
-      buf = buf .. chunk
-      local lines = buf:split ("\r\n")
-      buf = lines[#lines]
-      for i = 1, #lines - 1 do
-        local s = apply_colors (lines[i], make_colors (lines[i]))
-        if s then
-          posix.write (posix.STDOUT_FILENO, s .. "\n")
-        end
-      end
-    until false
-    -- FIXME: print anything left in buf
-  end
   -- Wrap a child process's I/O line by line.
   -- Returns nil from child process, and exit code from parent
   -- process, which is -1 if it was interrupted.
@@ -177,7 +159,22 @@ if not nocolor and color_stdout then
       return true
     else
       -- parent process to filter the program's output; kills children if interrupted.
-      f () --Ignore errors.
+      repeat
+        local chunk = posix.read (master, posix.BUFSIZ)
+        if (not chunk or #chunk == 0) and exit == true then
+          break
+        end
+        buf = buf .. chunk
+        local lines = buf:split ("\r\n")
+        buf = lines[#lines]
+        for i = 1, #lines - 1 do
+          local s = apply_colors (lines[i], make_colors (lines[i]))
+          if s then
+            posix.write (posix.STDOUT_FILENO, s .. "\n")
+          end
+        end
+      until false
+      -- FIXME: print anything left in buf
     end
     if pid_c ~= 0 then
       local _
@@ -191,7 +188,7 @@ if not nocolor and color_stdout then
   end
   local old_chld_handler = posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
   local old_int_handler = posix.signal (posix.SIGINT, int_handler)
-  local ret, err = wrap_child (filter_input)
+  local ret, err = wrap_child ()
   if ret ~= true then -- in parent process, or setup failed
     os.exit (ret)
   end
