@@ -31,27 +31,12 @@ require "std"
 local posix = require "posix"
 local colors = require "ansicolors"
 
--- Parse command-line arguments
-local scrname = arg[1]
-local base_scrname = posix.basename(scrname or arg[0])
-if #arg < 1 or arg[1] == "--help" then
-  io.stderr:write ("Usage: not for direct use; use via definition files (see cw(1)):\n" ..
-                   "  --version             display version information and exit\n" ..
-                   "  --help                display this help and exit\n")
-  os.exit ()
-elseif arg[1] == "--version" then
-  io.stderr:write ("cw (color wrapper) v@VERSION@\n")
-  os.exit ()
-end
-
 -- Filter a directory out of a PATH-like colon-separated path list.
 local function remove_dir_from_path(path, dir)
   local canon_dir = posix.realpath (dir)
   return table.concat (list.filter (function (s) return posix.realpath (s) ~= canon_dir end,
                                     path:split (":")), ":")
 end
-
-posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
 -- Type to color map.
 local colormap = {}
@@ -67,12 +52,6 @@ local function setcolors (str)
     colormap[class] = colors.noReset ("%{reset " .. col .. "}")
   end
 end
-
-setcolors ("base=reset") -- Ensure there is a "base" class
-setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
-  "base=yellow:bright=bright yellow:highlight=bright magenta:lowlight=magenta:neutral=bright black:warning=bright blue:error=bright red:punctuation=bright green" or
-  "base=cyan:bright=bright cyan:highlight=bright green:lowlight=green:neutral=bright white:warning=bright yellow:error=bright red:punctuation=bright blue"))
-local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 -- Convert a lexical class to a color, defaulting to the color of the base class.
 local function class_to_color (class)
@@ -113,6 +92,28 @@ local function apply_colors (s, color)
   end
   return tbuf
 end
+
+
+-- Parse command-line arguments
+local scrname = arg[1]
+local base_scrname = posix.basename(scrname or arg[0])
+if #arg < 1 or arg[1] == "--help" then
+  io.stderr:write ("Usage: not for direct use; use via definition files (see cw(1)):\n" ..
+                   "  --version             display version information and exit\n" ..
+                   "  --help                display this help and exit\n")
+  os.exit ()
+elseif arg[1] == "--version" then
+  io.stderr:write ("cw (color wrapper) v@VERSION@\n")
+  os.exit ()
+end
+
+posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
+
+setcolors ("base=reset") -- Ensure there is a "base" class
+setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
+  "base=yellow:bright=bright yellow:highlight=bright magenta:lowlight=magenta:neutral=bright black:warning=bright blue:error=bright red:punctuation=bright green" or
+  "base=cyan:bright=bright cyan:highlight=bright green:lowlight=green:neutral=bright white:warning=bright yellow:error=bright red:punctuation=bright blue"))
+local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 -- Run definition script
 table.remove (arg, 1)
