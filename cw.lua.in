@@ -31,9 +31,9 @@ require "std"
 local posix = require "posix"
 local colors = require "ansicolors"
 
+-- Parse command-line arguments
 local scrname = arg[1]
 local base_scrname = posix.basename(scrname or arg[0])
-
 if #arg < 1 or arg[1] == "--help" then
   io.stderr:write ("Usage: not for direct use; use via definition files (see cw(1)):\n" ..
                    "  --version             display version information and exit\n" ..
@@ -53,14 +53,8 @@ end
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
+-- Type to color map.
 local colormap = {}
-
--- Convert a lexical class to a color, defaulting to the color of the base class.
-local function class_to_color (class)
-  return colormap[class] or colormap["base"]
-end
-
--- Set user color map.
 local function setcolors (str)
   for ass in list.elems (str:split (":")) do
     local class, col = unpack (ass:split ("="))
@@ -80,8 +74,13 @@ setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
   "base=cyan:bright=bright cyan:highlight=bright green:lowlight=green:neutral=bright white:warning=bright yellow:error=bright red:punctuation=bright blue"))
 local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
-local matches = list.new ()
+-- Convert a lexical class to a color, defaulting to the color of the base class.
+local function class_to_color (class)
+  return colormap[class] or colormap["base"]
+end
 
+-- User-visible APIs
+local matches = list.new ()
 function match (class, regex)
   table.insert (matches, {col = class_to_color (class), regex = regex})
 end
@@ -126,7 +125,6 @@ end
 -- Take chunks of input, color it line by line, and write the result.
 if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   local master, slave = posix.openpty ()
-  local buf = ""
   local exit = false
   local pid_c
 
@@ -145,8 +143,6 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   if not master then
     die ("openpty error.")
   end
-  local old_chld_handler = posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
-  local old_int_handler = posix.signal (posix.SIGINT, int_handler)
 
   pid_c = posix.fork ()
   if pid_c == nil then -- FIXME: Report error?
@@ -159,6 +155,9 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     posix.setpid ('s')
   else
     -- parent process to filter the program's output; kills children if interrupted.
+    posix.signal (posix.SIGCHLD, chld_handler, posix.SA_NOCLDSTOP)
+    posix.signal (posix.SIGINT, int_handler)
+    local buf = ""
     repeat
       local chunk = posix.read (master, posix.BUFSIZ)
       if (not chunk or #chunk == 0) and exit == true then
@@ -178,8 +177,6 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     local _, _, ret = posix.wait (pid_c)
     os.exit (ret)
   end
-  posix.signal (posix.SIGCHLD, old_chld_handler)
-  posix.signal (posix.SIGINT, old_int_handler)
 end
 
 -- Child process
