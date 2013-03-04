@@ -20,10 +20,9 @@
 ACLOCAL_AMFLAGS = -I m4
 
 bin_SCRIPTS = cw
-
-man_MANS = cw.1
+man_MANS = $(PACKAGE).1
 EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in
-DISTCLEANFILES = $(PACKAGE).1
+DISTCLEANFILES = $(man_MANS)
 pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
 
 $(pkglibexec_SCRIPTS): config.status
@@ -31,19 +30,19 @@ $(pkglibexec_SCRIPTS): config.status
 edit = sed \
 	-e 's|@pkglibexecdir[@]|$(pkglibexecdir)|g'
 
-$(top_builddir)/cw: cw.lua Makefile
+$(top_builddir)/$(PACKAGE): $(PACKAGE).lua Makefile
 	rm -f $@ $@.tmp
 	$(edit) '$@.lua' >$@.tmp
 	mv $@.tmp $@
 	chmod +x $@
-	$(LUA) $(top_builddir)/cw --version >/dev/null || ( cat $@ && rm $@ )
+	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
 
 %: %.lua
-	printf "#!$(bindir)/cw\n" > $@
+	printf "#!$(bindir)/$(PACKAGE)\n" > $@
 	cat $< >> $@
 
 clean-local:
-	rm -f $(pkglibexec_SCRIPTS) cw
+	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE)
 
 $(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.am config.status
 	rm -f $@ $@.tmp
