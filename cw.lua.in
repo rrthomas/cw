@@ -130,11 +130,11 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   end
   local exit = false
   local pid_c = posix.fork ()
-  if pid_c == nil then -- FIXME: Report error?
+  if pid_c == nil then
     die ("fork() error.")
   elseif pid_c == 0 then
     -- child process to execute the program.
-    if not posix.dup2 (slave, posix.STDOUT_FILENO) then -- FIXME: Report error?
+    if not posix.dup2 (slave, posix.STDOUT_FILENO) then
       die ("dup2() failed.")
     end
     posix.setpid ('s')
