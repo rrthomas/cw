@@ -4,15 +4,18 @@
               (c) 2004-2010 v9/fakehalo <v9@fakehalo.us>
                 (c) 2013 Reuben Thomas <rrt@sc3d.org>
 
+                    http://github.com/rrthomas/cw/
 
-cw is a colorer for command-line programs.  It is designed to simulate
-the environment of the commands being executed, so that when you type
-'du', 'df', 'ping', etc. in your shell the output is automatically
-colored according to a definition script.  Text patterns are assigned
-to lexical classes, which themselves are given colors.  The arguments
-to the original program and OS under which it is running can also be
-tested.  cw includes over 70 definition scripts, and it's easy to
-write more.
+
+cw is a colorer for command-line programs.  It is designed to be
+transparent: when you type 'du', 'df', 'ping', etc. in your shell the
+output is automatically colored according to a definition script, but
+when the commands are used non-interactively (e.g. in another script)
+their output is not colored, so as not to confuse programs that
+process their output.  Text patterns are defined as lexical classes,
+and assigned colors.  The arguments to the original program and OS
+under which it is running can be tested.  cw includes over 70
+definition scripts, and it's easy to write more.
 
 cw is distributed under the GNU General Public License version 3, or,
 at your option, any later version.
