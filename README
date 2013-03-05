@@ -32,14 +32,15 @@ colordiff: to color the output of diff
 Installation
 ------------
 
-First build the program with
+The simplest way is to install using LuaRocks from
+http://www.luarocks.org/ :
 
-  ./configure && make install
+  luarocks install cw
 
-or, to install it in your home directory, for example, change the first
-part of the command to
+Or, you can use the GNU autotools build system directly: from a git
+checkout:
 
-  ./configure --prefix=$HOME/.local
+  autoreconf -i && ./configure && make
 
 cw works by prepending the cw definition directory to the PATH
 environment variable.  You should do this in your shell's interactive
