@@ -162,10 +162,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
       local lines = buf:split ("\r\n")
       buf = lines[#lines]
       for i = 1, #lines - 1 do
-        local s = apply_colors (lines[i], make_colors (lines[i]))
-        if s then
-          posix.write (posix.STDOUT_FILENO, s .. "\n")
-        end
+        posix.write (posix.STDOUT_FILENO, apply_colors (lines[i], make_colors (lines[i])) .. "\n")
       end
     until (not chunk or #chunk == 0) and exit == true
     local _, _, ret = posix.wait (pid_c)
