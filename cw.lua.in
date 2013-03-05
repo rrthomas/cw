@@ -158,9 +158,6 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     -- Take chunks of input, color it line by line, and write the result.
     repeat
       local chunk = posix.read (master, posix.BUFSIZ)
-      if (not chunk or #chunk == 0) and exit == true then
-        break
-      end
       buf = buf .. chunk
       local lines = buf:split ("\r\n")
       buf = lines[#lines]
@@ -170,8 +167,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
           posix.write (posix.STDOUT_FILENO, s .. "\n")
         end
       end
-    until false
-    -- FIXME: print anything left in buf
+    until (not chunk or #chunk == 0) and exit == true
     local _, _, ret = posix.wait (pid_c)
     os.exit (ret)
   end
