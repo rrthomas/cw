@@ -21,9 +21,6 @@ This function adds a rule for that  matching \fBpattern\fR should be colored as 
 .TP
 \fBarg\fR
 As for a standalone Lua script, the \fBarg\fR table gives a list of command-line arguments to the program being wrapped. For convenience, each argument is also a key in the table, so it is easy to test whether a certain argument has been given, in any position, with code such as \fBif arg["\-\-help"] then...\fR
-.TP
-\fBcommand\fR
-If this global variable is set to a string by the definition script, it is used as the command to run.
 .SH COLORS
 .PP
 The default list of classes is: \fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The mapping of classes to colors can be changed by the \fBCW_COLORS\fR environment variable (see below).

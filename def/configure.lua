@@ -1,4 +1,3 @@
-command = "./configure " .. table.concat(arg, " ")
 match("highlight", "yes$")
 match("error", "no$")
 match("punctuation", "%.")

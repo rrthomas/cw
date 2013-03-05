@@ -19,7 +19,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-bin_SCRIPTS = cw
+bin_SCRIPTS = cw script/*
 man_MANS = $(PACKAGE).1
 
 EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in

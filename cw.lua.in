@@ -178,16 +178,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
 end
 
 -- Run the command, in the child process if we've forked.
-local cmd = base_scrname
-if command then
-  if not type (command) == "string" then
-    die ("invalid command given.")
-  end
-  cmd = "/bin/sh"
-  arg = {[0] = base_scrname, "-c", command}
-else
-  arg[0] = nil
-end
-posix.execp (cmd, arg)
+arg[0] = nil
+posix.execp (base_scrname, arg)
 -- FIXME: turn off coloring for error
 die ("could not run command: " .. cmd)
