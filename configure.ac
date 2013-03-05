@@ -26,5 +26,5 @@ dnl Checks for programs
 AX_PROG_LUA
 
 dnl Generate output
-AC_CONFIG_FILES([Makefile cw.lua])
+AC_CONFIG_FILES([Makefile luarocks-config.lua cw.lua])
 AC_OUTPUT

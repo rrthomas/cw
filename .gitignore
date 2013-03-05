@@ -1,5 +1,6 @@
 /build-aux
 *~
+/*.rockspec
 Makefile
 /aclocal.m4
 /autom4te.cache
@@ -11,6 +12,7 @@ Makefile
 /cw.1
 /cw-*.tar.gz
 /install-sh
+/luarocks-config.lua
 /missing
 /Makefile.in
 /TAGS
