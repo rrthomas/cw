@@ -3,7 +3,7 @@
 \\$2 \(laURL: \\$1 \(ra\\$3
 ..
 .if \n[.g] .mso www.tmac
-.TH "CW" "1" "February 2013" "v9/fakehalo" "Text Manipulation"
+.TH "CW" "1" "March 2013" "v9/fakehalo" "Text Manipulation"
 .SH "NAME"
 cw \- colorer for command-line programs
 .SH "SYNOPSIS"
@@ -11,29 +11,41 @@ cw \- colorer for command-line programs
 [\fI\-\-version|\-\-help\fR]
 .SH "DESCRIPTION"
 .PP
-\fBcw\fR colors the output of command-line programs.  The colors to use are defined by a definition script.  These definition files have the same name as the program they are executing, and are stored in \fB@pkglibexecdir@/\fR.
+\fBcw\fR colors the output of command-line programs.  The colors to use are defined by definition scripts, which have the same name as the program they color, and are stored in \fB@pkglibexecdir@\fR.
 .SH "DEFINITION SCRIPTS"
-Definition scripts are written in the Lua scripting language (see lua(1)).  Try starting by modifying an existing script.  If you create a new definition script, remember to make it executable, and please consider submitting it to the cw maintainer for inclusion in future releases.  There is no need to know Lua to write a simple definition file. The \fBluaposix\fR library is recommended for tasks such as checking the system type and setting environment variables; you can find examples in the included scripts.  cw provides the following extra features:
+Definition scripts are written in
+.URL "http://www.lua.org/" "the Lua scripting language" ","
+but you don't need to know Lua to make a simple script.  To make your own, try first modifying an existing script; remember to make your script executable, and please consider submitting it to the cw maintainer (see
+.SM
+.BR BUGS )
+for inclusion in future releases.
+.PP
+cw provides scripts with a standard Lua environment, plus \fBluaposix\fR (useful for tasks such as checking the system type and setting environment variables) and the following extra features:
 .TP
 \fBmatch(\fIclass\fR, \fIpattern\fB)\fR
-This function adds a rule for that  matching \fBpattern\fR should be colored as class \fBclass\fR.  Matches are applied in order of definition.  See below for an explanation of classes, and
+This function adds a rule to color text matching \fBpattern\fR as class \fBclass\fR.  Matches are applied in order of definition.  See
+.SM
+.B "CLASSES AND COLORS"
+for an explanation of classes, and
 .URL "http://www.lua.org/manual/5.1/manual.html#5.4.1" "the Lua manual" " for the syntax of patterns."
 .TP
 \fBarg\fR
-As for a standalone Lua script, the \fBarg\fR table gives a list of command-line arguments to the program being wrapped. For convenience, each argument is also a key in the table, so it is easy to test whether a certain argument has been given, in any position, with code such as \fBif arg["\-\-help"] then...\fR
-.SH COLORS
+A list of command-line arguments to the program being colored.  For convenience, each argument is also a key in the table, so it is easy to test whether a certain argument has been given, in any position, with code such as \fBif arg["\-\-help"] then...\fR
+.SH CLASSES AND COLORS
 .PP
-The default list of classes is: \fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The mapping of classes to colors can be changed by the \fBCW_COLORS\fR environment variable (see below).
+The default classes are: \fBbase, bright, highlight, lowlight, neutral, warning, error, punctuation\fR.  The names suggest the sort of text patterns you may want to map to them.  The mapping of classes to colors can be changed with the \fBCW_COLORS\fR environment variable (see
+.SM
+.BR "ENVIRONMENT VARIABLES" ).
 .PP
 The available colors are:
-\fBblack, red, green, yellow, blue, magenta, cyan, white\fR. A color may be prefixed \fBbright\fR to denote a brighter color, e.g. \fBbright red\fR (note the space).
+\fBblack, red, green, yellow, blue, magenta, cyan, white\fR.  A color may be prefixed \fBbright\fR to denote a brighter color, e.g. \fBbright red\fR (note the space).
 .SH "ENVIRONMENT VARIABLES"
 .TP
 \fBNOCOLOR\fR
-Disables color wrapping when set to any value. Note that cw disables coloring if standard output is not connected to a terminal, or if the terminal type \fBTERM\fR is \fBdumb\fR.
+Disables color wrapping when set.  Note that cw disables coloring if standard output is not connected to a terminal, or if the terminal type \fBTERM\fR is \fBdumb\fR.
 .TP
 \fBCW_INVERT\fR
-Redefines the internal colormap to the opposite colors.  This is intended to help terminals with white backgrounds become more readable (any value placed in the variable will enable)
+Inverts the built-in color scheme when set, to make cw more legible on terminals with white backgrounds (cw is set up for a black background by default).
 .TP
 \fBCW_COLORS\fR
 Defines a mapping from classes to colors.  The format is \fBCW_COLORS=class=color\fR[\fB:class=color...\fR].
@@ -49,5 +61,4 @@ Report bugs to <v9@fakehalo.us>.
 Copyright \(co 2004\(en2010 v9/fakehalo, and \(co 2013 Reuben Thomas.  License GPLv3+:
 .URL "http://gnu.org/licenses/gpl.html" "GNU GPL version 3 or later" "."
 .PP
-This is free software: you are free to change and redistribute it.  There is NO
-warranty, to the extent permitted by law.
+This is free software: you are free to change and redistribute it.  There is NO warranty, to the extent permitted by law.

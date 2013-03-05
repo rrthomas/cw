@@ -18,17 +18,6 @@ cw is distributed under the GNU General Public License version 3, or,
 at your option, any later version.
 
 
-Dedicated colorers
-------------------
-
-cw doesn't try to replace some dedicated coloring wrappers and
-programs, such as:
-
-ccal: for colored calendars
-colorgcc: to color the output of gcc
-colordiff: to color the output of diff
-
-
 Installation
 ------------
 
@@ -57,10 +46,16 @@ Use
 ---
 
 Start a new shell and try some commands, which should now be colored!
-Set NOCOLOR=1 in the environment to turn cw off.
-
-cw is set up for a black background by default.  Set CW_INVERT=1 in
-the environment to invert cw's default color scheme.
-
 See cw(1) (the cw man page) for more information, including details of
 definition scripts.
+
+
+Dedicated colorers
+------------------
+
+cw doesn't try to replace some dedicated coloring wrappers and
+programs, such as:
+
+ccal: for colored calendars
+colorgcc: to color the output of gcc
+colordiff: to color the output of diff
