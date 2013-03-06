@@ -1,16 +1,4 @@
-if arg["--help"] then
-  match("highlight", "%[")
-  match("highlight", "%]")
-  match("highlight", "<")
-  match("highlight", ">")
-  match("highlight", ":")
-  match("bright", ",")
-  match("bright", "=")
-  match("bright", "%-")
-else
-  match("bright", "/")
-  match("default", "M")
-  match("default", "K")
-  match("highlight", "[^\t]+")
+if not arg["--help"] then
+  match("bright", "M")
+  match("bright", "K")
 end
-match("default", "Try")

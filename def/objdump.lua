@@ -1,9 +1,5 @@
-if #arg == 0 or arg["--help"] then
-  match("bright", "<.+>")
-  match("bright", "%-%-[^ ]+")
-end
 if arg["-s"] then
-  match("bright", "%x+ %x+ %x+ %x+")
+  match("bright", "%x+ %x+ %x+ %x+ %x+")
 end
 if arg["-R"] then
   match("bright", "^%x+[ ]")

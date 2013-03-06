@@ -1,16 +1,12 @@
-if not arg["--interactive"] then
-  match("bright", "%d")
-  match("highlight", ":")
-  match("neutral", "%.")
+if not arg["--help"] then
+  match("bright", "[%d%.]")
   match("neutral", "/")
   match("neutral", "%[")
   match("neutral", "%]")
   match("neutral", "%(")
   match("neutral", "%)")
   match("warning", "%*")
-  match("bright", "%-")
   match("bright", ",")
-  match("bright", "nmap")
   match("highlight", "tcp")
   match("warning", "udp")
   match("highlight", "open")

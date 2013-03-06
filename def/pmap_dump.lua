@@ -1,3 +1,3 @@
 match("bright", "%d")
-match("warning", "tcp")
+match("highlight", "tcp")
 match("highlight", "udp")

@@ -1,12 +1,6 @@
-match("bright", "%d")
-match("punctuation", "%[")
-match("punctuation", "%]")
-match("neutral", "%(")
-match("neutral", "%)")
-match("neutral", "%+")
-match("bright", "%-")
-match("highlight", ":")
-match("error", "root")
 if not arg["--help"] then
-  match("bright", "[^ ]+")
+  match("punctuation", "%b[]")
+  match("neutral", "%b()")
+  match("error", "root")
+  match("bright", "^[^ ]+")
 end

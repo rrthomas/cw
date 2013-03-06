@@ -1,24 +1,12 @@
-if arg["--help"] then
-  match("neutral", "%?")
-  match("neutral", "%+")
-  match("neutral", " - ")
-elseif arg["-"] then
-  match("highlight", " %+ ")
-  match("lowlight", " - ")
+if not arg["--help"] then
+  if arg["-"] then
+    match("highlight", " %+ ")
+    match("lowlight", " - ")
+  end
+  match("punctuation", "%b()")
+  match("highlight", "^%S+")
+  match("bright", "tty%S+")
+  match("bright", "pts%S+")
+  match("punctuation", "LOGIN")
+  match("warning", "root")
 end
-match("neutral", "%-")
-match("neutral", ":")
-match("neutral", "%.")
-match("neutral", "=")
-match("punctuation", "/")
-match("punctuation", "%(")
-match("punctuation", "%)")
-match("punctuation", "<")
-match("punctuation", ">")
-match("punctuation", "%[")
-match("punctuation", "%]")
-match("neutral", "tty")
-match("neutral", "pts")
-match("punctuation", "LOGIN")
-match("neutral", "root")
-match("bright", "... .. ..:..")

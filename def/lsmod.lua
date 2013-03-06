@@ -1,8 +1,8 @@
-match("bright", "%d")
-match("bright", "%b()")
-match("bright", "%[")
-match("bright", "%]")
-match("bright", "Module")
-if arg["-h"] or arg["--help"] then
-  match("bright", "%-")
+if not arg["-h"] and not arg["--help"] then
+  match("bright", " %d+ ")
+  match("bright", "%b()")
+  match("bright", "%b[]")
+  match("bright", "Module")
+  match("bright", "Size")
+  match("bright", "Used by")
 end

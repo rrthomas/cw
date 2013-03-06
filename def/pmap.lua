@@ -1,4 +1,3 @@
-match("punctuation", "%d")
-match("punctuation", "/")
-match("error", "%-")
-match("error", "%b[]")
+match("bright", "^%x+")
+match("warning", "%b[]")
+match("highlight", "^ total")

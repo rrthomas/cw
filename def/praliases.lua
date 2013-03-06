@@ -1,2 +1,2 @@
-match("bright", ":")
-match("bright", "[^:]+")
+match("lowlight", ":")
+match("bright", "^[^:]+")

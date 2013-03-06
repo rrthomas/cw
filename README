@@ -14,7 +14,7 @@ when the commands are used non-interactively (e.g. in another script)
 their output is not colored, so as not to confuse programs that
 process their output.  Text patterns are defined as lexical classes,
 and assigned colors.  The arguments to the original program and OS
-under which it is running can be tested.  cw includes over 70
+under which it is running can be tested.  cw includes over 50
 definition scripts, and it's easy to write more.
 
 cw is distributed under the GNU General Public License version 3, or,

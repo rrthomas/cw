@@ -4,15 +4,8 @@ if posix.uname("%s") == "SunOS" then
 else
   match("bright", "---")
 end
-if not arg["--help"] then
-  match("highlight", "=")
-else
-  match("neutral", ":")
-  match("highlight", "%b()")
-  match("highlight", "%b[]")
-  match("bright", ",")
-  match("highlight", " ms")
-  match("default", " from ")
-  match("default", "From ")
-  match("punctuation", "PING")
-end
+match("bright", "%b()")
+match("bright", "%b[]")
+match("lowlight", " from ")
+match("lowlight", "From ")
+match("lowlight", "PING")
