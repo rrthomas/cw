@@ -96,7 +96,7 @@ end
 
 -- Parse command-line arguments
 local scrname = arg[1]
-local base_scrname = posix.basename(scrname or arg[0])
+local command = posix.basename(scrname or arg[0])
 if #arg < 1 or arg[1] == "--help" then
   io.stderr:write ("Usage: not for direct use; use via definition files (see cw(1)):\n" ..
                    "  --version             display version information and exit\n" ..
@@ -172,6 +172,6 @@ end
 
 -- Run the command, in the child process if we've forked.
 arg[0] = nil
-posix.execp (base_scrname, arg)
+posix.execp (command, arg)
 -- FIXME: turn off coloring for error
-die ("could not run command: " .. cmd)
+die ("could not run command: " .. command)
