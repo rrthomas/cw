@@ -12,6 +12,8 @@ cw \- colorer for command-line programs
 .SH "DESCRIPTION"
 .PP
 \fBcw\fR colors the output of command-line programs.  The colors to use are defined by definition scripts, which have the same name as the program they color, and are stored in \fB@pkglibexecdir@\fR.
+.PP
+\fBcw\fR should not cause any security problems, but since wrapping processes and changing their output can result in subtle bugs, it is not recommended for use by privileged users such as root.
 .SH "DEFINITION SCRIPTS"
 Definition scripts are written in
 .URL "http://www.lua.org/" "the Lua scripting language" ","
@@ -49,6 +51,25 @@ Inverts the built-in color scheme when set, to make cw more legible on terminals
 .TP
 \fBCW_COLORS\fR
 Defines a mapping from classes to colors.  The format is \fBCW_COLORS=class=color\fR[\fB:class=color...\fR].
+.SH "RECOMMENDATIONS FOR DEFINITION SCRIPTS"
+.PP
+There are two obvious reasons to color commands: first, for aesthetic reasons, and secondly, to make the output more legible. For the first kind, use your imagination! The colorers provided with cw are of the second kind, and the following suggestions aim to help improve presentation:
+.RS
+.PP
+Colors should be used to pick out key information; it is not necessary to color everything.
+.PP
+Some commands present their information very clearly already using spacing (e.g. as a table). A lot of coloring may not improve it; for example, you can color just the column headings of tabular output.
+.PP
+When each line is in the same format, but unaligned, color can be helpful to pick out particular fields; for example, the coloring of variable names in the \fBenv\fR colorer.
+.PP
+Since \fBcw\fR is not recommended for use by privileged users, there is little point writing wrappers for commands that typically require administrator privileges to use.
+.PP
+Help output (e.g. the output of \fB\-\-help\fR) should not be colored.
+.PP
+Use of the \fBdefault\fR class only makes sense to override the coloring of text that has already been colored by another pattern.
+.PP
+Minimize the number of match rules, for example by using character classes to color individual characters.
+.RE
 .SH "SEE ALSO"
 .BR ccal (1),
 .BR colordiff (1),
