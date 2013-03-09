@@ -27,7 +27,7 @@ local default = {
     "lua >= 5.1",
     "stdlib >= 32",
     "luaposix >= 5.1.26",
-    "ansicolors >= 1.0",
+    "ansicolors >= 1.0.2",
   },
   build = {
     type = "command",
