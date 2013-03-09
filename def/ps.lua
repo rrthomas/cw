@@ -1,4 +1,4 @@
-match("bright", "^%d+")
+match("bright", "^%s*%d+")
 match("bright", "%.")
 match("bright", "%-")
 match("bright", "%*")
