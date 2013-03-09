@@ -22,7 +22,11 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 -- <http://www.gnu.org/licenses/>. */
 
 
-prog = { name = "@PACKAGE@" }
+prog = {
+  name = "@PACKAGE@",
+  version = "@PACKAGE@ @VERSION@",
+  purpose = "not for direct use (see cw(1))",
+}
 
 -- Remove current directory from package.path
 package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
@@ -97,15 +101,7 @@ end
 -- Parse command-line arguments
 local scrname = arg[1]
 local command = posix.basename(scrname or arg[0])
-if #arg < 1 or arg[1] == "--help" then
-  io.stderr:write ("Usage: not for direct use; use via definition files (see cw(1)):\n" ..
-                   "  --version             display version information and exit\n" ..
-                   "  --help                display this help and exit\n")
-  os.exit ()
-elseif arg[1] == "--version" then
-  io.stderr:write ("cw (color wrapper) v@VERSION@\n")
-  os.exit ()
-end
+getopt.processArgs (prog, true)
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
