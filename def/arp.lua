@@ -1,11 +1,11 @@
-match("neutral", "%x+:%x+:%x+:%x+:%x+:%x+")
+match("lowlight", "%x+:%x+:%x+:%x+:%x+:%x+")
 if posix.uname("%s") == "SunOS" then
-  match("bright", "Device")
-  match("bright", "%-%-%-%-%-")
+  match("highlight", "Device")
+  match("highlight", "%-%-%-%-%-")
 else
-  match("bright", "Address")
-  match("bright", "%-")
+  match("highlight", "Address")
+  match("highlight", "%-")
 end
-match("bright", "%b[]")
-match("neutral", "%b<>")
+match("highlight", "%b[]")
+match("lowlight", "%b<>")
 match("highlight", "%b()")

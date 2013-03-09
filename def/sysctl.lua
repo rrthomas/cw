@@ -1,2 +1,2 @@
-match("bright", "^%S+")
+match("highlight", "^%S+")
 match("lowlight", " = ")

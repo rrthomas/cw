@@ -1,8 +1,8 @@
 if not arg["-h"] then
-  match("bright", "%d")
+  match("highlight", "%d")
   match("highlight", "%b[]")
   match("warning", "%b()")
-  match("neutral", "%*")
+  match("lowlight", "%*")
   match("punctuation", "UDP")
   match("punctuation", "TCP")
   match("punctuation", "TPI")

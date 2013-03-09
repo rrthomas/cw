@@ -1,2 +1,2 @@
-match("bright", "%d+: ")
-match("bright", "%b[]")
+match("highlight", "%d+: ")
+match("highlight", "%b[]")

@@ -1,2 +1,2 @@
-match("bright", "%b()")
+match("highlight", "%b()")
 match("lowlight", " on")

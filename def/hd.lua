@@ -1,4 +1,4 @@
 if not arg["--help"] then
-  match("bright", "^[^ ]+")
+  match("highlight", "^[^ ]+")
   match("warning", "|")
 end

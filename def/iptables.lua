@@ -1,5 +1,5 @@
-match("bright", "%d")
-match("bright", "%u")
+match("highlight", "%d")
+match("highlight", "%u")
 match("highlight", "%-")
 match("punctuation", ":")
 match("punctuation", "%.")

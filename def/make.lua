@@ -1,7 +1,7 @@
 -- don't want to color kernel dialog compiling.
 if not arg["menuconfig"] then
   match("highlight", "%*%*%*")
-  match("neutral", "checking")
+  match("lowlight", "checking")
   match("highlight", "warning: ")
   match("error", "error: ")
   match("error", "Error")

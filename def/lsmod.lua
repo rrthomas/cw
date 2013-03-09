@@ -1,8 +1,8 @@
 if not arg["-h"] and not arg["--help"] then
-  match("bright", " %d+ ")
-  match("bright", "%b()")
-  match("bright", "%b[]")
-  match("bright", "Module")
-  match("bright", "Size")
-  match("bright", "Used by")
+  match("highlight", " %d+ ")
+  match("highlight", "%b()")
+  match("highlight", "%b[]")
+  match("highlight", "Module")
+  match("highlight", "Size")
+  match("highlight", "Used by")
 end

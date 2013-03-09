@@ -1,4 +1,4 @@
-match("bright", "%d")
-match("bright", "%-")
+match("highlight", "%d")
+match("highlight", "%-")
 match("punctuation", "%b()")
 match("punctuation", "%b[]")

@@ -1,4 +1,4 @@
-match("neutral", ":")
+match("lowlight", ":")
 match("warning", "%*%*.*")
 match("punctuation", "Username")
-match("bright", "root")
+match("highlight", "root")

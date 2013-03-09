@@ -1,2 +1,2 @@
-match("bright", "root")
-match("bright", "wheel")
+match("highlight", "root")
+match("highlight", "wheel")

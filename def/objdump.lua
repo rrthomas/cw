@@ -1,14 +1,14 @@
 if arg["-s"] then
-  match("bright", "%x+ %x+ %x+ %x+ %x+")
+  match("highlight", "%x+ %x+ %x+ %x+ %x+")
 end
 if arg["-R"] then
-  match("bright", "^%x+[ ]")
-  match("bright", "[ ](_+)[%w_]+$")
+  match("highlight", "^%x+[ ]")
+  match("highlight", "[ ](_+)[%w_]+$")
 end
 if not arg["-s"] and not arg["-R"] then
-  match("bright", "^[ ]*[%w/]+:")
+  match("highlight", "^[ ]*[%w/]+:")
 end
 if #arg > 0 and not arg["--help"] and not arg["-s"] and not arg["-R"] then
-  match("bright", "0x%x+")
-  match("bright", "[<>%(%)%*%+%$%%,%.]")
+  match("highlight", "0x%x+")
+  match("highlight", "[<>%(%)%*%+%$%%,%.]")
 end

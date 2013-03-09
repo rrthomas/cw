@@ -1,4 +1,4 @@
-match("bright", "%b()")
-match("bright", "%b[]")
+match("highlight", "%b()")
+match("highlight", "%b[]")
 match("highlight", "^%a+ +%d+ +[%d:]+ [^ ]+")
-match("neutral", "^%a+ +%d+ +[%d:]+")
+match("lowlight", "^%a+ +%d+ +[%d:]+")

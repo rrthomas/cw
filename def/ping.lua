@@ -1,11 +1,11 @@
 if posix.uname("%s") == "SunOS" then
-  match("bright", "----")
-  match("neutral", "is alive")
+  match("highlight", "----")
+  match("lowlight", "is alive")
 else
-  match("bright", "---")
+  match("highlight", "---")
 end
-match("bright", "%b()")
-match("bright", "%b[]")
+match("highlight", "%b()")
+match("highlight", "%b[]")
 match("lowlight", " from ")
 match("lowlight", "From ")
 match("lowlight", "PING")
