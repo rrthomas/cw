@@ -125,10 +125,10 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     die ("openpty error.")
   end
   local exit = false
-  local pid_c = posix.fork ()
-  if pid_c == nil then
+  local pid = posix.fork ()
+  if pid == nil then
     die ("fork() error.")
-  elseif pid_c == 0 then
+  elseif pid == 0 then
     -- child process to execute the program.
     if not posix.dup2 (slave, posix.STDOUT_FILENO) then
       die ("dup2() failed.")
@@ -145,8 +145,8 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     posix.signal (posix.SIGINT,
                   function ()
                     posix.write (posix.STDOUT_FILENO, "\x1b[00m")
-                    if pid_c ~= 0 then
-                      posix.killpg (pid_c, posix.SIGINT)
+                    if pid ~= 0 then
+                      posix.killpg (pid, posix.SIGINT)
                     end
                     error ("interrupted")
                   end)
@@ -161,7 +161,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
         posix.write (posix.STDOUT_FILENO, apply_colors (lines[i], make_colors (lines[i])) .. "\n")
       end
     until (not chunk or #chunk == 0) and exit == true
-    local _, _, ret = posix.wait (pid_c)
+    local _, _, ret = posix.wait (pid)
     os.exit (ret)
   end
 end
