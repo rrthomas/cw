@@ -154,11 +154,13 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
     -- Take chunks of input, color it line by line, and write the result.
     repeat
       local chunk = posix.read (master, posix.BUFSIZ)
-      buf = buf .. chunk
-      local lines = buf:split ("\r\n")
-      buf = lines[#lines]
-      for i = 1, #lines - 1 do
-        posix.write (posix.STDOUT_FILENO, apply_colors (lines[i], make_colors (lines[i])) .. "\n")
+      if chunk then
+        buf = buf .. chunk
+        local lines = buf:split ("\r\n")
+        buf = lines[#lines]
+        for i = 1, #lines - 1 do
+          posix.write (posix.STDOUT_FILENO, apply_colors (lines[i], make_colors (lines[i])) .. "\n")
+        end
       end
     until (not chunk or #chunk == 0) and exit == true
     local _, _, ret = posix.wait (pid)
