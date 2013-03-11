@@ -53,7 +53,7 @@ See cw(1) (the cw man page) for more information, including details of
 definition scripts.
 
 
-Dedicated colorers
+Alternatives to cw
 ------------------
 
 cw doesn't try to replace some dedicated coloring wrappers and
@@ -62,3 +62,8 @@ programs, such as:
 ccal: for colored calendars
 colorgcc: to color the output of gcc
 colordiff: to color the output of diff
+
+There are also other programs like cw that you may prefer:
+
+Crayonizer: https://sites.google.com/site/columscode/home/crayonizer
+acoc: http://www.caliban.org/ruby/acoc.shtml
