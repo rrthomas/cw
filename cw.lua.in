@@ -102,6 +102,10 @@ end
 local scrname = arg[1]
 local command = posix.basename(scrname or arg[0])
 getopt.processArgs (prog, true)
+arg[0] = nil
+table.remove (arg, 1)
+command_arg = table.clone (arg)
+table.insert (command_arg, 1, command)
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
@@ -112,7 +116,6 @@ setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
 local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 -- Run definition script
-table.remove (arg, 1)
 table.merge (arg, table.invert (arg)) -- add arguments as keys
 local ok, msg = pcall (dofile, scrname)
 if ok == false then
@@ -120,56 +123,37 @@ if ok == false then
 end
 
 if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
-  local master, slave = posix.openpty ()
-  if not master then
-    die ("openpty error.")
-  end
-  local exit = false
-  local pid = posix.fork ()
-  if pid == nil then
-    die ("fork() error.")
-  elseif pid == 0 then
-    -- child process to execute the program.
-    if not posix.dup2 (slave, posix.STDOUT_FILENO) then
-      die ("dup2() failed.")
-    end
-    posix.setpid ('s')
-  else
-    -- parent process to filter the program's output; kills children if interrupted.
-    posix.signal (posix.SIGCHLD,
-                  function ()
-                    posix.fcntl (master, posix.F_SETFL, posix.O_NONBLOCK)
-                    exit = true
-                  end,
-                  posix.SA_NOCLDSTOP)
-    posix.signal (posix.SIGINT,
-                  function ()
+  local orig_pid = posix.getpid ("pid")
+  posix.signal (posix.SIGINT,
+                function ()
+                  local pid = posix.getpid ("pid")
+                  if pid == orig_pid then
                     posix.write (posix.STDOUT_FILENO, "\x1b[00m")
-                    if pid ~= 0 then
-                      posix.killpg (pid, posix.SIGINT)
-                    end
-                    error ("interrupted")
-                  end)
-    local buf = ""
-    -- Take chunks of input, color it line by line, and write the result.
-    repeat
-      local chunk = posix.read (master, posix.BUFSIZ)
-      if chunk then
-        buf = buf .. chunk
-        local lines = buf:split ("\r\n")
-        buf = lines[#lines]
-        for i = 1, #lines - 1 do
-          posix.write (posix.STDOUT_FILENO, apply_colors (lines[i], make_colors (lines[i])) .. "\n")
-        end
-      end
-    until (not chunk or #chunk == 0) and exit == true
-    local _, _, ret = posix.wait (pid)
-    os.exit (ret)
-  end
+                  end
+                  posix.kill (pid, posix.SIGINT)
+                end)
+  -- Take chunks of input, color it line by line, and write the result.
+  posix.pipeline ({command_arg,
+                   -- Take chunks of input, color it line by line, and write the result.
+                   function ()
+                     local function color (s)
+                       posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
+                     end
+                     local buf = ""
+                     local chunk
+                     repeat
+                       chunk = posix.read (posix.STDIN_FILENO, posix.BUFSIZ)
+                       if chunk then
+                         buf = buf .. chunk
+                         local lines = buf:split ("\r\n")
+                         buf = lines[#lines]
+                         lines[#lines] = nil
+                         list.map (color, lines)
+                       end
+                     until not chunk
+                   end},
+                  posix.openpty)
+else -- Run the command without coloring.
+  posix.execp (unpack (command_arg))
+  die ("could not run command: " .. command)
 end
-
--- Run the command, in the child process if we've forked.
-arg[0] = nil
-posix.execp (command, arg)
--- FIXME: turn off coloring for error
-die ("could not run command: " .. command)
