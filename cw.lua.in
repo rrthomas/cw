@@ -25,7 +25,7 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 prog = {
   name = "@PACKAGE@",
   version = "@PACKAGE@ @VERSION@",
-  purpose = "not for direct use (see cw(1))",
+  purpose = "Not for direct use (see cw(1)).",
 }
 
 -- Remove current directory from package.path
