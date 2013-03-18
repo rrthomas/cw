@@ -132,26 +132,18 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
                   end
                   posix.kill (pid, posix.SIGINT)
                 end)
-  posix.pipeline ({command_arg,
-                   -- Take chunks of input, color it line by line, and write the result.
-                   function ()
-                     local function color (s)
-                       posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
-                     end
-                     local buf = ""
-                     local chunk
-                     repeat
-                       chunk = posix.read (posix.STDIN_FILENO, posix.BUFSIZ)
-                       if chunk then
-                         buf = buf .. chunk
-                         local lines = buf:split ("\r\n")
-                         buf = lines[#lines]
-                         lines[#lines] = nil
-                         list.map (color, lines)
-                       end
-                     until not chunk
-                   end},
-                  posix.openpty)
+  -- Take chunks of input, color it line by line, and write the result.
+  local buf = ""
+  for chunk in posix.pipeline_iterator ({command_arg}, posix.openpty) do
+    buf = buf .. chunk
+    local lines = buf:split ("\r\n")
+    buf = lines[#lines]
+    lines[#lines] = nil
+    list.map (function (s)
+                posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
+              end,
+              lines)
+  end
 else -- Run the command without coloring.
   posix.execp (unpack (command_arg))
   die ("could not run command: " .. command)
