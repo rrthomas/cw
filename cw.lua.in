@@ -82,19 +82,19 @@ end
 
 -- Color a string given a coloring array.
 local function apply_colors (s, color)
-  local tbuf = ""
+  local r = ""
   local col -- nil guarantees immediate change of color
   for i = 1, #s do
     if col ~= color[i] then
       col = color[i]
-      tbuf = tbuf .. col
+      r = r .. col
     end
-    tbuf = tbuf .. s[i]
+    r = r .. s[i]
   end
   if col ~= "reset" then
-    tbuf = tbuf .. colors.noReset ("%{reset}")
+    r = r .. colors.noReset ("%{reset}")
   end
-  return tbuf
+  return r
 end
 
 
