@@ -137,8 +137,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   for chunk in posix.pipeline_iterator ({command_arg}, posix.openpty) do
     buf = buf .. chunk
     local lines = buf:split ("\r\n")
-    buf = lines[#lines]
-    lines[#lines] = nil
+    buf = table.remove (lines)
     list.map (function (s)
                 posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
               end,
