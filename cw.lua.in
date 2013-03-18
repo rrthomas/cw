@@ -100,12 +100,15 @@ end
 
 -- Parse command-line arguments
 local scrname = arg[1]
-local command = posix.basename(scrname or arg[0])
 getopt.processArgs (prog, true)
+if not scrname then
+  getopt.usage (prog)
+  os.exit ()
+end
 arg[0] = nil
 table.remove (arg, 1)
 command_arg = table.clone (arg)
-table.insert (command_arg, 1, command)
+table.insert (command_arg, 1, posix.basename (scrname))
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
@@ -145,5 +148,5 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   end
 else -- Run the command without coloring.
   posix.execp (unpack (command_arg))
-  die ("could not run command: " .. command)
+  die ("could not run command: " .. scrname)
 end
