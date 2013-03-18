@@ -132,7 +132,6 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
                   end
                   posix.kill (pid, posix.SIGINT)
                 end)
-  -- Take chunks of input, color it line by line, and write the result.
   posix.pipeline ({command_arg,
                    -- Take chunks of input, color it line by line, and write the result.
                    function ()
