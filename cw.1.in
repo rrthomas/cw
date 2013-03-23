@@ -40,7 +40,7 @@ A list of command-line arguments to the program being colored.
 For convenience, each argument is also a key in the table, so it is easy to test whether a certain argument has been given, in any position, with code such as \fBif arg["\-\-help"] then...\fR
 .SH CLASSES AND COLORS
 .PP
-The default classes are: \fBhighlight, lowlight, warning, error, punctuation, default\fR.
+The default classes are: \fBhighlight, lowlight, warning, error, default\fR.
 The names suggest the sort of text patterns you may want to map to them.
 The mapping of classes to colors can be changed with the \fBCW_COLORS\fR environment variable (see
 .SM

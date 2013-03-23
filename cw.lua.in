@@ -114,8 +114,8 @@ posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"
 
 setcolors ("default=reset") -- Ensure there is a "default" class
 setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
-  "default=black:highlight=bright magenta:lowlight=magenta:warning=bright blue:error=bright red:punctuation=bright green" or
-  "default=white:highlight=bright green:lowlight=green:warning=bright yellow:error=bright red:punctuation=bright blue"))
+  "default=black:highlight=bright magenta:lowlight=magenta:warning=bright blue:error=bright red" or
+  "default=white:highlight=bright green:lowlight=green:warning=bright yellow:error=bright red"))
 local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 -- Run definition script
