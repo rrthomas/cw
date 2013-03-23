@@ -63,12 +63,15 @@ Defines a mapping from classes to colors.
 The format is \fBCW_COLORS=class=color\fR[\fB:class=color...\fR].
 .SH "RECOMMENDATIONS FOR DEFINITION SCRIPTS"
 .PP
-There are two obvious reasons to color commands: first, for aesthetic reasons, and secondly, to make the output more legible. For the first kind, use your imagination! The colorers provided with cw are of the second kind, and the following suggestions aim to help improve presentation:
+There are two obvious reasons to color commands: first, for aesthetic reasons, and secondly, to make the output more legible.
+For the first kind, use your imagination!
+The colorers provided with cw are of the second kind, and the following suggestions aim to help improve presentation:
 .RS
 .PP
 Colors should be used to pick out key information; it is not necessary to color everything.
 .PP
-Many commands' output is already clear, and needs little or no coloring. For example, color just the column headings of tables.
+Many commands' output is already clear, and needs little or no coloring.
+For example, color just the column headings of tables.
 .PP
 When each line is in the same format, but unaligned, color can be helpful to pick out particular fields; for example, the coloring of variable names in the \fBenv\fR colorer.
 .PP
