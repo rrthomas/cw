@@ -68,17 +68,15 @@ There are two obvious reasons to color commands: first, for aesthetic reasons, a
 .PP
 Colors should be used to pick out key information; it is not necessary to color everything.
 .PP
-Some commands present their information very clearly already using spacing (e.g. as a table). A lot of coloring may not improve it; for example, you can color just the column headings of tabular output.
+Many commands' output is already clear, and needs little or no coloring. For example, color just the column headings of tables.
 .PP
 When each line is in the same format, but unaligned, color can be helpful to pick out particular fields; for example, the coloring of variable names in the \fBenv\fR colorer.
 .PP
-Since \fBcw\fR is not recommended for use by privileged users, there is little point writing wrappers for commands that typically require administrator privileges to use.
+Since \fBcw\fR is not recommended for use by privileged users, don't bother point writing wrappers for commands that typically require administrator privileges to use.
 .PP
 Help output (e.g. the output of \fB\-\-help\fR) should not be colored.
 .PP
 Use of the \fBdefault\fR class only makes sense to override the coloring of text that has already been colored by another pattern.
-.PP
-Minimize the number of match rules, for example by using character classes to color individual characters.
 .RE
 .SH "SEE ALSO"
 .BR ccal (1),
