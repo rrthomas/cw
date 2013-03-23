@@ -133,6 +133,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
                   if pid == orig_pid then
                     posix.write (posix.STDOUT_FILENO, "\x1b[00m")
                   end
+                  posix.signal (posix.SIGINT, "SIG_DFL")
                   posix.kill (pid, posix.SIGINT)
                 end)
   -- Take chunks of input, color it line by line, and write the result.
