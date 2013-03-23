@@ -1,5 +1,3 @@
-match("punctuation", ":")
-match("punctuation", "%(")
-match("punctuation", "%)")
-match("punctuation", "/")
-match("punctuation", "[^:]+")
+match("lowlight", "[:/]")
+match("lowlight", "%b()")
+match("highlight", "[^:]+")

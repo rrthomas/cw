@@ -1,7 +1,3 @@
-match("highlight", "%d")
-match("highlight", "%-.")
-match("highlight", "%-")
-match("highlight", "%.")
-match("highlight", ":")
+match("highlight", "%d+%.%d+%.%d+%.%d+")
 match("highlight", "%b[]")
 match("highlight", "%b()")

@@ -1,7 +1,4 @@
-match("highlight", "%d")
-match("highlight", "/")
-match("highlight", ":")
-match("highlight", "%.")
+match("highlight", "[%d/:%.]")
 match("lowlight", "%b()")
 match("lowlight", "%b[]")
 match("highlight", "Filesystem")

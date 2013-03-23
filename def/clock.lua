@@ -1,8 +1,0 @@
-match("highlight", "%d")
-match("punctuation", ":")
-match("lowlight", "/")
-match("punctuation", "%.")
-match("highlight", "%-")
-match("highlight", "_")
-match("highlight", "=")
-match("highlight", "%b[]")

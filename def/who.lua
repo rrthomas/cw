@@ -1,12 +1,10 @@
 if not arg["--help"] then
-  if arg["-"] then
-    match("highlight", " %+ ")
-    match("lowlight", " - ")
-  end
-  match("punctuation", "%b()")
+  match("highlight", " %+ ")
+  match("lowlight", " - ")
+  match("lowlight", "%b()")
   match("highlight", "^%S+")
   match("highlight", "tty%S+")
   match("highlight", "pts%S+")
-  match("punctuation", "LOGIN")
+  match("lowlight", "LOGIN")
   match("warning", "root")
 end

@@ -1,8 +1,4 @@
 match("highlight", "^%s*%d+")
-match("highlight", "%.")
-match("highlight", "%-")
-match("highlight", "%*")
-match("lowlight", "%?")
 match("warning", "root")
 match("highlight", "%b[]")
 match("highlight", "%b()")

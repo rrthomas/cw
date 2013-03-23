@@ -1,16 +1,13 @@
 if arg["-m"] then
-  match("lowlight", "_")
-  match("lowlight", "%-")
+  match("lowlight", "[_%-]")
   match("lowlight", "Cache")
   match("lowlight", "Num")
   match("lowlight", "Total")
   match("lowlight", "Size")
   match("lowlight", "Pages")
-  match("punctuation", " .*")
+  match("lowlight", " .*")
 else
-  match("punctuation", "%d")
-  match("lowlight", "%-")
-  match("lowlight", "%[")
-  match("lowlight", "%]")
+  match("lowlight", "[%-%d]")
+  match("lowlight", "%b[]")
 end
 match("highlight", "%b()")

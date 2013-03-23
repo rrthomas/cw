@@ -1,5 +1,0 @@
-match("warning", "|")
-match("highlight", ">")
-match("highlight", "<")
-match("highlight", "%+")
-match("highlight", "%-")

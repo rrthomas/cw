@@ -1,4 +1,4 @@
--- don't want to color kernel dialog compiling.
+-- Don't color kernel compilation dialogs.
 if not arg["menuconfig"] then
   match("highlight", "%*%*%*")
   match("lowlight", "checking")

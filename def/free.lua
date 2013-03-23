@@ -1,5 +1,4 @@
-match("highlight", "%-")
-match("highlight", "%+")
+match("highlight", "[%-%+]")
 match("highlight", "total")
 match("highlight", "used")
 match("highlight", "free")

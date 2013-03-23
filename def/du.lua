@@ -1,4 +1,3 @@
 if not arg["--help"] then
-  match("highlight", "M")
-  match("highlight", "K")
+  match("highlight", "[MK]")
 end
