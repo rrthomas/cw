@@ -57,9 +57,9 @@ local function setcolors (str)
   end
 end
 
--- Convert a lexical class to a color, defaulting to the color of the base class.
+-- Convert a lexical class to a color, defaulting to the color of the default class.
 local function class_to_color (class)
-  return colormap[class] or colormap["base"]
+  return colormap[class] or colormap["default"]
 end
 
 -- User-visible APIs
@@ -70,7 +70,7 @@ end
 
 -- Create a coloring array for a string.
 local function make_colors (s)
-  local cols = list.rep ({class_to_color ("base")}, #s) -- Fill color array with base color.
+  local cols = list.rep ({class_to_color ("default")}, #s) -- Fill color array with default color.
   for m in matches:elems () do
     for c in list.elems (s:finds (m.regex)) do
       local from, to = unpack (c)
@@ -112,10 +112,10 @@ table.insert (command_arg, 1, posix.basename (scrname))
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
-setcolors ("base=reset") -- Ensure there is a "base" class
+setcolors ("default=reset") -- Ensure there is a "default" class
 setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
-  "base=black:highlight=bright magenta:lowlight=magenta:warning=bright blue:error=bright red:punctuation=bright green" or
-  "base=white:highlight=bright green:lowlight=green:warning=bright yellow:error=bright red:punctuation=bright blue"))
+  "default=black:highlight=bright magenta:lowlight=magenta:warning=bright blue:error=bright red:punctuation=bright green" or
+  "default=white:highlight=bright green:lowlight=green:warning=bright yellow:error=bright red:punctuation=bright blue"))
 local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 -- Run definition script
