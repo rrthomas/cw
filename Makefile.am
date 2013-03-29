@@ -19,10 +19,10 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-bin_SCRIPTS = cw script/*
+bin_SCRIPTS = cw $(top_srcdir)/script/*
 man_MANS = $(PACKAGE).1
 
-EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in
+EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in $(bin_SCRIPTS)
 DISTCLEANFILES = $(man_MANS)
 
 pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
