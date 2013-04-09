@@ -13,8 +13,7 @@ local default = {
   },
   description = {
     summary = "Colorer for command-line programs",
-    detailed = [[
-      cw is a colorer for command-line programs.  It is designed to simulate
+    detailed = [[cw is a colorer for command-line programs.  It is designed to simulate
       the environment of the commands being executed, so that when you type
       'du', 'df', 'ping', etc. in your shell the output is automatically
       colored according to a definition script.  You can easily change
