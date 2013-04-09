@@ -70,9 +70,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/cw.lua.in \
-	$(srcdir)/luarocks-config.lua.in $(top_srcdir)/configure \
-	AUTHORS COPYING NEWS TODO install-sh missing
+	$(srcdir)/Makefile.in $(srcdir)/cw-definitions-path.lua.in \
+	$(srcdir)/cw.lua.in $(srcdir)/luarocks-config.lua.in \
+	$(top_srcdir)/configure AUTHORS COPYING NEWS TODO install-sh \
+	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_lua.m4 \
 	$(top_srcdir)/configure.ac
@@ -81,7 +82,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES = luarocks-config.lua cw.lua
+CONFIG_CLEAN_FILES = luarocks-config.lua cw.lua \
+	cw-definitions-path.lua
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -228,7 +230,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-bin_SCRIPTS = cw $(top_srcdir)/script/*
+bin_SCRIPTS = cw cw-definitions-path $(top_srcdir)/script/*
 man_MANS = $(PACKAGE).1
 EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in $(bin_SCRIPTS)
 DISTCLEANFILES = $(man_MANS)
@@ -276,6 +278,8 @@ $(am__aclocal_m4_deps):
 luarocks-config.lua: $(top_builddir)/config.status $(srcdir)/luarocks-config.lua.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 cw.lua: $(top_builddir)/config.status $(srcdir)/cw.lua.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+cw-definitions-path.lua: $(top_builddir)/config.status $(srcdir)/cw-definitions-path.lua.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
@@ -713,13 +717,20 @@ $(top_builddir)/$(PACKAGE): $(PACKAGE).lua Makefile
 	chmod +x $@
 	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
 
+$(top_builddir)/$(PACKAGE)-definitions-path: $(PACKAGE)-definitions-path.lua Makefile
+	rm -f $@ $@.tmp
+	$(edit) '$@.lua' >$@.tmp
+	mv $@.tmp $@
+	chmod +x $@
+	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
+
 $(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.am config.status
 	rm -f $@ $@.tmp
 	$(edit) $(srcdir)/$(PACKAGE).1.in >$@.tmp
 	mv $@.tmp $@
 
 clean-local:
-	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE)
+	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path
 
 rockspecs:
 	rm -f *.rockspec
