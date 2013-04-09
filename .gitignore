@@ -9,6 +9,8 @@ Makefile
 /config.status
 /cw
 /cw.lua
+/cw-definitions-path
+/cw-definitions-path.lua
 /cw.1
 /cw-*.tar.gz
 /install-sh

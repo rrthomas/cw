@@ -19,7 +19,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-bin_SCRIPTS = cw $(top_srcdir)/script/*
+bin_SCRIPTS = cw cw-definitions-path $(top_srcdir)/script/*
 man_MANS = $(PACKAGE).1
 
 EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in $(bin_SCRIPTS)
@@ -42,13 +42,20 @@ $(top_builddir)/$(PACKAGE): $(PACKAGE).lua Makefile
 	chmod +x $@
 	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
 
+$(top_builddir)/$(PACKAGE)-definitions-path: $(PACKAGE)-definitions-path.lua Makefile
+	rm -f $@ $@.tmp
+	$(edit) '$@.lua' >$@.tmp
+	mv $@.tmp $@
+	chmod +x $@
+	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
+
 $(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.am config.status
 	rm -f $@ $@.tmp
 	$(edit) $(srcdir)/$(PACKAGE).1.in >$@.tmp
 	mv $@.tmp $@
 
 clean-local:
-	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE)
+	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path
 
 rockspecs:
 	rm -f *.rockspec
