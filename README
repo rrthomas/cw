@@ -62,6 +62,7 @@ programs, such as:
 ccal: for colored calendars
 colorgcc: to color the output of gcc
 colordiff: to color the output of diff
+colormake: to color the output of make
 
 There are also other programs like cw that you may prefer:
 
