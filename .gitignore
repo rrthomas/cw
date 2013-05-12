@@ -14,7 +14,9 @@ Makefile
 /cw.1
 /cw-*.tar.gz
 /install-sh
+/luarocks
 /luarocks-config.lua
 /missing
 /Makefile.in
+/release-notes
 /TAGS
