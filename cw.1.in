@@ -88,7 +88,7 @@ Use of the \fBdefault\fR class only makes sense to override the coloring of text
 .SH "AUTHOR"
 Written by v9/fakehalo <v9@fakehalo.us> and Reuben Thomas <rrt@sc3d.org>
 .SH "BUGS"
-Report bugs to <v9@fakehalo.us>.
+Report bugs to <rrt@sc3d.org>.
 .SH "COPYRIGHT"
 Copyright \(co 2004\(en2010 v9/fakehalo, and \(co 2013 Reuben Thomas.
 License GPLv3+:
