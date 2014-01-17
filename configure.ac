@@ -1,6 +1,6 @@
 dnl configure.ac
 dnl
-dnl Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
+dnl Copyright (c) 2013-2014 Reuben Thomas <rrt@sc3d.org>
 dnl
 dnl This file is part of cw.
 dnl
@@ -19,7 +19,7 @@ dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 dnl Initialise autoconf and automake
 AC_INIT([cw], [2.0.1], [rrt@sc3d.org])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 dnl Checks for programs
