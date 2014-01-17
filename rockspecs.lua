@@ -2,7 +2,7 @@
 
 -- Variables to be interpolated:
 --
--- package
+-- package_name
 -- version
 
 local default = {
