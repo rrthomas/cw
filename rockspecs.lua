@@ -39,7 +39,7 @@ local default = {
 if version ~= "git" then
   default.source.branch = "release-v"..version
 else
-  default.build.build_command = "./bootstrap && " .. default.build.build_command
+  default.build.build_command = "autoreconf -i && " .. default.build.build_command
   table.insert (default.dependencies, "ldoc")
 end
 
