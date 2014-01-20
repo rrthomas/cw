@@ -1,6 +1,6 @@
 # Top-level Makefile.am
 #
-# Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
+# Copyright (c) 2013-2014 Reuben Thomas <rrt@sc3d.org>
 #
 # This file is part of cw.
 #
@@ -67,17 +67,7 @@ tag-release:
 	git tag -a -m "Release tag" v$(VERSION) && \
 	git push && git push --tags
 
-check-in-release: distcheck
-	cd ../$(PACKAGE)-release && \
-	tar zxf ../$(PACKAGE)/$(PACKAGE)-$(VERSION).tar.gz && \
-	cp -af $(PACKAGE)-$(VERSION)/* . && \
-	rm -rf $(PACKAGE)-$(VERSION)/ && \
-	git add . && git ci -m "Release v$(VERSION)" && \
-	git tag -a -m "Full source release tag" release-v$(VERSION) && \
-	git push && git push --tags
-
 release: rockspecs
 	$(MAKE) tag-release && \
-	$(MAKE) check-in-release && \
 	LUAROCKS_CONFIG=$(abs_srcdir)/luarocks-config.lua luarocks --tree=$(abs_srcdir)/luarocks build $(PACKAGE)-$(VERSION)-1.rockspec && \
 	woger luarocks package=$(PACKAGE) package_name=$(PACKAGE_NAME) version=$(VERSION)

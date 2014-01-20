@@ -27,20 +27,18 @@ local default = {
     "stdlib >= 37",
     "luaposix >= 5.1.28",
     "ansicolors >= 1.0.2",
+    "ldoc",
   },
   build = {
     type = "command",
-    build_command = "LUA=$(LUA) ./configure --prefix=$(PREFIX) --libdir=$(LIBDIR) --datadir=$(LUADIR) && make clean && make",
+    build_command = "LUA=$(LUA) autoreconf -i && ./configure --prefix=$(PREFIX) --libdir=$(LIBDIR) --datadir=$(LUADIR) && make clean && make",
     install_command = "make install",
     copy_directories = {},
   },
 }
 
 if version ~= "git" then
-  default.source.branch = "release-v"..version
-else
-  default.build.build_command = "autoreconf -i && " .. default.build.build_command
-  table.insert (default.dependencies, "ldoc")
+  default.source.branch = "v"..version
 end
 
 return {default=default, [""]={}}
