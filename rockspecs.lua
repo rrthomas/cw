@@ -23,8 +23,8 @@ local default = {
     license = "GPL",
   },
   dependencies = {
-    "lua >= 5.1",
-    "stdlib >= 34",
+    "lua >= 5.2",
+    "stdlib >= 37",
     "luaposix >= 5.1.28",
     "ansicolors >= 1.0.2",
   },

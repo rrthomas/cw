@@ -22,11 +22,18 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 -- <http://www.gnu.org/licenses/>. */
 
 
-prog = {
-  name = "@PACKAGE@",
-  version = "@PACKAGE@ @VERSION@",
-  purpose = "Not for direct use (see cw(1)).",
-}
+spec = [[
+@PACKAGE@ @VERSION@
+
+Usage: cw [OPTION]... [FILE]...
+
+Not for direct use (see cw(1)).
+
+Options:
+
+      --help               display this help, then exit
+      --version            display version information, then exit
+]]
 
 -- Remove current directory from package.path
 package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
@@ -100,10 +107,11 @@ end
 
 -- Parse command-line arguments
 local scrname = arg[1]
-getopt.processArgs (prog, true)
+local OptionParser = require "std.optparse"
+local parser = OptionParser (spec)
+_G.arg, opts = parser:parse (_G.arg)
 if not scrname then
-  getopt.usage (prog)
-  os.exit ()
+  parser:help ()
 end
 arg[0] = nil
 table.remove (arg, 1)
