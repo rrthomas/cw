@@ -59,10 +59,11 @@ Alternatives to cw
 cw doesn't try to replace some dedicated coloring wrappers and
 programs, such as:
 
-ccal: for colored calendars
-colorgcc: to color the output of gcc
-colordiff: to color the output of diff
-colormake: to color the output of make
+ccal: http://unicorn.us.com/cal.html
+colorgcc: http://schlueters.de/colorgcc.html
+colordiff: http://www.colordiff.org/
+colormake: https://github.com/pagekite/Colormake
+freecolor: http://www.rkeene.org/oss/freecolor/
 
 There are also other programs like cw that you may prefer:
 
