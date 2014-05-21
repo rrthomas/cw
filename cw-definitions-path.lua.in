@@ -24,10 +24,10 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 -- along with cw; see the file COPYING.  If not, see
 -- <http://www.gnu.org/licenses/>. */
 
-require "std"
+local std = require "std".barrel ()
 local posix = require "posix"
 
-local s = string.chomp (posix.pipeline_slurp ({"luarocks list cw", "grep '(installed)'"}))
+local s = std.string.chomp (posix.pipeline_slurp ({"luarocks list cw", "grep '(installed)'"}))
 if s ~= "" then -- If installed with LuaRocks, use that path
   local version, path = s:match ("(%S+) %(installed%) %- (.*)$")
   io.write (path .. "/@PACKAGE@/" .. version .. "/libexec/@PACKAGE@")

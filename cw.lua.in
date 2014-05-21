@@ -38,21 +38,21 @@ Options:
 -- Remove current directory from package.path
 package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
 
-require "std"
+local std = require "std".monkey_patch ()
 local posix = require "posix"
 local colors = require "ansicolors"
 
 -- Filter a directory out of a PATH-like colon-separated path list.
 local function remove_dir_from_path(path, dir)
   local canon_dir = posix.realpath (dir)
-  return table.concat (list.filter (function (s) return posix.realpath (s) ~= canon_dir end,
+  return std.table.concat (std.list.filter (function (s) return posix.realpath (s) ~= canon_dir end,
                                     path:split (":")), ":")
 end
 
 -- Type to color map.
 local colormap = {}
 local function setcolors (str)
-  for ass in list.elems (str:split (":")) do
+  for ass in std.list.elems (str:split (":")) do
     local class, col = unpack (ass:split ("="))
     if not class or #class == 0 then
       die ("class missing.")
@@ -70,18 +70,18 @@ local function class_to_color (class)
 end
 
 -- User-visible APIs
-local matches = list.new ()
+local matches = std.list {}
 function match (class, regex)
-  table.insert (matches, {col = class_to_color (class), regex = regex})
+  std.table.insert (matches, {col = class_to_color (class), regex = regex})
 end
 
 -- Create a coloring array for a string.
 local function make_colors (s)
-  local cols = list.rep ({class_to_color ("default")}, #s) -- Fill color array with default color.
+  local cols = std.list.rep ({class_to_color ("default")}, #s) -- Fill color array with default color.
   for m in matches:elems () do
-    for c in list.elems (s:finds (m.regex)) do
+    for c in std.list.elems (s:finds (m.regex)) do
       local from, to = unpack (c)
-      cols = cols:sub (1, from - 1) .. list.rep ({m.col}, to - from + 1) .. cols:sub (to + 1)
+      cols = cols:sub (1, from - 1) .. std.list.rep ({m.col}, to - from + 1) .. cols:sub (to + 1)
     end
   end
  return cols
@@ -114,9 +114,9 @@ if not scrname then
   parser:help ()
 end
 arg[0] = nil
-table.remove (arg, 1)
-command_arg = table.clone (arg)
-table.insert (command_arg, 1, posix.basename (scrname))
+std.table.remove (arg, 1)
+command_arg = std.table.clone (arg)
+std.table.insert (command_arg, 1, posix.basename (scrname))
 
 posix.setenv ("PATH", remove_dir_from_path (os.getenv("PATH"), "@pkglibexecdir@"))
 
@@ -127,7 +127,7 @@ setcolors (os.getenv ("CW_COLORS") or (os.getenv ("CW_INVERT") and
 local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCOLOR before definition script
 
 -- Run definition script
-table.merge (arg, table.invert (arg)) -- add arguments as keys
+std.table.merge (arg, std.table.invert (arg)) -- add arguments as keys
 local ok, msg = pcall (dofile, scrname)
 if ok == false then
   die ("error in definition file: " .. msg)
@@ -149,11 +149,11 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   for chunk in posix.pipeline_iterator ({command_arg}, posix.openpty) do
     buf = buf .. chunk
     local lines = buf:split ("\r\n")
-    buf = table.remove (lines)
-    list.map (function (s)
-                posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
-              end,
-              lines)
+    buf = std.table.remove (lines)
+    std.list.map (function (s)
+                    posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
+                  end,
+                  lines)
   end
 else -- Run the command without coloring.
   posix.execp (unpack (command_arg))
