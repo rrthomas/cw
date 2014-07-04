@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 dnl Initialise autoconf and automake
-AC_INIT([cw], [2.0.2], [rrt@sc3d.org])
+AC_INIT([cw], [2.0.3], [rrt@sc3d.org])
 AM_INIT_AUTOMAKE([-Wall foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
