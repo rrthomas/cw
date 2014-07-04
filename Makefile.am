@@ -70,4 +70,4 @@ tag-release:
 release: rockspecs
 	$(MAKE) tag-release && \
 	LUAROCKS_CONFIG=$(abs_srcdir)/luarocks-config.lua luarocks --tree=$(abs_srcdir)/luarocks build $(PACKAGE)-$(VERSION)-1.rockspec && \
-	woger luarocks package=$(PACKAGE) package_name=$(PACKAGE_NAME) version=$(VERSION)
+	woger moonrocks package=$(PACKAGE) version=$(VERSION)
