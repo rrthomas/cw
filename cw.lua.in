@@ -3,7 +3,7 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 --
 -- cw (color wrapper)
 --
--- Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
+-- Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
 --
 -- This file is part of cw.
 --
@@ -38,27 +38,29 @@ Options:
 -- Remove current directory from package.path
 package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
 
-local std = require "std".monkey_patch ()
+local std = require "std"
+local string = require "std.string"
 local posix = require "posix"
 local colors = require "ansicolors"
 
 -- Filter a directory out of a PATH-like colon-separated path list.
 local function remove_dir_from_path(path, dir)
   local canon_dir = posix.realpath (dir)
-  return std.table.concat (std.list.filter (function (s) return posix.realpath (s) ~= canon_dir end,
-                                    path:split (":")), ":")
+  return std.table.concat (std.functional.filter (function (s) return posix.realpath (s) ~= canon_dir end,
+                                                  std.ielems,
+                                                  string.split (path, ":")), ":")
 end
 
 -- Type to color map.
 local colormap = {}
 local function setcolors (str)
-  for ass in std.list.elems (str:split (":")) do
-    local class, col = unpack (ass:split ("="))
+  for ass in std.ielems (string.split (str, ":")) do
+    local class, col = unpack (string.split (ass, "="))
     if not class or #class == 0 then
-      die ("class missing.")
+      std.io.die ("class missing.")
     end
     if not col or #col == 0 then
-      die ("color missing.")
+      std.io.die ("color missing.")
     end
     colormap[class] = colors.noReset ("%{reset " .. col .. "}")
   end
@@ -77,11 +79,11 @@ end
 
 -- Create a coloring array for a string.
 local function make_colors (s)
-  local cols = std.list.rep ({class_to_color ("default")}, #s) -- Fill color array with default color.
-  for m in matches:elems () do
-    for c in std.list.elems (s:finds (m.regex)) do
+  local cols = std.list.rep (std.list {class_to_color ("default")}, #s) -- Fill color array with default color.
+  for m in std.ielems (matches) do
+    for c in std.ielems (string.finds (s, m.regex)) do
       local from, to = unpack (c)
-      cols = cols:sub (1, from - 1) .. std.list.rep ({m.col}, to - from + 1) .. cols:sub (to + 1)
+      cols = cols:sub (1, from - 1) .. std.list.rep (std.list {m.col}, to - from + 1) .. cols:sub (to + 1)
     end
   end
  return cols
@@ -96,7 +98,7 @@ local function apply_colors (s, color)
       col = color[i]
       r = r .. col
     end
-    r = r .. s[i]
+    r = r .. s:sub (i, i)
   end
   if col ~= "reset" then
     r = r .. colors.noReset ("%{reset}")
@@ -130,7 +132,7 @@ local nocolor = os.getenv("NOCOLOR") or os.getenv("TERM") == "dumb" -- read NOCO
 std.table.merge (arg, std.table.invert (arg)) -- add arguments as keys
 local ok, msg = pcall (dofile, scrname)
 if ok == false then
-  die ("error in definition file: " .. msg)
+  std.io.die ("error in definition file: " .. msg)
 end
 
 if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
@@ -148,14 +150,13 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   local buf = ""
   for chunk in posix.pipeline_iterator ({command_arg}, posix.openpty) do
     buf = buf .. chunk
-    local lines = buf:split ("\r\n")
+    local lines = string.split (buf, "\r\n")
     buf = std.table.remove (lines)
-    std.list.map (function (s)
-                    posix.write (posix.STDOUT_FILENO, apply_colors (s, make_colors (s)) .. "\n")
-                  end,
-                  lines)
+    for l in std.ielems (lines) do
+      posix.write (posix.STDOUT_FILENO, apply_colors (l, make_colors (l)) .. "\n")
+    end
   end
 else -- Run the command without coloring.
   posix.execp (unpack (command_arg))
-  die ("could not run command: " .. scrname)
+  std.io.die ("could not run command: " .. scrname)
 end

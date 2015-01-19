@@ -24,7 +24,7 @@ local default = {
   },
   dependencies = {
     "lua >= 5.2",
-    "stdlib >= 40",
+    "stdlib >= 41",
     "luaposix >= 5.1.28",
     "ansicolors >= 1.0.2",
     "ldoc",
