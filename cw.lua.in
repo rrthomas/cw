@@ -40,7 +40,7 @@ package.path = package.path:gsub (";%./%?%.lua", ""):gsub ("^%./%?%.lua;", "")
 
 local std = require "std"
 local string = require "std.string"
-local posix = require "posix"
+posix = require "posix" -- make visible to definitions
 local colors = require "ansicolors"
 
 -- Filter a directory out of a PATH-like colon-separated path list.
