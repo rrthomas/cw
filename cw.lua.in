@@ -163,7 +163,8 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
       posix.write (posix.STDOUT_FILENO, apply_colors (l, make_colors (l)) .. "\n")
     end
   end
-  posix.pclose (pfd)
+  local _, ret = posix.pclose (pfd)
+  os.exit (ret)
 else -- Run the command without coloring.
   posix.execp (unpack (command_arg))
   std.io.die ("could not run command: " .. scrname)
