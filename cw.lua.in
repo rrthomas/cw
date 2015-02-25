@@ -148,7 +148,14 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
                 end)
   -- Take chunks of input, color it line by line, and write the result.
   local buf = ""
-  for chunk in posix.pipeline_iterator ({command_arg}, posix.openpty) do
+  local pfd = posix.popen (command_arg, "r", posix.openpty)
+  -- It seems obvious to use io.lines on fdopen (pfd.fd), but a pty returns
+  -- EIO to read when the slave end is closed. Wrapping the loop in pcall
+  -- would suppress errors in the coloring code, so instead we slurp the fd
+  -- directly and catch errors from read.
+  while true do
+    local chunk = posix.read (pfd.fd, posix.BUFSIZ)
+    if not chunk or #chunk == 0 then break end
     buf = buf .. chunk
     local lines = string.split (buf, "\r\n")
     buf = std.table.remove (lines)
@@ -156,6 +163,7 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
       posix.write (posix.STDOUT_FILENO, apply_colors (l, make_colors (l)) .. "\n")
     end
   end
+  posix.pclose (pfd)
 else -- Run the command without coloring.
   posix.execp (unpack (command_arg))
   std.io.die ("could not run command: " .. scrname)
