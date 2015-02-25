@@ -91,19 +91,19 @@ end
 
 -- Color a string given a coloring array.
 local function apply_colors (s, color)
-  local r = ""
+  local r = {}
   local col -- nil guarantees immediate change of color
   for i = 1, #s do
     if col ~= color[i] then
       col = color[i]
-      r = r .. col
+      table.insert (r, col)
     end
-    r = r .. s:sub (i, i)
+    table.insert (r, s:sub (i, i))
   end
   if col ~= "reset" then
-    r = r .. colors.noReset ("%{reset}")
+    table.insert (r, colors.noReset ("%{reset}"))
   end
-  return r
+  return table.concat (r)
 end
 
 
