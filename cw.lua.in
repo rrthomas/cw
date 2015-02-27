@@ -55,7 +55,7 @@ end
 local colormap = {}
 local function setcolors (str)
   for ass in std.ielems (string.split (str, ":")) do
-    local class, col = unpack (string.split (ass, "="))
+    local class, col = table.unpack (string.split (ass, "="))
     if not class or #class == 0 then
       std.io.die ("class missing.")
     end
@@ -82,7 +82,7 @@ local function make_colors (s)
   local cols = std.list.rep (std.list {class_to_color ("default")}, #s) -- Fill color array with default color.
   for m in std.ielems (matches) do
     for c in std.ielems (string.finds (s, m.regex)) do
-      local from, to = unpack (c)
+      local from, to = table.unpack (c)
       cols = cols:sub (1, from - 1) .. std.list.rep (std.list {m.col}, to - from + 1) .. cols:sub (to + 1)
     end
   end
@@ -166,6 +166,6 @@ if not nocolor and posix.isatty (posix.STDOUT_FILENO) == 1 then
   local _, ret = posix.pclose (pfd)
   os.exit (ret)
 else -- Run the command without coloring.
-  posix.execp (unpack (command_arg))
+  posix.execp (table.unpack (command_arg))
   std.io.die ("could not run command: " .. scrname)
 end
