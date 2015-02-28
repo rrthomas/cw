@@ -6,7 +6,7 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 -- Output the path to the cw definitions files, to use in setting
 -- PATH.
 --
--- Copyright (c) 2013 Reuben Thomas <rrt@sc3d.org>
+-- Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
 --
 -- This file is part of cw.
 --
@@ -27,7 +27,10 @@ A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
 local std = require "std".barrel ()
 local posix = require "posix"
 
-local s = std.string.chomp (posix.pipeline_slurp ({"luarocks list cw", "grep '(installed)'"}))
+local pfd = posix.popen_pipeline ({{"luarocks", "list", "cw"}, {"grep", "(installed)"}}, "r")
+local h = posix.fdopen (pfd.fd, "r")
+local s = std.string.chomp (h:read ("*a"))
+posix.pclose (pfd)
 if s ~= "" then -- If installed with LuaRocks, use that path
   local version, path = s:match ("(%S+) %(installed%) %- (.*)$")
   io.write (path .. "/@PACKAGE@/" .. version .. "/libexec/@PACKAGE@")
