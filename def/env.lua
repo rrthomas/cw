@@ -1,3 +1,3 @@
-if not arg["--help"] then
+if #arg == 0 then
   match("highlight", "^[^=]+")
 end
