@@ -13,6 +13,7 @@ Makefile
 /cw-definitions-path.lua
 /cw.1
 /cw-*.tar.gz
+/cw-*.src.rock
 /install-sh
 /luarocks
 /luarocks-config.lua
