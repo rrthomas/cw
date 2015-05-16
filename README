@@ -29,8 +29,9 @@ http://www.luarocks.org/ :
 
   luarocks install cw
 
-Or, you can use the GNU autotools build system directly: from a git
-checkout:
+Or, you can use the GNU autotools build system directly. This requires the
+stdlib and luaposix libraries (`luarocks install stdlib luaposix`)
+From a git checkout:
 
   autoreconf -i && ./configure && make
 
