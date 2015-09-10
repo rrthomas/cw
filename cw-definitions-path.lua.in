@@ -1,6 +1,4 @@
-#!/bin/sh
-A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
---
+#!@LUA@
 -- cw-definitions-path
 --
 -- Output the path to the cw definitions files, to use in setting

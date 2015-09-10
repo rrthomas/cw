@@ -1,6 +1,4 @@
-#!/bin/sh
-A=--[[ exec @LUA@ "$0" "$@"  # -*- mode: lua; -*- ]]A
---
+#!@LUA@
 -- cw (color wrapper)
 --
 -- Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
