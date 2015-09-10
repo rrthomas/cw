@@ -24,18 +24,11 @@ at your option, any later version.
 Installation
 ------------
 
-It is recommended to install cw using LuaRocks from
-http://www.luarocks.org/ :
+Install cw using LuaRocks from http://www.luarocks.org/ :
 
   luarocks install cw
 
 Note: you must already have automake installed.
-
-Or, you can use the GNU autotools build system directly. This requires the
-stdlib and luaposix libraries (`luarocks install stdlib luaposix`)
-From a git checkout:
-
-  autoreconf -i && ./configure && make
 
 To use cw, you need to prepend its definition directory to the PATH
 environment variable.  You should do this in your shell's interactive

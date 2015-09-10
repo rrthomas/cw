@@ -28,10 +28,7 @@ local posix = require "posix"
 local pfd = posix.popen_pipeline ({{"luarocks", "list", "cw"}, {"grep", "(installed)"}}, "r")
 local h = posix.fdopen (pfd.fd, "r")
 local s = std.string.chomp (h:read ("*a"))
+assert (s ~= "") -- FIXME: Give a better error message if we appear not to be installed
 posix.pclose (pfd)
-if s ~= "" then -- If installed with LuaRocks, use that path
-  local version, path = s:match ("(%S+) %(installed%) %- (.*)$")
-  io.write (path .. "/@PACKAGE@/" .. version .. "/libexec/@PACKAGE@")
-else -- Otherwise assume "make install" was used
-  io.write ("@pkglibexecdir@")
-end
+local version, path = s:match ("(%S+) %(installed%) %- (.*)$")
+io.write (path .. "/@PACKAGE@/" .. version .. "/libexec/@PACKAGE@")
