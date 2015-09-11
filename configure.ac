@@ -22,9 +22,7 @@ AC_INIT([cw], [2.0.5], [rrt@sc3d.org])
 AM_INIT_AUTOMAKE([-Wall foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-dnl Checks for programs
-AX_PROG_LUA
-
 dnl Generate output
+AC_SUBST([LUA])
 AC_CONFIG_FILES([Makefile luarocks-config.lua cw.lua cw-definitions-path.lua])
 AC_OUTPUT
