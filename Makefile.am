@@ -1,6 +1,6 @@
 # Top-level Makefile.am
 #
-# Copyright (c) 2013-2014 Reuben Thomas <rrt@sc3d.org>
+# Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
 #
 # This file is part of cw.
 #
