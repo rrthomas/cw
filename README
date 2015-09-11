@@ -28,7 +28,7 @@ Install cw using LuaRocks from http://www.luarocks.org/ :
 
   luarocks install cw
 
-Note: you must already have automake installed.
+Note: you must already have autoconf installed.
 
 To use cw, you need to prepend its definition directory to the PATH
 environment variable.  You should do this in your shell's interactive

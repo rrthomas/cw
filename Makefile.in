@@ -1,4 +1,4 @@
-# Top-level Makefile.am
+# Top-level Makefile.in
 #
 # Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
 #
@@ -17,13 +17,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+PACKAGE=@PACKAGE_NAME@
+VERSION=@PACKAGE_VERSION@
+
+LUA=@LUA@
+MKDIR_P=@MKDIR_P@
+INSTALL=@INSTALL@
+INSTALL_SCRIPT=@INSTALL_SCRIPT@
+INSTALL_DATA=@INSTALL_DATA@
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+abs_srcdir=@abs_srcdir@
+top_srcdir=@top_srcdir@
+srcdir=@srcdir@
+top_builddir=@top_builddir@
+bindir=@bindir@
+mandir=@mandir@
+pkglibexecdir=@libexecdir@/$(PACKAGE)
+
 bin_SCRIPTS = cw cw-definitions-path $(top_srcdir)/script/*
 man_MANS = $(PACKAGE).1
-
-EXTRA_DIST = $(srcdir)/def/*.lua $(PACKAGE).1.in $(bin_SCRIPTS)
-DISTCLEANFILES = $(man_MANS)
-
 pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
+
+all: $(bin_SCRIPTS) $(man_MANS) $(pkglibexec_SCRIPTS)
+
 $(pkglibexec_SCRIPTS): config.status
 
 %: %.lua
@@ -47,12 +65,20 @@ $(top_builddir)/$(PACKAGE)-definitions-path: $(PACKAGE)-definitions-path.lua Mak
 	chmod +x $@
 	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ && false )
 
-$(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.am config.status
+$(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.in config.status
 	rm -f $@ $@.tmp
 	$(edit) $(srcdir)/$(PACKAGE).1.in >$@.tmp
 	mv $@.tmp $@
 
-clean-local:
+install:
+	$(MKDIR_P) $(bindir)
+	$(MKDIR_P) $(pkglibexecdir)
+	$(MKDIR_P) $(mandir)/man1
+	$(INSTALL_SCRIPT) $(pkglibexec_SCRIPTS) $(pkglibexecdir)
+	$(INSTALL_SCRIPT) $(bin_SCRIPTS) $(bindir)
+	$(INSTALL_DATA) $(man_MANS) $(mandir)/man1
+
+clean:
 	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path
 
 rockspecs:

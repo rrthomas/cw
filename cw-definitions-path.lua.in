@@ -31,4 +31,4 @@ local s = std.string.chomp (h:read ("*a"))
 assert (s ~= "") -- FIXME: Give a better error message if we appear not to be installed
 posix.pclose (pfd)
 local version, path = s:match ("(%S+) %(installed%) %- (.*)$")
-io.write (path .. "/@PACKAGE@/" .. version .. "/libexec/@PACKAGE@")
+io.write (path .. "/@PACKAGE_NAME@/" .. version .. "/libexec/@PACKAGE_NAME@")

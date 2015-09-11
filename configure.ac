@@ -17,10 +17,14 @@ dnl
 dnl You should have received a copy of the GNU General Public License
 dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-dnl Initialise autoconf and automake
+dnl Initialise autoconf
 AC_INIT([cw], [2.0.5], [rrt@sc3d.org])
-AM_INIT_AUTOMAKE([-Wall foreign])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AC_SUBST([PACKAGE_NAME])
+AC_SUBST([PACKAGE_VERSION])
+
+dnl Programs
+AC_PROG_MKDIR_P
+AC_PROG_INSTALL
 
 dnl Generate output
 AC_SUBST([LUA])
