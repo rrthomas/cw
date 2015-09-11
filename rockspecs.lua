@@ -30,9 +30,8 @@ local default = {
     "ldoc",
   },
   build = {
-    type = "command",
-    build_command = "make LUA=$(LUA) prefix=$(PREFIX) all",
-    install_command = "make LUA=$(LUA) prefix=$(PREFIX) install",
+    type = "make",
+    variables = { LUA = "$(LUA)", prefix = "$(PREFIX)" },
     copy_directories = {},
   },
 }
