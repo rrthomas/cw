@@ -1,5 +1,5 @@
 #!@LUA@
--- cw (color wrapper)
+-- cw (color wrapper) -*- lua -*-
 --
 -- Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
 --
@@ -21,7 +21,7 @@
 
 
 spec = [[
-@PACKAGE_NAME@ @PACKAGE_VERSION@
+@PACKAGE@ @VERSION@
 
 Usage: cw [OPTION]... [FILE]...
 
