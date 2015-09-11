@@ -19,14 +19,8 @@ dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 dnl Initialise autoconf
 AC_INIT([cw], [2.0.5], [rrt@sc3d.org])
-AC_SUBST([PACKAGE_NAME])
-AC_SUBST([PACKAGE_VERSION])
-
-dnl Programs
-AC_PROG_MKDIR_P
-AC_PROG_INSTALL
 
 dnl Generate output
 AC_SUBST([LUA])
-AC_CONFIG_FILES([Makefile luarocks-config.lua cw.lua cw-definitions-path.lua])
+AC_CONFIG_FILES([luarocks-config.lua cw.lua cw-definitions-path.lua])
 AC_OUTPUT

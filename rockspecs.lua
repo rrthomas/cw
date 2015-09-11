@@ -31,8 +31,8 @@ local default = {
   },
   build = {
     type = "command",
-    build_command = "autoreconf -i && LUA=$(LUA) ./configure --prefix=$(PREFIX) --libdir=$(LIBDIR) --datadir=$(LUADIR) && make clean && make",
-    install_command = "make install",
+    build_command = "autoreconf -i && LUA=$(LUA) ./configure --prefix=$(PREFIX) --libdir=$(LIBDIR) --datadir=$(LUADIR) && make LUA=$(LUA) prefix=$(PREFIX) clean all",
+    install_command = "make LUA=$(LUA) prefix=$(PREFIX) install",
     copy_directories = {},
   },
 }

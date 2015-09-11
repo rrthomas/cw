@@ -1,4 +1,4 @@
-# Top-level Makefile.in
+# Top-level Makefile
 #
 # Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
 #
@@ -17,24 +17,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-PACKAGE=@PACKAGE_NAME@
-VERSION=@PACKAGE_VERSION@
+PACKAGE=cw
+VERSION=2.0.5
 
-LUA=@LUA@
-MKDIR_P=@MKDIR_P@
-INSTALL=@INSTALL@
-INSTALL_SCRIPT=@INSTALL_SCRIPT@
-INSTALL_DATA=@INSTALL_DATA@
+LUA ?= lua
+MKDIR_P=/bin/mkdir -p
+INSTALL=/usr/bin/install -c
+INSTALL_SCRIPT=${INSTALL}
+INSTALL_DATA=${INSTALL} -m 644
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-abs_srcdir=@abs_srcdir@
-top_srcdir=@top_srcdir@
-srcdir=@srcdir@
-top_builddir=@top_builddir@
-bindir=@bindir@
-mandir=@mandir@
-pkglibexecdir=@libexecdir@/$(PACKAGE)
+prefix ?= /usr/local
+exec_prefix=${prefix}
+top_srcdir=.
+srcdir=.
+top_builddir=.
+bindir=${exec_prefix}/bin
+mandir=${prefix}/share/man
+pkglibexecdir=${exec_prefix}/libexec/$(PACKAGE)
 
 bin_SCRIPTS = cw cw-definitions-path $(top_srcdir)/script/*
 man_MANS = $(PACKAGE).1
@@ -65,7 +64,7 @@ $(top_builddir)/$(PACKAGE)-definitions-path: $(PACKAGE)-definitions-path.lua Mak
 	chmod +x $@
 	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ && false )
 
-$(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.in config.status
+$(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile config.status
 	rm -f $@ $@.tmp
 	$(edit) $(srcdir)/$(PACKAGE).1.in >$@.tmp
 	mv $@.tmp $@
@@ -93,5 +92,5 @@ tag-release:
 
 release: rockspecs
 	$(MAKE) tag-release && \
-	LUAROCKS_CONFIG=$(abs_srcdir)/luarocks-config.lua luarocks --tree=$(abs_srcdir)/luarocks build $(PACKAGE)-$(VERSION)-1.rockspec && \
+	LUAROCKS_CONFIG=`pwd`/luarocks-config.lua luarocks --tree=`pwd`/luarocks build $(PACKAGE)-$(VERSION)-1.rockspec && \
 	woger luarocks package=$(PACKAGE) version=$(VERSION)
