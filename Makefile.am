@@ -40,14 +40,14 @@ $(top_builddir)/$(PACKAGE): $(PACKAGE).lua Makefile
 	$(edit) '$@.lua' >$@.tmp
 	mv $@.tmp $@
 	chmod +x $@
-	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
+	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ && false )
 
 $(top_builddir)/$(PACKAGE)-definitions-path: $(PACKAGE)-definitions-path.lua Makefile
 	rm -f $@ $@.tmp
 	$(edit) '$@.lua' >$@.tmp
 	mv $@.tmp $@
 	chmod +x $@
-	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ )
+	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ && false )
 
 $(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile.am config.status
 	rm -f $@ $@.tmp
