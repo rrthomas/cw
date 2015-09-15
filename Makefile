@@ -21,10 +21,6 @@ PACKAGE=cw
 VERSION=2.0.5
 
 LUA ?= lua
-MKDIR_P=/bin/mkdir -p
-INSTALL=/usr/bin/install -c
-INSTALL_SCRIPT=${INSTALL}
-INSTALL_DATA=${INSTALL} -m 644
 
 prefix ?= /usr/local
 exec_prefix=${prefix}
@@ -79,12 +75,13 @@ $(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile
 	mv $@.tmp $@
 
 install:
-	$(MKDIR_P) $(bindir)
-	$(MKDIR_P) $(pkglibexecdir)
-	$(MKDIR_P) $(mandir)/man1
-	$(INSTALL_SCRIPT) $(pkglibexec_SCRIPTS) $(pkglibexecdir)
-	$(INSTALL_SCRIPT) $(bin_SCRIPTS) $(bindir)
-	$(INSTALL_DATA) $(man_MANS) $(mandir)/man1
+	mkdir -p $(bindir) $(pkglibexecdir) $(mandir)/man1
+	cp $(pkglibexec_SCRIPTS) $(pkglibexecdir)
+	chmod 755 $(pkglibexecdir)/*
+	cp $(bin_SCRIPTS) $(bindir)
+	chmod 755 $(bindir)/*
+	cp $(man_MANS) $(mandir)/man1
+	chmod 644 $(mandir)/man1/*
 
 clean:
 	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path
