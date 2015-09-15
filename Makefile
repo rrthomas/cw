@@ -62,7 +62,7 @@ install:
 	chmod 644 $(mandir)/man1/*
 
 clean:
-	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path
+	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path $(man_MANS)
 
 rockspecs:
 	rm -f *.rockspec
