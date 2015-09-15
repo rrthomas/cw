@@ -91,8 +91,9 @@ clean:
 
 rockspecs:
 	rm -f *.rockspec
-	$(LUA) mkrockspecs.lua $(PACKAGE) $(VERSION)
-	$(LUA) mkrockspecs.lua $(PACKAGE) git
+	for v in $(VERSION) git; do \
+		$(LUA) mkrockspecs.lua $(PACKAGE) $$v; \
+	done
 
 tag-release:
 	git diff --exit-code && \
