@@ -25,8 +25,6 @@ LUA ?= lua
 prefix ?= /usr/local
 exec_prefix=${prefix}
 top_srcdir=.
-srcdir=.
-top_builddir=.
 bindir=${exec_prefix}/bin
 mandir=${prefix}/share/man
 pkglibexecdir=${exec_prefix}/libexec/$(PACKAGE)
@@ -47,31 +45,11 @@ edit = sed \
 	-e 's|@LUA[@]|$(LUA)|g' \
 	-e 's|@PACKAGE[@]|$(PACKAGE)|g' \
 	-e 's|@VERSION[@]|$(VERSION)|g' \
-	-e 's|@abs_srcdir[@]|$(abs_srcdir)|g' \
 	-e 's|@pkglibexecdir[@]|$(pkglibexecdir)|g'
 
-$(top_builddir)/$(PACKAGE): $(PACKAGE).in Makefile
+%: %.in Makefile
 	rm -f $@ $@.tmp
 	$(edit) '$@.in' >$@.tmp
-	mv $@.tmp $@
-	chmod +x $@
-	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ && false )
-
-$(top_builddir)/$(PACKAGE)-definitions-path: $(PACKAGE)-definitions-path.in Makefile
-	rm -f $@ $@.tmp
-	$(edit) '$@.in' >$@.tmp
-	mv $@.tmp $@
-	chmod +x $@
-	$(LUA) $@ --version >/dev/null || ( cat $@ && rm $@ && false )
-
-$(top_builddir)/luarocks-config.lua: luarocks-config.lua.in Makefile
-	rm -f $@ $@.tmp
-	$(edit) '$@.lua.in' >$@.tmp
-	mv $@.tmp $@
-
-$(PACKAGE).1: $(srcdir)/$(PACKAGE).1.in Makefile
-	rm -f $@ $@.tmp
-	$(edit) $(srcdir)/$(PACKAGE).1.in >$@.tmp
 	mv $@.tmp $@
 
 install:
