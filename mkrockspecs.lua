@@ -16,7 +16,11 @@ function format (x, indent)
     local s = "{\n"
     for i, v in pairs (x) do
       if type (i) ~= "number" then
-        s = s..indent..i.." = "..format (v, indent.."  ")..",\n"
+        local key = i
+        if type (key) == "string" and not key:match("^[%w_]+$") then
+          key = "["..format (key).."]"
+        end
+        s = s..indent..key.." = "..format (v, indent.."  ")..",\n"
       end
     end
     for i, v in ipairs (x) do
