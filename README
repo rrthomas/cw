@@ -17,8 +17,11 @@ and assigned colors.  The arguments to the original program and OS
 under which it is running can be tested.  cw includes over 50
 definition scripts, and it's easy to write more.
 
-cw is distributed under the GNU General Public License version 3, or,
-at your option, any later version.
+cw is distributed under the GNU General Public License version 3, or, at
+your option, any later version.  This is free software: you are free to
+change and redistribute it.  There is NO warranty, to the extent permitted
+by law.
+
 
 
 Installation
