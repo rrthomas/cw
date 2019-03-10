@@ -53,13 +53,10 @@ edit = sed \
 	mv $@.tmp $@
 
 install:
-	mkdir -p $(bindir) $(pkglibexecdir) $(mandir)/man1
-	cp $(pkglibexec_SCRIPTS) $(pkglibexecdir)
-	chmod 755 $(pkglibexecdir)/*
-	cp $(bin_SCRIPTS) $(bindir)
-	chmod 755 $(bindir)/*
-	cp $(man_MANS) $(mandir)/man1
-	chmod 644 $(mandir)/man1/*
+	install -d $(mandir)/man1 $(pkglibexecdir) $(bindir)
+	install -m 0644 $(man_MANS) $(mandir)/man1
+	install $(pkglibexec_SCRIPTS) $(pkglibexecdir)
+	install $(bin_SCRIPTS) $(bindir)
 
 clean:
 	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path $(man_MANS)
