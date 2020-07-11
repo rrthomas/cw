@@ -25,7 +25,7 @@ spec = [[
 
 Usage: cw [OPTION]... [FILE]...
 
-Not for direct use (see cw(1)).
+cw is not meant to be run directly! (See documentation.)
 
 Options:
 
