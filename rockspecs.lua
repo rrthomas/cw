@@ -23,9 +23,9 @@ local default = {
     license = "GPL",
   },
   dependencies = {
-    "lua >= 5.2, < 5.4",
-    "stdlib ~> 41.2",
-    "luaposix >= 33.3.1, < 33.4",
+    "lua >= 5.2",
+    "stdlib >= 41.2",
+    "luaposix >= 33.3.1",
     "ansicolors >= 1.0.2",
     "ldoc",
   },
