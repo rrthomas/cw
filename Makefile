@@ -1,6 +1,6 @@
 # Top-level Makefile
 #
-# Copyright (c) 2013-2019 Reuben Thomas <rrt@sc3d.org>
+# Copyright (c) 2013-2020 Reuben Thomas <rrt@sc3d.org>
 #
 # This file is part of cw.
 #
@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE=cw
-VERSION=2.0.6
+VERSION=2.0.7
 
 LUA ?= lua
 
