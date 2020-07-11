@@ -22,8 +22,8 @@
 -- along with cw; see the file COPYING.  If not, see
 -- <http://www.gnu.org/licenses/>. */
 
-local std = require "std".barrel ()
 local posix = require "posix"
+local std = require "std".barrel ()
 
 local pfd = posix.popen_pipeline ({{"luarocks", "list", "cw"}, {"grep", "(installed)"}}, "r")
 local h = posix.fdopen (pfd.fd, "r")
