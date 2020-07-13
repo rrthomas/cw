@@ -1,7 +1,7 @@
 #!@LUA@
 -- cw (color wrapper) -*- lua -*-
 --
--- Copyright (c) 2013-2015 Reuben Thomas <rrt@sc3d.org>
+-- Copyright (c) 2013-2020 Reuben Thomas <rrt@sc3d.org>
 --
 -- This file is part of cw.
 --
@@ -109,9 +109,10 @@ end
 local scrname = arg[1]
 local OptionParser = require "std.optparse"
 local parser = OptionParser (spec)
-_G.arg, opts = parser:parse (_G.arg)
 if not scrname then
   parser:help ()
+elseif scrname:sub (1, 1) == "-" then
+  _G.arg, _ = parser:parse (_G.arg)
 end
 arg[0] = nil
 std.table.remove (arg, 1)
