@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE=cw
-VERSION=2.0.7
+VERSION=2.0.8
 
 LUA ?= lua
 
