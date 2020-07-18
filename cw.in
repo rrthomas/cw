@@ -107,7 +107,7 @@ end
 
 -- Parse command-line arguments
 local scrname = arg[1]
-local OptionParser = require "std.optparse"
+local OptionParser = require "optparse"
 local parser = OptionParser (spec)
 if not scrname then
   parser:help ()
