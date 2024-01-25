@@ -1,5 +1,12 @@
 (! = major, * = minor)
 
+version 2.0.9:
+* Remove man page, and put documentation in README.md
+* Update Lua libraries used.
+
+version 2.0.6:
+* Remove use of autoconf, just use a Makefile. 
+
 version 2.0.0:
 ! Complete rewrite: the program was rewritten in Lua, and the build
   system now uses GNU autotools.

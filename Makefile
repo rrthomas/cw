@@ -1,6 +1,6 @@
 # Top-level Makefile
 #
-# Copyright (c) 2013-2020 Reuben Thomas <rrt@sc3d.org>
+# Copyright (c) 2013-2024 Reuben Thomas <rrt@sc3d.org>
 #
 # This file is part of cw.
 #
@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE=cw
-VERSION=2.0.8
+VERSION=2.0.9
 
 LUA ?= lua
 
@@ -30,10 +30,9 @@ mandir=${prefix}/share/man
 pkglibexecdir=${exec_prefix}/libexec/$(PACKAGE)
 
 bin_SCRIPTS = cw cw-definitions-path $(top_srcdir)/script/*
-man_MANS = $(PACKAGE).1
 pkglibexec_SCRIPTS = $(basename $(wildcard def/*.lua))
 
-all: $(bin_SCRIPTS) $(man_MANS) $(pkglibexec_SCRIPTS)
+all: $(bin_SCRIPTS) $(pkglibexec_SCRIPTS)
 
 $(pkglibexec_SCRIPTS): Makefile
 
@@ -53,13 +52,12 @@ edit = sed \
 	mv $@.tmp $@
 
 install:
-	install -d $(mandir)/man1 $(pkglibexecdir) $(bindir)
-	install -m 0644 $(man_MANS) $(mandir)/man1
+	install -d $(pkglibexecdir) $(bindir)
 	install $(pkglibexec_SCRIPTS) $(pkglibexecdir)
 	install $(bin_SCRIPTS) $(bindir)
 
 clean:
-	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path $(man_MANS)
+	rm -f $(pkglibexec_SCRIPTS) $(PACKAGE) $(PACKAGE)-definitions-path
 
 rockspecs:
 	rm -f *.rockspec

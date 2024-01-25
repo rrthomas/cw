@@ -2,10 +2,8 @@
 /*.rockspec
 /cw
 /cw-definitions-path
-/cw.1
 /cw-*.tar.gz
 /cw-*.src.rock
 /luarocks
 /luarocks-config.lua
 /release-notes
-/TAGS
