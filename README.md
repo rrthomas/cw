@@ -96,7 +96,7 @@ variables) and the following extra features:
   See “Classes and colors” below for an explanation of classes, and
   [the Lua manual][2] for the syntax of patterns.
 
-[2]: https://www.lua.org/manual/5.1/manual.html#5.4.1
+[2]: https://www.lua.org/manual/5.4/manual.html#6.4.1
 
 * `arg` A list of command-line arguments to the program being colored.  For
   convenience, each argument is also a key in the table, so it is easy to
